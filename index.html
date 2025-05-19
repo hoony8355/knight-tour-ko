@@ -63,41 +63,12 @@
   </style>
 </head>
 <body>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
-    authDomain: "knight-tour-ranking.firebaseapp.com",
-    databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "knight-tour-ranking",
-    storageBucket: "knight-tour-ranking.firebasestorage.app",
-    messagingSenderId: "1073626351852",
-    appId: "1:1073626351852:web:41ae6cb7db759beb703dc9",
-    measurementId: "G-D2P9PJ00JT"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-  <head>
-  <!-- head 생략 (이미 반영됨) -->
-</head>
-<body>
-  <body>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
   <label>닉네임: <input type="text" id="playerName" placeholder="이름 입력" /></label>
   <br><br>
-  <label>보드 크기 선택: 
+  <label>보드 크기 선택:
     <select id="sizeSelect">
       <option value="5">5x5</option>
       <option value="6">6x6</option>
@@ -105,18 +76,37 @@
       <option value="8" selected>8x8</option>
     </select>
   </label>
+
   <div id="status">시작할 칸을 클릭하세요.</div>
   <div id="timer">경과 시간: <span id="timeElapsed">0</span>초</div>
+
   <table id="board"></table>
-  <button id="resetBtn">🔄 다시 시작</button>
+
+  <div style="margin-top: 1em;">
+    <button id="resetBtn">🔄 다시 시작</button>
+    <button id="undoBtn">↩️ 되돌리기</button>
+  </div>
 
   <h2>🏆 글로벌 랭킹</h2>
   <ol id="rankingList"></ol>
+
+  <div id="utterances-container" style="margin-top: 2em;">
+    <h2>💬 댓글</h2>
+    <script src="https://utteranc.es/client.js"
+            repo="hoony8355/knight-tour-comments"
+            issue-term="pathname"
+            label="comment"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+  </div>
 
   <script>
     const boardEl = document.getElementById('board');
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
+    const undoBtn = document.getElementById('undoBtn');
     const sizeSelect = document.getElementById('sizeSelect');
     const playerNameEl = document.getElementById('playerName');
     const timerEl = document.getElementById('timeElapsed');
@@ -125,6 +115,7 @@
     let board = [], current = null, moveCount = 0;
     let size = parseInt(sizeSelect.value);
     let startTime = null, timerInterval = null;
+    let moveHistory = [];
 
     const knightMoves = [
       [2, 1], [1, 2], [-1, 2], [-2, 1],
@@ -175,6 +166,7 @@
         }
       }
 
+      moveHistory.push(current);
       square.el.textContent = ++moveCount;
       square.visited = true;
       if (current) board[current.y][current.x].el.classList.remove('current');
@@ -193,10 +185,25 @@
       }
     }
 
+    function undoMove() {
+      if (moveCount === 0 || moveHistory.length === 0) return;
+      const { x, y } = current;
+      board[y][x].visited = false;
+      board[y][x].el.textContent = '';
+      board[y][x].el.classList.remove('current');
+      current = moveHistory.pop();
+      if (current) board[current.y][current.x].el.classList.add('current');
+      moveCount--;
+      statusEl.textContent = `되돌림 → 이동 수: ${moveCount} / ${size * size}`;
+      clearHints();
+      if (current) showHints(current.x, current.y);
+    }
+
     function createBoard() {
       size = parseInt(sizeSelect.value);
       boardEl.innerHTML = '';
       board = [];
+      moveHistory = [];
       for (let y = 0; y < size; y++) {
         const row = [];
         const tr = document.createElement('tr');
@@ -246,6 +253,7 @@
     }
 
     resetBtn.addEventListener('click', createBoard);
+    undoBtn.addEventListener('click', undoMove);
     sizeSelect.addEventListener('change', createBoard);
     window.addEventListener('load', createBoard);
   </script>
