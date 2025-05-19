@@ -16,41 +16,6 @@
   <meta name="twitter:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험" />
   <meta name="twitter:description" content="기사의 여행을 나이트로 체험해보고, 데블스플랜 시즌2의 주인공처럼 도전해보세요!" />
   <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "기사의 여행 퍼즐 게임",
-    "url": "https://hoony8355.github.io/knight-tour-ko/",
-    "inLanguage": "ko",
-    "description": "넷플릭스 데블스플랜 시즌2에 등장한 기사의 여행 퍼즐을 직접 플레이해보세요.",
-    "keywords": "기사의 여행, 데블스플랜 시즌2, 체스 퍼즐, 나이트 퍼즐"
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "기사의 여행 퍼즐이란 무엇인가요?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "기사의 여행은 체스판에서 기사(knight)가 모든 칸을 정확히 한 번씩 방문하는 퍼즐입니다. 체스 기사 특유의 L자 이동 규칙을 따릅니다."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "넷플릭스 데블스플랜 시즌2에 등장한 퍼즐이 맞나요?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "네, 데블스플랜 시즌2에서는 실제로 참가자들이 기사 퍼즐을 제한 시간 내에 해결하는 미션을 수행했습니다."
-        }
-      }
-    ]
-  }
-  </script>
   <style>
     body { font-family: sans-serif; background: #fff; color: #333; text-align: center; padding: 1em; }
     h1 { font-size: 1.8em; margin-bottom: 0.5em; }
@@ -65,9 +30,11 @@
     #resetBtn, #sizeSelect { margin-top: 1em; padding: 0.5em 1em; font: inherit; cursor: pointer; }
     #comments { max-width: 600px; margin: 2em auto; text-align: left; }
     #comments h3 { margin-bottom: 0.5em; }
-    #commentInput { width: 100%; padding: 0.5em; margin-bottom: 0.5em; }
+    #commentName, #commentInput { width: 100%; padding: 0.5em; margin-bottom: 0.5em; }
     #commentList { list-style: none; padding: 0; }
     #commentList li { padding: 0.5em; border-bottom: 1px solid #ddd; }
+    .comment-meta { font-size: 0.9em; color: #666; }
+    .comment-body { margin-top: 0.3em; }
   </style>
 </head>
 <body>
@@ -96,7 +63,8 @@
 
   <div id="comments">
     <h3>💬 사용자 댓글</h3>
-    <textarea id="commentInput" rows="3" placeholder="여기에 댓글을 작성하세요..."></textarea><br />
+    <input id="commentName" type="text" placeholder="이름을 입력하세요" />
+    <textarea id="commentInput" rows="3" placeholder="댓글을 작성하세요..."></textarea><br />
     <button onclick="addComment()">댓글 작성</button>
     <ul id="commentList"></ul>
   </div>
@@ -188,15 +156,22 @@
     createBoard();
 
     function addComment() {
-      const input = document.getElementById('commentInput');
+      const name = document.getElementById('commentName').value.trim();
+      const text = document.getElementById('commentInput').value.trim();
       const list = document.getElementById('commentList');
-      const text = input.value.trim();
-      if (text) {
-        const li = document.createElement('li');
-        li.textContent = text;
-        list.appendChild(li);
-        input.value = '';
-      }
+      if (!name || !text) return alert('이름과 댓글을 모두 입력해주세요.');
+      const li = document.createElement('li');
+      const meta = document.createElement('div');
+      meta.className = 'comment-meta';
+      meta.textContent = `${name} · ${new Date().toLocaleString()}`;
+      const body = document.createElement('div');
+      body.className = 'comment-body';
+      body.textContent = text;
+      li.appendChild(meta);
+      li.appendChild(body);
+      list.appendChild(li);
+      document.getElementById('commentName').value = '';
+      document.getElementById('commentInput').value = '';
     }
   </script>
 </body>
