@@ -87,6 +87,10 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+  <head>
+  <!-- head 생략 (이미 반영됨) -->
+</head>
+<body>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
@@ -205,23 +209,31 @@
     }
 
     function saveRanking(name, seconds) {
-      const dbPath = window.dbRef(window.db, "rankings");
+      const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
       window.dbPush(dbPath, {
         name,
         time: seconds,
-        size: `${size}x${size}`,
+        createdAt: Date.now()
+      });
+    }x${size}`,
         createdAt: Date.now()
       });
     }
 
     function renderRanking() {
-      const dbPath = window.dbRef(window.db, "rankings");
+      const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
       const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
 
       window.dbGet(q).then(snapshot => {
         rankingList.innerHTML = "";
         snapshot.forEach((child, index) => {
           const { name, time } = child.val();
+          const li = document.createElement("li");
+          li.textContent = `${index + 1}. ${name} - ${time}초`;
+          rankingList.appendChild(li);
+        });
+      });
+    } = child.val();
           const li = document.createElement("li");
           li.textContent = `${index + 1}. ${name} - ${time}초`;
           rankingList.appendChild(li);
