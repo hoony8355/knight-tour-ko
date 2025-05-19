@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험</title>
+  <meta name="description" content="넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐, 기사의 여행을 직접 체험해보세요. 나이트로 모든 칸을 한 번씩만 방문하세요!" />
+  <link rel="canonical" href="https://yourdomain.github.io/knight-tour-ko" />
+  <meta property="og:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 퍼즐" />
+  <meta property="og:description" content="넷플릭스 데블스플랜 시즌2에서 화제가 된 기사의 여행 퍼즐을 지금 직접 풀어보세요!" />
+  <meta property="og:url" content="https://yourdomain.github.io/knight-tour-ko" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
+  <meta property="og:image:alt" content="기사의 여행 체스 퍼즐 이미지" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험" />
+  <meta name="twitter:description" content="기사의 여행을 나이트로 체험해보고, 데블스플랜 시즌2의 주인공처럼 도전해보세요!" />
+  <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "기사의 여행 퍼즐 게임",
+    "url": "https://yourdomain.github.io/knight-tour-ko",
+    "inLanguage": "ko",
+    "description": "넷플릭스 데블스플랜 시즌2에 등장한 기사의 여행 퍼즐을 직접 플레이해보세요.",
+    "keywords": "기사의 여행, 데블스플랜 시즌2, 체스 퍼즐, 나이트 퍼즐"
+  }
+  </script>
+  <style>
+    body { font-family: sans-serif; background: #fff; color: #333; text-align: center; padding: 1em; }
+    h1 { font-size: 1.8em; margin-bottom: 0.5em; }
+    table { margin: auto; border-collapse: collapse; }
+    td { width: 45px; height: 45px; text-align: center; vertical-align: middle; font-weight: bold; }
+    .light { background: #f0d9b5; }
+    .dark { background: #b58863; color: white; }
+    .current { outline: 3px solid orange; }
+    #status { margin-top: 1em; font-weight: bold; }
+    #resetBtn { margin-top: 1em; padding: 0.5em 1em; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>기사의 여행 퍼즐 🧩</h1>
+  <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>
+  체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
+  <div id="status">시작할 칸을 클릭하세요.</div>
+  <table id="board"></table>
+  <button id="resetBtn">🔄 다시 시작</button>
+
+  <script>
+    const boardEl = document.getElementById('board');
+    const statusEl = document.getElementById('status');
+    const resetBtn = document.getElementById('resetBtn');
+    const size = 8;
+    let board = [], current = null, moveCount = 0;
+
+    const knightMoves = [
+      [2, 1], [1, 2], [-1, 2], [-2, 1],
+      [-2, -1], [-1, -2], [1, -2], [2, -1]
+    ];
+
+    function createBoard() {
+      boardEl.innerHTML = '';
+      board = [];
+      for (let y = 0; y < size; y++) {
+        const row = [];
+        const tr = document.createElement('tr');
+        for (let x = 0; x < size; x++) {
+          const td = document.createElement('td');
+          td.dataset.x = x;
+          td.dataset.y = y;
+          td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+          td.addEventListener('click', onClick);
+          tr.appendChild(td);
+          row.push({ el: td, visited: false });
+        }
+        board.push(row);
+        boardEl.appendChild(tr);
+      }
+      moveCount = 0;
+      current = null;
+      statusEl.textContent = '시작할 칸을 클릭하세요.';
+    }
+
+    function onClick(e) {
+      const x = +e.target.dataset.x;
+      const y = +e.target.dataset.y;
+      const square = board[y][x];
+      if (square.visited) return;
+
+      if (current) {
+        const dx = Math.abs(x - current.x);
+        const dy = Math.abs(y - current.y);
+        if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) {
+          statusEl.textContent = '❌ 나이트는 L자 형태로만 이동할 수 있어요!';
+          return;
+        }
+      }
+
+      square.el.textContent = ++moveCount;
+      square.visited = true;
+      if (current) board[current.y][current.x].el.classList.remove('current');
+      square.el.classList.add('current');
+      current = { x, y };
+
+      if (moveCount === size * size) {
+        statusEl.textContent = '🎉 축하합니다! 기사의 여행을 완주했어요!';
+      } else {
+        statusEl.textContent = `현재 이동 수: ${moveCount} / 64`;
+      }
+    }
+
+    resetBtn.addEventListener('click', createBoard);
+    createBoard();
+  </script>
+</body>
+</html>
