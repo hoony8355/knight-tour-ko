@@ -63,6 +63,30 @@
   </style>
 </head>
 <body>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
+    authDomain: "knight-tour-ranking.firebaseapp.com",
+    databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "knight-tour-ranking",
+    storageBucket: "knight-tour-ranking.firebasestorage.app",
+    messagingSenderId: "1073626351852",
+    appId: "1:1073626351852:web:41ae6cb7db759beb703dc9",
+    measurementId: "G-D2P9PJ00JT"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
 
