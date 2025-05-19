@@ -88,60 +88,46 @@
   const analytics = getAnalytics(app);
 </script>
   <h1>기사의 여행 퍼즐 🧩</h1>
-  <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
+  <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
-  <div id="timer">⏱️ 소요 시간: <span id="timeElapsed">0초</span></div>
-
-  <label for="sizeSelect">보드 크기 선택: </label>
-  <select id="sizeSelect">
-    <option value="5">5x5</option>
-    <option value="6">6x6</option>
-    <option value="7">7x7</option>
-    <option value="8" selected>8x8</option>
-  </select>
+  <label>닉네임: <input type="text" id="playerName" placeholder="이름 입력" /></label>
   <div id="status">시작할 칸을 클릭하세요.</div>
+  <div id="timer">경과 시간: <span id="timeElapsed">0</span>초</div>
   <table id="board"></table>
   <button id="resetBtn">🔄 다시 시작</button>
 
-  <div class="sns-share">
-    <p><strong>퍼즐 재밌게 즐기셨나요? 공유해보세요!</strong></p>
-    <a href="https://www.facebook.com/sharer/sharer.php?u=https://hoony8355.github.io/knight-tour-ko/" target="_blank">📘 Facebook</a>
-    <a href="https://twitter.com/intent/tweet?text=기사의 여행 퍼즐 도전!&url=https://hoony8355.github.io/knight-tour-ko/" target="_blank">🐦 Twitter</a>
-    <a href="https://share.kakao.com/?url=https://hoony8355.github.io/knight-tour-ko/" target="_blank">🟡 Kakao</a>
-  </div>
-
-  <div id="ranking">
-    <h3>🏆 베스트 기록</h3>
-    <ol id="rankingList"></ol>
-  </div>
-
-  <div id="utterances-container">
-    <h2>💬 공개 댓글</h2>
-    <script src="https://utteranc.es/client.js"
-            repo="hoony8355/knight-tour-comments"
-            issue-term="pathname"
-            label="comment"
-            theme="github-light"
-            crossorigin="anonymous"
-            async>
-    </script>
-  </div>
+  <h2>🏆 글로벌 랭킹</h2>
+  <ol id="rankingList"></ol>
 
   <script>
     const boardEl = document.getElementById('board');
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
-    const sizeSelect = document.getElementById('sizeSelect');
+    const playerNameEl = document.getElementById('playerName');
     const timerEl = document.getElementById('timeElapsed');
     const rankingList = document.getElementById('rankingList');
-    let size = parseInt(sizeSelect.value);
+
     let board = [], current = null, moveCount = 0;
+    let size = 8;
     let startTime = null, timerInterval = null;
 
     const knightMoves = [
       [2, 1], [1, 2], [-1, 2], [-2, 1],
       [-2, -1], [-1, -2], [1, -2], [2, -1]
     ];
+
+    function startTimer() {
+      startTime = Date.now();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        timerEl.textContent = seconds;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
 
     function clearHints() {
       document.querySelectorAll('.hint').forEach(el => el.classList.remove('hint'));
@@ -155,66 +141,6 @@
           board[ny][nx].el.classList.add('hint');
         }
       });
-    }
-
-    function updateTimer() {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      timerEl.textContent = `${elapsed}초`;
-    }
-
-    function startTimer() {
-      startTime = Date.now();
-      clearInterval(timerInterval);
-      timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    function stopTimer() {
-      clearInterval(timerInterval);
-    }
-
-    function saveRanking(seconds) {
-      const scores = JSON.parse(localStorage.getItem('knightRanking') || '[]');
-      scores.push(seconds);
-      scores.sort((a, b) => a - b);
-      localStorage.setItem('knightRanking', JSON.stringify(scores.slice(0, 5)));
-      renderRanking();
-    }
-
-    function renderRanking() {
-      const scores = JSON.parse(localStorage.getItem('knightRanking') || '[]');
-      rankingList.innerHTML = '';
-      scores.forEach((s, i) => {
-        const li = document.createElement('li');
-        li.textContent = `${i + 1}. ${s}초`;
-        rankingList.appendChild(li);
-      });
-    }
-
-    function createBoard() {
-      size = parseInt(sizeSelect.value);
-      boardEl.innerHTML = '';
-      board = [];
-      for (let y = 0; y < size; y++) {
-        const row = [];
-        const tr = document.createElement('tr');
-        for (let x = 0; x < size; x++) {
-          const td = document.createElement('td');
-          td.dataset.x = x;
-          td.dataset.y = y;
-          td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
-          td.addEventListener('click', onClick);
-          tr.appendChild(td);
-          row.push({ el: td, visited: false });
-        }
-        board.push(row);
-        boardEl.appendChild(tr);
-      }
-      moveCount = 0;
-      current = null;
-      clearHints();
-      statusEl.textContent = '시작할 칸을 클릭하세요.';
-      timerEl.textContent = '0초';
-      stopTimer();
     }
 
     function onClick(e) {
@@ -245,17 +171,69 @@
       if (moveCount === size * size) {
         stopTimer();
         const timeUsed = Math.floor((Date.now() - startTime) / 1000);
-        statusEl.textContent = `🎉 축하합니다! ${timeUsed}초만에 완주했어요!`;
-        saveRanking(timeUsed);
+        statusEl.textContent = `🎉 ${timeUsed}초만에 완주!`;
+        saveRanking(playerNameEl.value || '익명', timeUsed);
       } else {
         statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
       }
     }
 
+    function createBoard() {
+      boardEl.innerHTML = '';
+      board = [];
+      for (let y = 0; y < size; y++) {
+        const row = [];
+        const tr = document.createElement('tr');
+        for (let x = 0; x < size; x++) {
+          const td = document.createElement('td');
+          td.dataset.x = x;
+          td.dataset.y = y;
+          td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+          td.addEventListener('click', onClick);
+          tr.appendChild(td);
+          row.push({ el: td, visited: false });
+        }
+        board.push(row);
+        boardEl.appendChild(tr);
+      }
+      moveCount = 0;
+      current = null;
+      clearHints();
+      statusEl.textContent = '시작할 칸을 클릭하세요.';
+      timerEl.textContent = '0';
+      stopTimer();
+    }
+
+    function saveRanking(name, seconds) {
+      const dbPath = window.dbRef(window.db, "rankings");
+      window.dbPush(dbPath, {
+        name,
+        time: seconds,
+        size: `${size}x${size}`,
+        createdAt: Date.now()
+      });
+    }
+
+    function renderRanking() {
+      const dbPath = window.dbRef(window.db, "rankings");
+      const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+
+      window.dbGet(q).then(snapshot => {
+        rankingList.innerHTML = "";
+        snapshot.forEach((child, index) => {
+          const { name, time } = child.val();
+          const li = document.createElement("li");
+          li.textContent = `${index + 1}. ${name} - ${time}초`;
+          rankingList.appendChild(li);
+        });
+      });
+    }
+
     resetBtn.addEventListener('click', createBoard);
-    sizeSelect.addEventListener('change', createBoard);
-    createBoard();
-    renderRanking();
+    window.addEventListener('load', () => {
+      createBoard();
+      renderRanking();
+    });
   </script>
 </body>
 </html>
