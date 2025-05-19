@@ -91,10 +91,20 @@
   <!-- head 생략 (이미 반영됨) -->
 </head>
 <body>
+  <body>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
   <label>닉네임: <input type="text" id="playerName" placeholder="이름 입력" /></label>
+  <br><br>
+  <label>보드 크기 선택: 
+    <select id="sizeSelect">
+      <option value="5">5x5</option>
+      <option value="6">6x6</option>
+      <option value="7">7x7</option>
+      <option value="8" selected>8x8</option>
+    </select>
+  </label>
   <div id="status">시작할 칸을 클릭하세요.</div>
   <div id="timer">경과 시간: <span id="timeElapsed">0</span>초</div>
   <table id="board"></table>
@@ -107,12 +117,13 @@
     const boardEl = document.getElementById('board');
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
+    const sizeSelect = document.getElementById('sizeSelect');
     const playerNameEl = document.getElementById('playerName');
     const timerEl = document.getElementById('timeElapsed');
     const rankingList = document.getElementById('rankingList');
 
     let board = [], current = null, moveCount = 0;
-    let size = 8;
+    let size = parseInt(sizeSelect.value);
     let startTime = null, timerInterval = null;
 
     const knightMoves = [
@@ -183,6 +194,7 @@
     }
 
     function createBoard() {
+      size = parseInt(sizeSelect.value);
       boardEl.innerHTML = '';
       board = [];
       for (let y = 0; y < size; y++) {
@@ -206,6 +218,7 @@
       statusEl.textContent = '시작할 칸을 클릭하세요.';
       timerEl.textContent = '0';
       stopTimer();
+      renderRanking();
     }
 
     function saveRanking(name, seconds) {
@@ -213,9 +226,6 @@
       window.dbPush(dbPath, {
         name,
         time: seconds,
-        createdAt: Date.now()
-      });
-    }x${size}`,
         createdAt: Date.now()
       });
     }
@@ -233,19 +243,11 @@
           rankingList.appendChild(li);
         });
       });
-    } = child.val();
-          const li = document.createElement("li");
-          li.textContent = `${index + 1}. ${name} - ${time}초`;
-          rankingList.appendChild(li);
-        });
-      });
     }
 
     resetBtn.addEventListener('click', createBoard);
-    window.addEventListener('load', () => {
-      createBoard();
-      renderRanking();
-    });
+    sizeSelect.addEventListener('change', createBoard);
+    window.addEventListener('load', createBoard);
   </script>
 </body>
 </html>
