@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta name="google-site-verification" content="RNqJmCaI831T3albJcCH4w0RE5zu2LOvZsY6tXM65Cc" />
-  <meta name="naver-site-verification" content="a4f0c6db7970cfb8b26027fba9aca4375471cb77" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험</title>
   <meta name="description" content="넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐, 기사의 여행을 직접 체험해보세요. 나이트로 모든 칸을 한 번씩만 방문하세요!" />
-  <link rel="canonical" href="https://yourdomain.github.io/knight-tour-ko" />
+  <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/" />
   <meta property="og:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 퍼즐" />
   <meta property="og:description" content="넷플릭스 데블스플랜 시즌2에서 화제가 된 기사의 여행 퍼즐을 지금 직접 풀어보세요!" />
-  <meta property="og:url" content="https://yourdomain.github.io/knight-tour-ko" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
   <meta property="og:image:alt" content="기사의 여행 체스 퍼즐 이미지" />
@@ -23,7 +21,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "기사의 여행 퍼즐 게임",
-    "url": "https://yourdomain.github.io/knight-tour-ko",
+    "url": "https://hoony8355.github.io/knight-tour-ko/",
     "inLanguage": "ko",
     "description": "넷플릭스 데블스플랜 시즌2에 등장한 기사의 여행 퍼즐을 직접 플레이해보세요.",
     "keywords": "기사의 여행, 데블스플랜 시즌2, 체스 퍼즐, 나이트 퍼즐"
@@ -39,12 +37,21 @@
     .current { outline: 3px solid orange; }
     #status { margin-top: 1em; font-weight: bold; }
     #resetBtn, #sizeSelect { margin-top: 1em; padding: 0.5em 1em; font: inherit; cursor: pointer; }
+    #comments { max-width: 600px; margin: 2em auto; text-align: left; }
+    #comments h3 { margin-bottom: 0.5em; }
+    #commentInput { width: 100%; padding: 0.5em; margin-bottom: 0.5em; }
+    #commentList { list-style: none; padding: 0; }
+    #commentList li { padding: 0.5em; border-bottom: 1px solid #ddd; }
   </style>
 </head>
 <body>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>
   체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
+
+  <p><a href="https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89" target="_blank" rel="noopener noreferrer">기사의 여행 위키백과 보기</a> | 
+     <a href="https://www.netflix.com/title/81671487" target="_blank" rel="noopener noreferrer">데블스플랜 시즌2 넷플릭스 바로가기</a></p>
+
   <label for="sizeSelect">보드 크기 선택: </label>
   <select id="sizeSelect">
     <option value="5">5x5</option>
@@ -55,6 +62,13 @@
   <div id="status">시작할 칸을 클릭하세요.</div>
   <table id="board"></table>
   <button id="resetBtn">🔄 다시 시작</button>
+
+  <div id="comments">
+    <h3>💬 사용자 댓글</h3>
+    <textarea id="commentInput" rows="3" placeholder="여기에 댓글을 작성하세요..."></textarea><br />
+    <button onclick="addComment()">댓글 작성</button>
+    <ul id="commentList"></ul>
+  </div>
 
   <script>
     const boardEl = document.getElementById('board');
@@ -124,6 +138,19 @@
     resetBtn.addEventListener('click', createBoard);
     sizeSelect.addEventListener('change', createBoard);
     createBoard();
+
+    // 댓글 기능
+    function addComment() {
+      const input = document.getElementById('commentInput');
+      const list = document.getElementById('commentList');
+      const text = input.value.trim();
+      if (text) {
+        const li = document.createElement('li');
+        li.textContent = text;
+        list.appendChild(li);
+        input.value = '';
+      }
+    }
   </script>
 </body>
 </html>
