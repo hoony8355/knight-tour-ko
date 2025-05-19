@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
   <title>기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험</title>
   <meta name="description" content="넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐, 기사의 여행을 직접 체험해보세요. 나이트로 모든 칸을 한 번씩만 방문하세요!" />
   <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/" />
@@ -18,86 +17,56 @@
   <meta name="twitter:description" content="기사의 여행을 나이트로 체험해보고, 데블스플랜 시즌2의 주인공처럼 도전해보세요!" />
   <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
   <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "기사의 여행 퍼즐 게임",
-  "url": "https://hoony8355.github.io/knight-tour-ko/",
-  "inLanguage": "ko",
-  "description": "넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 웹에서 체험해보세요. 퍼즐을 풀며 두뇌 회전을 자극하세요.",
-  "keywords": ["기사의 여행", "기사 퍼즐", "체스 퍼즐", "데블스플랜 시즌2", "넷플릭스 퍼즐", "나이트 투어", "knight tour puzzle"],
-  "breadcrumb": {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "홈",
-        "item": "https://hoony8355.github.io/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "기사의 여행 퍼즐",
-        "item": "https://hoony8355.github.io/knight-tour-ko/"
-      }
-    ]
-  }
-}
-</script>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
     {
-      "@type": "Question",
-      "name": "기사의 여행 퍼즐이란 무엇인가요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "기사의 여행은 체스판 위에서 나이트가 모든 칸을 단 한 번씩만 방문해야 하는 퍼즐입니다. 기사(knight)의 L자 이동 특성으로 인해 난이도가 높은 논리 퍼즐입니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "데블스플랜 시즌2에 나왔던 퍼즐이 맞나요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "네, 넷플릭스 예능 프로그램 '데블스플랜 시즌2'에 실제로 등장한 퍼즐이며, 참가자들이 제한 시간 안에 해결해야 했던 미션 중 하나입니다."
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "기사의 여행 퍼즐 게임",
+      "url": "https://hoony8355.github.io/knight-tour-ko/",
+      "inLanguage": "ko",
+      "description": "넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 웹에서 체험해보세요.",
+      "keywords": ["기사의 여행", "체스 퍼즐", "나이트 퍼즐", "데블스플랜 시즌2", "knight tour"],
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "홈", "item": "https://hoony8355.github.io/"},
+          {"@type": "ListItem", "position": 2, "name": "기사의 여행 퍼즐", "item": "https://hoony8355.github.io/knight-tour-ko/"}
+        ]
       }
     }
-  ]
-}
-</script>
-
+  </script>
   <style>
     body { font-family: sans-serif; background: #fff; color: #333; text-align: center; padding: 1em; }
     h1 { font-size: 1.8em; margin-bottom: 0.5em; }
     h2 { font-size: 1.4em; margin-top: 2em; }
     table { margin: auto; border-collapse: collapse; }
-    td { width: 45px; height: 45px; text-align: center; vertical-align: middle; font-weight: bold; }
+    td {
+      width: 45px; height: 45px; text-align: center; vertical-align: middle; font-weight: bold;
+      opacity: 0; animation: fadeIn 0.3s ease-in forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
     .light { background: #f0d9b5; }
     .dark { background: #b58863; color: white; }
     .current { outline: 3px solid orange; }
     .hint { box-shadow: inset 0 0 0 3px limegreen; }
     #status { margin-top: 1em; font-weight: bold; }
+    #timer { margin-top: 0.5em; font-size: 1em; color: #666; }
     #resetBtn, #sizeSelect { margin-top: 1em; padding: 0.5em 1em; font: inherit; cursor: pointer; }
-    #comments { max-width: 700px; margin: 3em auto; text-align: left; }
+    #utterances-container { max-width: 700px; margin: 3em auto; text-align: left; }
+    .sns-share { margin: 2em auto; font-size: 1em; }
+    .sns-share a { margin: 0 0.5em; text-decoration: none; font-weight: bold; }
+    #ranking { max-width: 500px; margin: 2em auto; text-align: left; border-top: 1px solid #ccc; padding-top: 1em; }
+    #ranking h3 { margin-bottom: 0.5em; }
+    #ranking ol { padding-left: 1em; }
   </style>
 </head>
 <body>
   <h1>기사의 여행 퍼즐 🧩</h1>
-  <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>
-  체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
+  <p>넷플릭스 <strong>데블스플랜 시즌2</strong>에 등장한 퍼즐, <strong>기사의 여행</strong>을 체험해보세요!<br>체스판에서 나이트가 모든 칸을 단 한 번씩만 방문하면 성공입니다.</p>
 
-  <p><a href="https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89" target="_blank" rel="noopener noreferrer">기사의 여행 위키백과 보기</a> | 
-     <a href="https://www.netflix.com/title/81671487" target="_blank" rel="noopener noreferrer">데블스플랜 시즌2 넷플릭스 바로가기</a></p>
-
-  <section>
-    <h2>기사의 여행이란?</h2>
-    <p>‘기사의 여행’은 체스판 위에서 기사(knight)가 모든 칸을 한 번씩만 방문하는 경로를 찾는 고전 퍼즐입니다. 기사 특유의 L자 이동 방식으로 인해 쉬워 보이지만, 실제로는 매우 복잡한 수학적 퍼즐이기도 합니다.</p>
-  </section>
+  <div id="timer">⏱️ 소요 시간: <span id="timeElapsed">0초</span></div>
 
   <label for="sizeSelect">보드 크기 선택: </label>
   <select id="sizeSelect">
@@ -110,8 +79,20 @@
   <table id="board"></table>
   <button id="resetBtn">🔄 다시 시작</button>
 
-  <div id="comments">
-    <h3>💬 사용자 댓글 (GitHub 로그인 필요)</h3>
+  <div class="sns-share">
+    <p><strong>퍼즐 재밌게 즐기셨나요? 공유해보세요!</strong></p>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://hoony8355.github.io/knight-tour-ko/" target="_blank">📘 Facebook</a>
+    <a href="https://twitter.com/intent/tweet?text=기사의 여행 퍼즐 도전!&url=https://hoony8355.github.io/knight-tour-ko/" target="_blank">🐦 Twitter</a>
+    <a href="https://share.kakao.com/?url=https://hoony8355.github.io/knight-tour-ko/" target="_blank">🟡 Kakao</a>
+  </div>
+
+  <div id="ranking">
+    <h3>🏆 베스트 기록</h3>
+    <ol id="rankingList"></ol>
+  </div>
+
+  <div id="utterances-container">
+    <h2>💬 공개 댓글</h2>
     <script src="https://utteranc.es/client.js"
             repo="hoony8355/knight-tour-comments"
             issue-term="pathname"
@@ -127,8 +108,11 @@
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
     const sizeSelect = document.getElementById('sizeSelect');
+    const timerEl = document.getElementById('timeElapsed');
+    const rankingList = document.getElementById('rankingList');
     let size = parseInt(sizeSelect.value);
     let board = [], current = null, moveCount = 0;
+    let startTime = null, timerInterval = null;
 
     const knightMoves = [
       [2, 1], [1, 2], [-1, 2], [-2, 1],
@@ -146,6 +130,39 @@
         if (nx >= 0 && nx < size && ny >= 0 && ny < size && !board[ny][nx].visited) {
           board[ny][nx].el.classList.add('hint');
         }
+      });
+    }
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timerEl.textContent = `${elapsed}초`;
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function saveRanking(seconds) {
+      const scores = JSON.parse(localStorage.getItem('knightRanking') || '[]');
+      scores.push(seconds);
+      scores.sort((a, b) => a - b);
+      localStorage.setItem('knightRanking', JSON.stringify(scores.slice(0, 5)));
+      renderRanking();
+    }
+
+    function renderRanking() {
+      const scores = JSON.parse(localStorage.getItem('knightRanking') || '[]');
+      rankingList.innerHTML = '';
+      scores.forEach((s, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${i + 1}. ${s}초`;
+        rankingList.appendChild(li);
       });
     }
 
@@ -172,6 +189,8 @@
       current = null;
       clearHints();
       statusEl.textContent = '시작할 칸을 클릭하세요.';
+      timerEl.textContent = '0초';
+      stopTimer();
     }
 
     function onClick(e) {
@@ -179,6 +198,8 @@
       const y = +e.target.dataset.y;
       const square = board[y][x];
       if (square.visited) return;
+
+      if (!current) startTimer();
 
       if (current) {
         const dx = Math.abs(x - current.x);
@@ -198,7 +219,10 @@
       showHints(x, y);
 
       if (moveCount === size * size) {
-        statusEl.textContent = '🎉 축하합니다! 기사의 여행을 완주했어요!';
+        stopTimer();
+        const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+        statusEl.textContent = `🎉 축하합니다! ${timeUsed}초만에 완주했어요!`;
+        saveRanking(timeUsed);
       } else {
         statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
       }
@@ -207,6 +231,7 @@
     resetBtn.addEventListener('click', createBoard);
     sizeSelect.addEventListener('change', createBoard);
     createBoard();
+    renderRanking();
   </script>
 </body>
 </html>
