@@ -35,6 +35,7 @@
     .light { background: #f0d9b5; }
     .dark { background: #b58863; color: white; }
     .current { outline: 3px solid orange; }
+    .hint { box-shadow: inset 0 0 0 3px limegreen; }
     #status { margin-top: 1em; font-weight: bold; }
     #resetBtn, #sizeSelect { margin-top: 1em; padding: 0.5em 1em; font: inherit; cursor: pointer; }
     #comments { max-width: 600px; margin: 2em auto; text-align: left; }
@@ -83,6 +84,20 @@
       [-2, -1], [-1, -2], [1, -2], [2, -1]
     ];
 
+    function clearHints() {
+      document.querySelectorAll('.hint').forEach(el => el.classList.remove('hint'));
+    }
+
+    function showHints(x, y) {
+      clearHints();
+      knightMoves.forEach(([dx, dy]) => {
+        const nx = x + dx, ny = y + dy;
+        if (nx >= 0 && nx < size && ny >= 0 && ny < size && !board[ny][nx].visited) {
+          board[ny][nx].el.classList.add('hint');
+        }
+      });
+    }
+
     function createBoard() {
       size = parseInt(sizeSelect.value);
       boardEl.innerHTML = '';
@@ -104,6 +119,7 @@
       }
       moveCount = 0;
       current = null;
+      clearHints();
       statusEl.textContent = '시작할 칸을 클릭하세요.';
     }
 
@@ -127,6 +143,8 @@
       if (current) board[current.y][current.x].el.classList.remove('current');
       square.el.classList.add('current');
       current = { x, y };
+      clearHints();
+      showHints(x, y);
 
       if (moveCount === size * size) {
         statusEl.textContent = '🎉 축하합니다! 기사의 여행을 완주했어요!';
@@ -139,7 +157,6 @@
     sizeSelect.addEventListener('change', createBoard);
     createBoard();
 
-    // 댓글 기능
     function addComment() {
       const input = document.getElementById('commentInput');
       const list = document.getElementById('commentList');
