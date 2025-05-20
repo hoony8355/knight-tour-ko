@@ -40,10 +40,11 @@ function startTimer() {
   startTime = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    const seconds = Math.floor((Date.now() - startTime) / 1000);
+    const seconds = ((Date.now() - startTime) / 1000).toFixed(2); // 🎯
     timerEl.textContent = seconds;
-  }, 1000);
+  }, 100);
 }
+
 
 function stopTimer() {
   clearInterval(timerInterval);
