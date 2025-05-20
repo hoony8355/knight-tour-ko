@@ -1,8 +1,10 @@
 // Kakao SDK 초기화
-if (window.Kakao && !Kakao.isInitialized()) {
-  Kakao.init("34b8e213c2ab2805f24550b665c764d6");
-  console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
-}
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.Kakao && !Kakao.isInitialized()) {
+    Kakao.init("34b8e213c2ab2805f24550b665c764d6");
+    console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
+  }
+});
 
 function getShareText(seconds) {
   return `🧩 '기사의 여행 퍼즐' 클리어! 저는 ${seconds}초 걸렸어요!\n지금 도전해보세요!`;
@@ -52,6 +54,7 @@ function copyLink() {
     .catch(() => alert("❌ 복사 실패! 브라우저를 확인해주세요."));
 }
 
+// ✅ 카카오 공유 기능
 function shareKakao() {
   const seconds = document.getElementById("resultMessage")?.dataset?.seconds || 0;
   const shareText = getShareText(seconds);
