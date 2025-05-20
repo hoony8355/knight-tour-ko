@@ -66,8 +66,6 @@
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
-  <label>닉네임: <input type="text" id="playerName" placeholder="이름 입력" /></label>
-  <br><br>
   <label>보드 크기 선택:
     <select id="sizeSelect">
       <option value="5">5x5</option>
@@ -108,7 +106,6 @@
     const resetBtn = document.getElementById('resetBtn');
     const undoBtn = document.getElementById('undoBtn');
     const sizeSelect = document.getElementById('sizeSelect');
-    const playerNameEl = document.getElementById('playerName');
     const timerEl = document.getElementById('timeElapsed');
     const rankingList = document.getElementById('rankingList');
 
@@ -178,8 +175,7 @@
       if (moveCount === size * size) {
         stopTimer();
         const timeUsed = Math.floor((Date.now() - startTime) / 1000);
-        statusEl.textContent = `🎉 ${timeUsed}초만에 완주!`;
-        saveRanking(playerNameEl.value || '익명', timeUsed);
+        estimateAndRegisterRanking(timeUsed);
       } else {
         statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
       }
@@ -226,6 +222,23 @@
       timerEl.textContent = '0';
       stopTimer();
       renderRanking();
+    }
+
+    function estimateAndRegisterRanking(seconds) {
+      const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
+      const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+
+      window.dbGet(q).then(snapshot => {
+        const list = [];
+        snapshot.forEach(child => list.push(child.val()));
+        const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10 ? list.length + 1 : null);
+        let msg = `🎉 ${seconds}초만에 퍼즐 완주!
+`;
+        msg += rank ? `예상 랭킹: ${rank}위\n` : `현재 랭킹권에는 들지 못했어요 😢\n`;
+        const name = prompt(msg + "닉네임을 입력해주세요:");
+        if (name && name.trim()) saveRanking(name.trim(), seconds);
+        renderRanking();
+      });
     }
 
     function saveRanking(name, seconds) {
