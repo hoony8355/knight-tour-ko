@@ -7,6 +7,10 @@ const timerEl = document.getElementById('timeElapsed');
 const rankingList = document.getElementById('rankingList');
 const confettiCanvas = document.getElementById('confetti');
 const darkToggle = document.getElementById('darkToggle');
+const resultModal = document.getElementById('resultModal');
+const resultMessage = document.getElementById('resultMessage');
+const nicknameInput = document.getElementById('nicknameInput');
+const submitScoreBtn = document.getElementById('submitScoreBtn');
 
 let board = [], current = null, moveCount = 0;
 let size = parseInt(sizeSelect.value);
@@ -148,20 +152,27 @@ function createBoard() {
 
 function estimateAndRegisterRanking(seconds) {
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
-  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000)); // 🔁 10,000위까지
 
   window.dbGet(q).then(snapshot => {
     const list = [];
     snapshot.forEach(child => list.push(child.val()));
-    const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10 ? list.length + 1 : null);
-    let msg = `🎉 ${seconds}초만에 퍼즐 완주!\n`;
-    msg += rank ? `예상 랭킹: ${rank}위\n` : `현재 랭킹권에는 들지 못했어요 😢\n`;
-    let name = localStorage.getItem("knightName") || prompt(msg + "닉네임을 입력해주세요:");
-    if (name && name.trim()) {
-      localStorage.setItem("knightName", name.trim());
-      saveRanking(name.trim(), seconds);
-    }
-    renderRanking();
+    const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
+
+    resultMessage.textContent = `⏱ ${seconds}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '현재 랭킹 밖이에요 😢'}`;
+    resultModal.style.display = 'block';
+
+    submitScoreBtn.onclick = () => {
+      const name = nicknameInput.value.trim();
+      if (!name) {
+        alert("닉네임을 입력해주세요!");
+        return;
+      }
+      localStorage.setItem("knightName", name);
+      saveRanking(name, seconds);
+      resultModal.style.display = 'none';
+      renderRanking();
+    };
   });
 }
 
