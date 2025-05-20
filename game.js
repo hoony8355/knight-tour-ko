@@ -90,15 +90,17 @@ function onClick(e) {
   showHints(x, y);
 
   if (moveCount === size * size) {
-    stopTimer();
-    const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
-    console.log("🏁 퍼즐 클리어!", seconds);
-    fireConfetti(() => {
-      estimateAndRegisterRanking(seconds);
-    });
-  } else {
-    statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
-  }
+  stopTimer();
+  const seconds = Math.floor((Date.now() - startTime) / 1000);
+  console.log("🏁 퍼즐 클리어!", seconds);
+  fireConfetti(() => {
+    estimateAndRegisterRanking(seconds);
+  });
+} else {
+  console.log(`🔍 moveCount: ${moveCount}, size*size: ${size * size}`);
+  statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
+}
+
 }
 
 function fireConfetti(onComplete) {
