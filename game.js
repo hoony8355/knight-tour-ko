@@ -233,13 +233,13 @@ function renderRanking() {
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
   window.dbGet(q).then(snapshot => {
     rankingList.innerHTML = "";
-    let index = 0;
+    let index = 1; // 수동 인덱스 시작
     snapshot.forEach(child => {
       const { name, time } = child.val();
       const li = document.createElement("li");
-      index++;
-      li.textContent = `${index}. ${name} - ${time}초`;
+      li.textContent = `${index}. ${name || "익명"} - ${time}초`;
       rankingList.appendChild(li);
+      index++; // 순위 수동 증가
     });
   });
 }
