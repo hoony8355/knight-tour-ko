@@ -1,3 +1,5 @@
+// game.js
+
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
 const resetBtn = document.getElementById('resetBtn');
@@ -7,8 +9,8 @@ const timerEl = document.getElementById('timeElapsed');
 const rankingList = document.getElementById('rankingList');
 const confettiCanvas = document.getElementById('confetti');
 const darkToggle = document.getElementById('darkToggle');
+const hintBtn = document.getElementById('hintBtn');
 
-// 팝업 관련 요소
 const resultModal = document.getElementById('resultModal');
 const resultMessage = document.getElementById('resultMessage');
 const nicknameInput = document.getElementById('nicknameInput');
@@ -18,6 +20,8 @@ let board = [], current = null, moveCount = 0;
 let size = parseInt(sizeSelect.value);
 let startTime = null, timerInterval = null;
 let moveHistory = [];
+
+const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
 
 if (localStorage.theme === 'dark') {
   document.documentElement.style.setProperty('--bg', '#111');
@@ -32,7 +36,6 @@ darkToggle.onclick = () => {
 };
 
 function startTimer() {
-  console.log("⏱ 타이머 시작됨");
   startTime = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -43,11 +46,10 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
-  console.log("🛑 타이머 중단됨");
 }
 
 function clearHints() {
-  document.querySelectorAll('.hint').forEach(el => el.classList.remove('hint'));
+  document.querySelectorAll('.hint, .hint-best').forEach(el => el.classList.remove('hint', 'hint-best'));
 }
 
 function showHints(x, y) {
@@ -60,20 +62,40 @@ function showHints(x, y) {
   });
 }
 
-const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
+function showBestHint() {
+  if (!current) return;
+  clearHints();
+  const { x, y } = current;
+  const options = [];
+
+  knightMoves.forEach(([dx, dy]) => {
+    const nx = x + dx, ny = y + dy;
+    if (nx >= 0 && nx < size && ny >= 0 && ny < size && !board[ny][nx].visited) {
+      let degree = 0;
+      knightMoves.forEach(([dx2, dy2]) => {
+        const nnx = nx + dx2, nny = ny + dy2;
+        if (nnx >= 0 && nnx < size && nny >= 0 && nny < size && !board[nny][nnx].visited) {
+          degree++;
+        }
+      });
+      options.push({ x: nx, y: ny, degree });
+    }
+  });
+
+  if (options.length === 0) return;
+  options.sort((a, b) => a.degree - b.degree);
+  const best = options[0];
+  board[best.y][best.x].el.classList.add('hint-best');
+  setTimeout(() => board[best.y][best.x].el.classList.remove('hint-best'), 3000);
+}
 
 function onClick(e) {
-  console.log("📌 클릭됨");
   const x = +e.target.dataset.x;
   const y = +e.target.dataset.y;
   const square = board[y][x];
-
   if (square.visited) return;
 
-  if (!current && moveCount === 0) {
-    startTimer();
-  }
-
+  if (!current) startTimer();
   if (current) {
     const dx = Math.abs(x - current.x), dy = Math.abs(y - current.y);
     if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) {
@@ -93,39 +115,26 @@ function onClick(e) {
   clearHints();
   showHints(x, y);
 
-  console.log(`🔍 moveCount: ${moveCount} / ${size * size}`);
-
   if (moveCount === size * size) {
-    console.log("🎯 퍼즐 클리어 조건 만족");
     stopTimer();
-    const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
-    fireConfetti(() => {
-      estimateAndRegisterRanking(seconds);
-    });
+    const seconds = Math.floor((Date.now() - startTime) / 1000);
+    fireConfetti();
+    estimateAndRegisterRanking(seconds);
   } else {
     statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
   }
 }
 
-function fireConfetti(onComplete) {
-  console.log("🔥 fireConfetti 실행됨");
+function fireConfetti() {
   confettiCanvas.style.display = 'block';
-  const duration = 2000;
+  const duration = 2 * 1000;
   const end = Date.now() + duration;
   const confettiInstance = confetti.create(confettiCanvas, { resize: true });
-
   (function frame() {
     confettiInstance({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
     confettiInstance({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    } else {
-      confettiCanvas.style.display = 'none';
-      console.log("🎊 fireConfetti 종료됨");
-      if (typeof onComplete === 'function') {
-        onComplete();
-      }
-    }
+    if (Date.now() < end) requestAnimationFrame(frame);
+    else confettiCanvas.style.display = 'none';
   })();
 }
 
@@ -144,7 +153,6 @@ function undoMove() {
 }
 
 function createBoard() {
-  console.log("📋 보드 생성 시작");
   size = parseInt(sizeSelect.value);
   boardEl.innerHTML = '';
   board = [];
@@ -174,22 +182,18 @@ function createBoard() {
 }
 
 function estimateAndRegisterRanking(seconds) {
-  console.log("📦 estimateAndRegisterRanking 실행됨", seconds);
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000));
 
   window.dbGet(q).then(snapshot => {
-    console.log("📥 Firebase 데이터 로딩 완료");
     const list = [];
     snapshot.forEach(child => list.push(child.val()));
-    const rankIndex = list.findIndex(item => seconds < item.time);
-  const rank = rankIndex >= 0 ? rankIndex + 1 : (list.length < 10000 ? list.length + 1 : null);
+    const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
 
     resultMessage.textContent = `⏱ ${seconds}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
     resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
     nicknameInput.focus();
-    console.log("🎉 팝업 표시 완료");
   });
 }
 
@@ -202,7 +206,7 @@ function saveRanking(name, seconds) {
   }).then(() => {
     console.log("✅ 랭킹 저장 완료", name, seconds);
   }).catch(err => {
-    console.error("❌ 랭킹 저장 실패", err);
+    console.error("❌ 저장 실패", err);
   });
 }
 
@@ -223,13 +227,9 @@ function renderRanking() {
 resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
 sizeSelect.addEventListener('change', createBoard);
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("🔁 DOMContentLoaded → 보드 생성");
-  createBoard();
-});
+window.addEventListener('load', createBoard);
+hintBtn.addEventListener('click', showBestHint);
 
-document.addEventListener("DOMContentLoaded", () => {
-  const submitScoreBtn = document.getElementById('submitScoreBtn');
 submitScoreBtn.addEventListener("click", () => {
   const name = nicknameInput.value.trim();
   const seconds = parseInt(resultMessage.dataset.seconds, 10);
@@ -242,5 +242,4 @@ submitScoreBtn.addEventListener("click", () => {
   saveRanking(name, seconds);
   resultModal.style.display = 'none';
   renderRanking();
-});
 });
