@@ -51,6 +51,28 @@
 
   <link rel="stylesheet" href="style.css" />
   <link rel="search" type="application/opensearchdescription+xml" title="기사의 여행 퍼즐" href="/opensearch.xml" />
+
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: #fff;
+      padding: 2em;
+      margin: 15% auto;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <button id="darkToggle">🌙</button>
