@@ -23,22 +23,59 @@
 
   <!-- Structured Data -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Game",
-    "name": "기사의 여행 퍼즐 게임",
-    "url": "https://hoony8355.github.io/knight-tour-ko/",
-    "image": "https://hoony8355.github.io/knight-tour-ko/Frame165.png",
-    "description": "데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 플레이하고 나이트 퍼즐의 도전을 즐겨보세요.",
-    "genre": ["퍼즐", "두뇌 게임", "체스"],
-    "inLanguage": "ko",
-    "sameAs": [
-      "https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89",
-      "https://www.netflix.com/kr/title/81688109",
-      "https://en.wikipedia.org/wiki/Knight%27s_tour"
-    ]
-  }
-  </script>
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Game",
+      "name": "기사의 여행",
+      "description": "넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 웹에서 직접 체험해보세요. 나이트를 움직여 퍼즐을 풀고, 전 세계 유저들과 랭킹을 겨뤄보세요.",
+      "url": "https://hoony8355.github.io/knight-tour-ko/",
+      "inLanguage": "ko",
+      "genre": ["퍼즐", "체스", "두뇌 게임"],
+      "author": {
+        "@type": "Person",
+        "name": "김광훈"
+      },
+      "image": "https://hoony8355.github.io/knight-tour-ko/Frame165.png",
+      "operatingSystem": "Web",
+      "applicationCategory": "Game",
+      "isAccessibleForFree": true
+    },
+    {
+      "@type": "GameAction",
+      "name": "기사의 여행 플레이",
+      "actionStatus": "CompletedActionStatus",
+      "object": {
+        "@type": "Game",
+        "name": "기사의 여행"
+      },
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://hoony8355.github.io/knight-tour-ko/",
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform"
+        ]
+      }
+    },
+    {
+      "@type": "Leaderboard",
+      "name": "기사의 여행 글로벌 랭킹",
+      "description": "기사의 여행 퍼즐을 클리어한 전 세계 유저들이 도전한 시간 기록 랭킹입니다.",
+      "game": {
+        "@type": "Game",
+        "name": "기사의 여행"
+      },
+      "inLanguage": "ko",
+      "playerType": "Person",
+      "entryRequirements": "닉네임을 입력하면 자동 등록됩니다.",
+      "url": "https://hoony8355.github.io/knight-tour-ko/"
+    }
+  ]
+}
+</script>
+
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H78FYYLN2B"></script>
