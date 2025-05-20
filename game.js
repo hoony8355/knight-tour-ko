@@ -233,14 +233,17 @@ function renderRanking() {
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
   window.dbGet(q).then(snapshot => {
     rankingList.innerHTML = "";
-    snapshot.forEach((child, index) => {
+    let index = 0;
+    snapshot.forEach(child => {
       const { name, time } = child.val();
       const li = document.createElement("li");
-      li.textContent = `${index + 1}. ${name} - ${time}초`;
+      index++;
+      li.textContent = `${index}. ${name} - ${time}초`;
       rankingList.appendChild(li);
     });
   });
 }
+
 
 resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
