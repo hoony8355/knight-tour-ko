@@ -224,10 +224,21 @@ function saveRanking(name, seconds) {
 }
 
 function renderRanking() {
+  const rankingList = document.getElementById("rankingList");
+  if (!rankingList) return;
+
+  const size = parseInt(document.getElementById("sizeSelect")?.value || "8");
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+
   window.dbGet(q).then(snapshot => {
     rankingList.innerHTML = "";
+
+    if (!snapshot.exists()) {
+      rankingList.innerHTML = "<li>아직 랭킹 정보가 없습니다.</li>";
+      return;
+    }
+
     let index = 1;
     snapshot.forEach(child => {
       const { name, time } = child.val();
@@ -236,6 +247,9 @@ function renderRanking() {
       rankingList.appendChild(li);
       index++;
     });
+  }).catch(err => {
+    console.error("❌ 랭킹 로딩 실패:", err);
+    rankingList.innerHTML = "<li>랭킹을 불러올 수 없습니다.</li>";
   });
 }
 
