@@ -23,17 +23,18 @@ let moveHistory = [];
 
 const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
 
-if (localStorage.theme === 'dark') {
-  document.documentElement.style.setProperty('--bg', '#111');
-  document.documentElement.style.setProperty('--fg', '#eee');
+function applyTheme() {
+  const isDark = localStorage.theme === 'dark';
+  document.body.classList.toggle('dark-mode', isDark);
 }
 
 darkToggle.onclick = () => {
   const dark = localStorage.theme !== 'dark';
   localStorage.theme = dark ? 'dark' : 'light';
-  document.documentElement.style.setProperty('--bg', dark ? '#111' : '#fff');
-  document.documentElement.style.setProperty('--fg', dark ? '#eee' : '#000');
+  applyTheme();
 };
+
+window.addEventListener('DOMContentLoaded', applyTheme);
 
 function startTimer() {
   startTime = Date.now();
