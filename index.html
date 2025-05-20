@@ -134,11 +134,12 @@
   </div>
 
   <script src="game.js"></script>
-  <script src="share.js"></script>
+  
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
         integrity="sha384-xrF/y+KZjAxt3z07X8zQn3I0zVbCKIym92ApO0H6rIq0h1OMlz6Dx9aXigJHwNkm"
         crossorigin="anonymous"></script>
   <script>
+  <script src="share.js"></script>
     // Web Share API 미지원 시 버튼 숨기기
     if (!navigator.share) {
       document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
