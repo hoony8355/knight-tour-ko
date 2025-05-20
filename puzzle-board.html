@@ -6,16 +6,24 @@
   <title>게시된 퍼즐 목록</title>
   <link rel="stylesheet" href="/knight-tour-ko/style.css">
   <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
+  <script src="/knight-tour-ko/game.js"></script>
+  <style>
+    .puzzle-preview {
+      display: none;
+      margin-top: 1em;
+      padding-top: 1em;
+      border-top: 1px dashed #ccc;
+    }
+  </style>
 </head>
 <body>
   <h1>퍼즐 공지장</h1>
   <p>사용자가 만들어 공개한 퍼즐들을 한 번 해결해 보세요!</p>
 
-  <div id="puzzleList" style="max-width: 600px; margin: 2em auto; text-align: left;"></div>
+  <div id="puzzleList" style="max-width: 800px; margin: 2em auto; text-align: left;"></div>
 
   <script type="module">
     const listEl = document.getElementById('puzzleList');
-
     const db = window.db;
     const dbRef = window.dbRef('puzzlePosts');
     const q = window.dbQuery(dbRef, window.dbOrderByChild('createdAt'));
@@ -27,15 +35,17 @@
       }
 
       const items = [];
-      snapshot.forEach(child => {
+      snapshot.forEach((child, index) => {
         const { title, author, seed, createdAt } = child.val();
         const date = new Date(createdAt).toLocaleString();
-        const url = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
+        const containerId = `puzzle-${index}`;
+
         items.push(`
-          <div class="puzzle-item" style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.3em;">퍼즐: <a href="${url}" target="_blank">${title}</a></h3>
+          <div class="puzzle-item" style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 8px; cursor: pointer;" onclick="togglePuzzle('${containerId}', '${seed}')">
+            <h3 style="margin: 0 0 0.3em;">퍼즐: ${title}</h3>
             <p style="margin: 0.2em 0;">작성자: ${author}</p>
             <p style="margin: 0.2em 0; font-size: 0.9em; color: #666;">게시일: ${date}</p>
+            <div id="${containerId}" class="puzzle-preview"></div>
           </div>
         `);
       });
@@ -45,6 +55,56 @@
       console.error("퍼즐 불러오기 실패", err);
       listEl.innerHTML = '<p style="color:red;">❌ 퍼즐을 불러오는 데 실패했습니다.</p>';
     });
+
+    window.togglePuzzle = function(containerId, seed) {
+      const container = document.getElementById(containerId);
+      if (container.style.display === 'block') {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+
+      // 디코드 및 파싱
+      try {
+        const parsed = JSON.parse(atob(seed));
+        container.style.display = 'block';
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'previewBoard';
+        canvas.width = 45 * parsed.cols;
+        canvas.height = 45 * parsed.rows;
+        canvas.style.border = '1px solid #ccc';
+        container.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+
+        for (let y = 0; y < parsed.rows; y++) {
+          for (let x = 0; x < parsed.cols; x++) {
+            const isBlocked = parsed.blocked.some(([bx, by]) => bx === x && by === y);
+            ctx.fillStyle = (x + y) % 2 === 0 ? '#f0d9b5' : '#b58863';
+            ctx.fillRect(x * 45, y * 45, 45, 45);
+            if (isBlocked) {
+              ctx.fillStyle = 'rgba(0,0,0,0.3)';
+              ctx.fillRect(x * 45, y * 45, 45, 45);
+            }
+          }
+        }
+
+        // 시작 지점 표시
+        if (parsed.start) {
+          ctx.strokeStyle = 'orange';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(parsed.start.x * 45 + 5, parsed.start.y * 45 + 5, 35, 35);
+        }
+
+        const info = document.createElement('div');
+        info.innerHTML = `<p>시작 위치: (${parsed.start.x}, ${parsed.start.y}) | 보드 크기: ${parsed.rows}x${parsed.cols}</p>`;
+        container.appendChild(info);
+
+      } catch (err) {
+        container.innerHTML = '<p style="color:red;">❌ 퍼즐 표시 실패</p>';
+      }
+    }
   </script>
 </body>
 </html>
