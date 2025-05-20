@@ -208,7 +208,7 @@ function estimateAndRegisterRanking(seconds) {
     snapshot.forEach(child => list.push(child.val()));
     const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
 
-    resultMessage.textContent = `⏱ ${seconds}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
+    resultMessage.textContent = `⏱ ${parseFloat(seconds).toFixed(2)}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
     resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
     nicknameInput.focus();
