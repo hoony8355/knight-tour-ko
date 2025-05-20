@@ -82,6 +82,7 @@
   <!-- ✅ 하단 공유 버튼 -->
   <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
     <h3>🔗 퍼즐 공유하기</h3>
+    <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
     <button onclick="shareOnTwitter()">X (트위터)</button>
     <button onclick="shareOnFacebook()">Facebook</button>
     <button onclick="copyLink()">🔗 링크 복사</button>
@@ -123,6 +124,7 @@
       <!-- ✅ 팝업 공유 버튼 -->
       <div id="shareAreaPopup" style="margin-top: 1em;">
         <h3>📣 친구에게 공유해보세요!</h3>
+        <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
         <button onclick="shareOnTwitter()">X 공유</button>
         <button onclick="copyLink()">링크 복사</button>
       </div>
@@ -130,5 +132,12 @@
   </div>
 
   <script src="game.js"></script>
+  <script src="share.js"></script>
+  <script>
+    // Web Share API 미지원 시 버튼 숨기기
+    if (!navigator.share) {
+      document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
+    }
+  </script>
 </body>
 </html>
