@@ -140,32 +140,36 @@ td {
   text-align: center;
 }
 
+/* ✅ 랭킹 리스트 스타일 개선 */
 #ranking ol {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  counter-reset: rank;
+  list-style-position: inside;
+  padding-left: 0;
+  margin-left: 0;
 }
 
+/* ✅ 기존 ::before 제거 (NaN. 방지) */
+#ranking li::before {
+  content: none;
+}
+
+/* ✅ 랭킹 항목 스타일 */
 #ranking li {
   background: #fffaf0;
   border: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  padding: 0.4em;
+  padding: 0.4em 1em;
   margin-bottom: 0.4em;
+  font-size: 1em;
+  text-align: left;
   transition: background 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 body.dark-mode #ranking li {
   background: #1a1a1a;
   border-color: #444;
-}
-
-#ranking li::before {
-  counter-increment: rank;
-  content: counter(rank) ". ";
-  font-weight: bold;
-  margin-right: 0.4em;
 }
 
 .modal {
