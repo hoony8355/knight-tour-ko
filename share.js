@@ -1,7 +1,7 @@
-// ✅ Kakao SDK 초기화는 DOM이 로드된 후 바로 실행
+// ✅ Kakao SDK 초기화
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Kakao && !Kakao.isInitialized()) {
-    Kakao.init("34b8e213c2ab2805f24550b665c764d6");
+    Kakao.init("34b8e213c2ab2805f24550b665c764d6"); // 발급받은 JavaScript 키
     console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
   } else if (!window.Kakao) {
     console.error("❌ Kakao SDK가 로드되지 않았습니다. script 순서를 확인하세요.");
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ✅ 공유 메시지 생성
+// ✅ 공유 텍스트 및 링크 생성
 function getShareText(seconds) {
   return `🧩 '기사의 여행 퍼즐' 클리어! 저는 ${seconds}초 걸렸어요!\n지금 도전해보세요!`;
 }
@@ -19,7 +19,7 @@ function getShareURL() {
   return "https://hoony8355.github.io/knight-tour-ko/";
 }
 
-// ✅ Web Share API
+// ✅ Web Share API (기본 공유)
 function shareNative() {
   const seconds = document.getElementById("resultMessage")?.dataset?.seconds || 0;
   const text = getShareText(seconds);
@@ -40,6 +40,7 @@ function shareNative() {
   }
 }
 
+// ✅ 트위터 공유
 function shareOnTwitter() {
   const seconds = document.getElementById("resultMessage")?.dataset?.seconds || 0;
   const text = encodeURIComponent(getShareText(seconds));
@@ -47,11 +48,13 @@ function shareOnTwitter() {
   window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
 }
 
+// ✅ 페이스북 공유
 function shareOnFacebook() {
   const url = encodeURIComponent(getShareURL());
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
 }
 
+// ✅ 링크 복사
 function copyLink() {
   const url = getShareURL();
   navigator.clipboard.writeText(url)
@@ -59,7 +62,7 @@ function copyLink() {
     .catch(() => alert("❌ 복사 실패! 브라우저를 확인해주세요."));
 }
 
-// ✅ 카카오 공유 기능
+// ✅ 카카오 공유
 function shareKakao() {
   const seconds = document.getElementById("resultMessage")?.dataset?.seconds || 0;
   const shareText = getShareText(seconds);
