@@ -87,17 +87,20 @@ function onClick(e) {
   showHints(x, y);
 
   if (moveCount === size * size) {
-    stopTimer();
-    const seconds = Math.floor((Date.now() - startTime) / 1000);
-    fireConfetti(() => {
-      estimateAndRegisterRanking(seconds);
-    });
+  stopTimer();
+  const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+  console.log("🏁 퍼즐 클리어!", seconds);
+  fireConfetti(() => {
+    estimateAndRegisterRanking(seconds);
+  });
+}
   } else {
     statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
   }
 }
 
 function fireConfetti(onComplete) {
+  console.log("🔥 fireConfetti 실행됨");
   confettiCanvas.style.display = 'block';
   const duration = 2000;
   const end = Date.now() + duration;
@@ -110,10 +113,15 @@ function fireConfetti(onComplete) {
       requestAnimationFrame(frame);
     } else {
       confettiCanvas.style.display = 'none';
-      if (typeof onComplete === 'function') onComplete();
+      console.log("🎯 fireConfetti 종료");
+      if (typeof onComplete === 'function') {
+        console.log("🚀 fireConfetti → onComplete 호출");
+        onComplete(); // estimateAndRegisterRanking 호출
+      }
     }
   })();
 }
+
 
 function undoMove() {
   if (moveCount === 0 || moveHistory.length === 0) return;
@@ -159,10 +167,12 @@ function createBoard() {
 }
 
 function estimateAndRegisterRanking(seconds) {
+  console.log("📦 estimateAndRegisterRanking 실행됨", seconds);
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000));
 
   window.dbGet(q).then(snapshot => {
+    console.log("📥 Firebase 데이터 불러옴");
     const list = [];
     snapshot.forEach(child => list.push(child.val()));
     const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
@@ -171,6 +181,7 @@ function estimateAndRegisterRanking(seconds) {
     resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
     nicknameInput.focus();
+    console.log("🎉 팝업 열림");
   });
 }
 
