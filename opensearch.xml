@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>기사의 여행 퍼즐</ShortName>
+  <Description>기사의 여행 퍼즐 게임을 직접 플레이하고 랭킹에 도전해보세요.</Description>
+  <Url type="text/html" template="https://hoony8355.github.io/knight-tour-ko/?q={searchTerms}" />
+</OpenSearchDescription>
