@@ -6,7 +6,6 @@ function getShareURL() {
   return "https://hoony8355.github.io/knight-tour-ko/";
 }
 
-// ✅ 모바일 + 최신 브라우저 대응
 function shareNative() {
   const seconds = document.getElementById("resultMessage")?.dataset?.seconds || 0;
   const text = getShareText(seconds);
