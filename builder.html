@@ -6,11 +6,14 @@
   <title>커스텀 퍼즐 만들기 - 기사의 여행</title>
   <link rel="stylesheet" href="style.css" />
   <style>
+    body {
+      max-width: 900px;
+      margin: auto;
+    }
     #boardBuilder {
       display: grid;
       gap: 2px;
       margin: 2em auto;
-      max-width: 90vw;
     }
     .builder-cell {
       width: 32px;
@@ -25,6 +28,19 @@
     .builder-cell.start {
       background: orange;
     }
+    .guide-box {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 1em;
+      margin-top: 2em;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 0.95em;
+    }
+    .guide-box ul {
+      margin: 0;
+      padding-left: 1.2em;
+    }
   </style>
   <script type="module" src="firebase-init.js"></script>
 </head>
@@ -33,19 +49,31 @@
   <p>보드 크기와 막힌 칸, 시작 위치를 설정하세요.</p>
 
   <label>행 (Rows): <input type="number" id="rowsInput" value="6" min="3" max="10" /></label>
-  <label>열 (Cols): <input type="number" id="colsInput" value="6" min="3" max="10" /></label>
-  <button onclick="generateBoard()">보드 만들기</button>
+  <label style="margin-left: 1em;">열 (Cols): <input type="number" id="colsInput" value="6" min="3" max="10" /></label>
+  <button style="margin-left: 1em;" onclick="generateBoard()">보드 만들기</button>
 
   <div id="boardBuilder"></div>
 
-  <h3>퍼즐 정보 입력</h3>
-  <input type="text" id="puzzleTitle" placeholder="퍼즐 제목" style="width: 80%; padding: 0.5em;" /><br/>
-  <input type="text" id="authorName" placeholder="작성자 닉네임" style="width: 80%; padding: 0.5em; margin-top: 0.5em;" /><br/>
-  <textarea id="puzzleDesc" placeholder="퍼즐 설명 (선택)" style="width: 80%; height: 60px; margin-top: 0.5em; padding: 0.5em;"></textarea><br/>
+  <div class="guide-box">
+    <strong>📘 사용 방법 안내</strong>
+    <ul>
+      <li>⬛ 셀 클릭 → 막힌 칸 (회색) 전환</li>
+      <li>🟧 첫 클릭 → 시작 위치 설정 (주황색)</li>
+      <li>다시 클릭하면 해제됨</li>
+      <li>시작 위치를 반드시 지정해야 퍼즐 생성 가능</li>
+    </ul>
+  </div>
 
-  <button onclick="generateSeed()">🔗 퍼즐 시드 만들기</button>
-  <button onclick="postPuzzle()">📬 퍼즐 게시하기</button>
-  <p id="seedOutput"></p>
+  <h3 style="margin-top: 2em;">퍼즐 정보 입력</h3>
+  <input type="text" id="puzzleTitle" placeholder="퍼즐 제목" style="width: 100%; padding: 0.5em; margin-bottom: 0.5em;" />
+  <input type="text" id="authorName" placeholder="작성자 닉네임" style="width: 100%; padding: 0.5em; margin-bottom: 0.5em;" />
+  <textarea id="puzzleDesc" placeholder="퍼즐 설명 (선택)" style="width: 100%; height: 60px; padding: 0.5em;"></textarea><br/>
+
+  <div style="margin-top: 1em; display: flex; gap: 1em; justify-content: center;">
+    <button onclick="generateSeed()">🔗 퍼즐 시드 만들기</button>
+    <button onclick="postPuzzle()">📬 퍼즐 게시하기</button>
+  </div>
+  <p id="seedOutput" style="margin-top: 1em; font-size: 0.9em; color: #555;"></p>
 
   <script>
     let currentStart = null;
