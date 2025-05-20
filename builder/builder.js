@@ -71,7 +71,10 @@ function postPuzzle() {
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
   const seedObj = getSeedObject();
-  if (!seedObj || !title || !author) return alert('제목과 닉네임, 시작 위치를 모두 입력하세요');
+  if (!seedObj || !title || !author) {
+    alert('제목, 닉네임, 시작 위치를 입력해주세요');
+    return;
+  }
 
   const data = {
     title,
@@ -81,11 +84,11 @@ function postPuzzle() {
     createdAt: Date.now()
   };
 
-  const dbPath = window.dbRef(window.db, 'puzzlePosts');
+  const dbPath = window.dbRef("puzzlePosts");
   window.dbPush(dbPath, data).then(() => {
-    alert('✅ 퍼즐이 게시되었습니다!');
+    alert("✅ 퍼즐이 게시되었습니다!");
   }).catch(err => {
-    console.error('❌ 퍼즐 게시 실패', err);
-    alert('Firebase 권한 오류로 실패했습니다.');
+    console.error("❌ 퍼즐 게시 실패", err);
+    alert("Firebase 저장 실패. 보안 규칙을 확인해주세요.");
   });
 }
