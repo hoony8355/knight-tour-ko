@@ -140,16 +140,24 @@ td {
   text-align: center;
 }
 
-/* ✅ 랭킹 리스트 스타일 개선 */
 #ranking ol {
-  list-style-position: inside;
+  list-style: none;
   padding-left: 0;
   margin-left: 0;
+  max-width: 320px;  /* 적당한 폭 제한 */
+  margin: 0 auto;
 }
 
-/* ✅ 기존 ::before 제거 (NaN. 방지) */
-#ranking li::before {
-  content: none;
+#ranking li {
+  display: block;              /* flex 제거 */
+  background: #fffaf0;
+  border: 1px solid #e0e0e0;
+  padding: 0.4em 0.8em;
+  margin-bottom: 0.4em;
+  font-size: 0.95em;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border-radius: 6px;
 }
 
 /* ✅ 랭킹 항목 스타일 */
