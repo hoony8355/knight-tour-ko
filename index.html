@@ -4,11 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험</title>
-  <meta name="description" content="넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐, 기사의 여행을 직접 체험해보세요." />
+  <meta name="description" content="넷플릭스 데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 웹에서 직접 체험해보세요. 나이트를 움직여 퍼즐을 풀고, 전 세계 유저들과 랭킹을 겨뤄보세요." />
+  <meta name="keywords" content="기사의 여행, 체스 퍼즐, 나이트 퍼즐, 데블스플랜 퍼즐, 넷플릭스 퍼즐, knight tour puzzle, Netflix Devil's Plan" />
   <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/" />
-  <meta property="og:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 퍼즐" />
-  <meta property="og:description" content="넷플릭스 데블스플랜 시즌2에서 화제가 된 퍼즐을 지금 직접 풀어보세요!" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험" />
+  <meta property="og:description" content="넷플릭스 데블스플랜 시즌2에서 화제가 된 퍼즐 '기사의 여행'을 직접 플레이해보세요!" />
   <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="기사의 여행 퍼즐 게임 - 데블스플랜 시즌2 체험" />
+  <meta name="twitter:description" content="데블스플랜 시즌2의 두뇌 퍼즐 '기사의 여행'을 직접 플레이하고 글로벌 랭킹에 도전해보세요." />
+  <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Game",
+    "name": "기사의 여행 퍼즐 게임",
+    "url": "https://hoony8355.github.io/knight-tour-ko/",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Chess_knight.jpg",
+    "description": "데블스플랜 시즌2에 등장한 체스 퍼즐 '기사의 여행'을 플레이하고 나이트 퍼즐의 도전을 즐겨보세요.",
+    "genre": ["퍼즐", "두뇌 게임", "체스"],
+    "inLanguage": "ko",
+    "sameAs": [
+      "https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89",
+      "https://www.netflix.com/kr/title/81688109",
+      "https://en.wikipedia.org/wiki/Knight%27s_tour"
+    ]
+  }
+  </script>
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -50,12 +81,20 @@
     </script>
   </div>
 
-
+  <!-- 외부 참고 링크 섹션 (SEO 및 사용자 편의용) -->
+  <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
+    <p>🔗 더 알아보기:</p>
+    <ul style="list-style: none; padding: 0;">
+      <li><a href="https://en.wikipedia.org/wiki/Knight%27s_tour" target="_blank">📚 Knight's Tour 위키백과 (영문)</a></li>
+      <li><a href="https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89" target="_blank">📘 기사 여행 위키백과 (한글)</a></li>
+      <li><a href="https://www.netflix.com/kr/title/81688109" target="_blank">🎬 넷플릭스 데블스플랜 시즌2</a></li>
+    </ul>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="firebase-init.js"></script>
-  
-    <!-- ✅ 닉네임 팝업 모달 -->
+
+  <!-- ✅ 닉네임 팝업 모달 -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
       <h2>🎉 클리어 성공!</h2>
@@ -64,6 +103,7 @@
       <button id="submitScoreBtn">등록하기</button>
     </div>
   </div>
+
   <script src="game.js"></script>
 </body>
 </html>
