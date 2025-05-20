@@ -32,6 +32,7 @@ darkToggle.onclick = () => {
 };
 
 function startTimer() {
+  console.log("⏱ 타이머 시작");
   startTime = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -42,6 +43,7 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
+  console.log("🛑 타이머 중지");
 }
 
 function clearHints() {
@@ -66,7 +68,8 @@ function onClick(e) {
   const square = board[y][x];
   if (square.visited) return;
 
-  if (!current) startTimer();
+  if (!current && moveCount === 0) startTimer();
+
   if (current) {
     const dx = Math.abs(x - current.x), dy = Math.abs(y - current.y);
     if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) {
@@ -87,13 +90,12 @@ function onClick(e) {
   showHints(x, y);
 
   if (moveCount === size * size) {
-  stopTimer();
-  const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
-  console.log("🏁 퍼즐 클리어!", seconds);
-  fireConfetti(() => {
-    estimateAndRegisterRanking(seconds);
-  });
-}
+    stopTimer();
+    const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    console.log("🏁 퍼즐 클리어!", seconds);
+    fireConfetti(() => {
+      estimateAndRegisterRanking(seconds);
+    });
   } else {
     statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
   }
@@ -116,12 +118,11 @@ function fireConfetti(onComplete) {
       console.log("🎯 fireConfetti 종료");
       if (typeof onComplete === 'function') {
         console.log("🚀 fireConfetti → onComplete 호출");
-        onComplete(); // estimateAndRegisterRanking 호출
+        onComplete();
       }
     }
   })();
 }
-
 
 function undoMove() {
   if (moveCount === 0 || moveHistory.length === 0) return;
@@ -217,7 +218,6 @@ undoBtn.addEventListener('click', undoMove);
 sizeSelect.addEventListener('change', createBoard);
 window.addEventListener('load', createBoard);
 
-// 모달 등록 이벤트 (한 번만)
 submitScoreBtn.addEventListener("click", () => {
   const name = nicknameInput.value.trim();
   const seconds = parseInt(resultMessage.dataset.seconds, 10);
