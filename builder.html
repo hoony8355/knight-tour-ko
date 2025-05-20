@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      max-width: 600px;
+      max-width: 480px;
       margin: auto;
       padding: 1em;
     }
@@ -15,16 +15,18 @@
       text-align: center;
       margin-bottom: 1em;
     }
+    #boardContainer {
+      display: flex;
+      justify-content: center;
+    }
     #boardBuilder {
-      display: inline-grid;
-      gap: 0;
-      margin: 1em auto;
+      display: grid;
+      gap: 1px;
       border: 2px solid #ccc;
     }
     .builder-cell {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      max-width: 24px;
+      width: 32px;
+      height: 32px;
       background: #fff;
       border: 1px solid #ddd;
       cursor: pointer;
@@ -81,7 +83,7 @@
     <button style="margin-left: 1em;" onclick="generateBoard()">보드 만들기</button>
   </div>
 
-  <div style="text-align: center;">
+  <div id="boardContainer">
     <div id="boardBuilder"></div>
   </div>
 
@@ -116,8 +118,8 @@
       const cols = parseInt(document.getElementById('colsInput').value);
       const board = document.getElementById('boardBuilder');
       board.innerHTML = '';
-      board.style.gridTemplateRows = `repeat(${rows}, auto)`;
-      board.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+      board.style.gridTemplateRows = `repeat(${rows}, 32px)`;
+      board.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
       currentStart = null;
 
       for (let y = 0; y < rows; y++) {
