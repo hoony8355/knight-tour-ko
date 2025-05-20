@@ -16,6 +16,10 @@ const resultMessage = document.getElementById('resultMessage');
 const nicknameInput = document.getElementById('nicknameInput');
 const submitScoreBtn = document.getElementById('submitScoreBtn');
 
+document.getElementById("closeModalBtn").addEventListener("click", () => {
+  document.getElementById("resultModal").style.display = "none";
+});
+
 let board = [], current = null, moveCount = 0;
 let size = parseInt(sizeSelect.value);
 let startTime = null, timerInterval = null;
