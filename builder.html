@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      max-width: 480px;
+      max-width: 640px;
       margin: auto;
       padding: 1em;
     }
@@ -21,12 +21,12 @@
     }
     #boardBuilder {
       display: grid;
-      gap: 1px;
+      gap: 2px;
       border: 2px solid #ccc;
     }
     .builder-cell {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       background: #fff;
       border: 1px solid #ddd;
       cursor: pointer;
@@ -118,8 +118,8 @@
       const cols = parseInt(document.getElementById('colsInput').value);
       const board = document.getElementById('boardBuilder');
       board.innerHTML = '';
-      board.style.gridTemplateRows = `repeat(${rows}, 32px)`;
-      board.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
+      board.style.gridTemplateRows = `repeat(${rows}, 40px)`;
+      board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
       currentStart = null;
 
       for (let y = 0; y < rows; y++) {
