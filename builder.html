@@ -12,12 +12,12 @@
     }
     #boardBuilder {
       display: grid;
-      gap: 2px;
+      gap: 1px;
       margin: 2em auto;
     }
     .builder-cell {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border: 1px solid #ccc;
       background: #fff;
       cursor: pointer;
@@ -83,8 +83,8 @@
       const cols = parseInt(document.getElementById('colsInput').value);
       const board = document.getElementById('boardBuilder');
       board.innerHTML = '';
-      board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-      board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      board.style.gridTemplateRows = `repeat(${rows}, auto)`;
+      board.style.gridTemplateColumns = `repeat(${cols}, auto)`;
       currentStart = null;
 
       for (let y = 0; y < rows; y++) {
@@ -172,7 +172,7 @@
         alert("✅ 퍼즐이 성공적으로 게시되었습니다!");
       }).catch(err => {
         console.error("❌ 퍼즐 게시 실패", err);
-        alert("오류가 발생했습니다. 콘솔을 확인해주세요.");
+        alert("❌ 퍼즐 게시 실패: Firebase 권한 오류. Firestore 보안 규칙 또는 인증 설정을 확인해주세요.");
       });
     }
 
