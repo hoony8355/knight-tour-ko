@@ -269,6 +269,12 @@
     container.style.border = '1px solid #ccc';
     container.style.boxShadow = '0 0 20px rgba(0,0,0,0.3)';
     container.style.zIndex = '10000';
+    container.style.maxWidth = '90vw';
+    container.style.width = '300px';
+    container.style.borderRadius = '0.5rem';
+    container.style.maxHeight = '80vh';
+    container.style.overflowY = 'auto';
+    container.style.boxSizing = 'border-box';
 
     const msg = document.createElement('p');
     msg.textContent = `🎉 ${seconds}초만에 퍼즐 완주!
@@ -296,6 +302,7 @@
     container.appendChild(input);
     container.appendChild(btn);
     document.body.appendChild(container);
+    setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 
     // focus default name if stored
     const stored = localStorage.getItem("knightName");
