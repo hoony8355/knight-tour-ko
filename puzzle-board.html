@@ -1,161 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>게시된 퍼즐 목록</title>
-  <link rel="stylesheet" href="/knight-tour-ko/style.css">
-  <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>퍼즐 게시판 - 기사의 여행</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>퍼즐 공지장</h1>
+  <h1>🧩 퍼즐 공지장</h1>
   <p>사용자가 만들어 공개한 퍼즐들을 한 번 해결해 보세요!</p>
 
-  <div id="puzzleList" style="max-width: 800px; margin: 2em auto; text-align: left;"></div>
+  <div id="postList"></div>
 
-  <script type="module">
-    import {
-      getDatabase, ref, get, query, orderByChild
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+  <!-- Firebase + 렌더링 함수 불러오기 -->
+  <script type="module" src="firebase-init.js"></script>
+  <script type="module" src="game-custom.js"></script>
 
-    const listEl = document.getElementById('puzzleList');
-    const db = window.db;
-    const dbRef = ref(db, 'puzzlePosts');
-    const q = query(dbRef, orderByChild('createdAt'));
-
-    get(q).then(snapshot => {
-      if (!snapshot.exists()) {
-        listEl.innerHTML = '<p>아직 등록된 퍼즐이 없습니다.</p>';
-        return;
-      }
-
-      let index = 0;
-      snapshot.forEach(child => {
-        const { title, author, seed, createdAt } = child.val();
-        const date = new Date(createdAt).toLocaleString();
-        const parsed = JSON.parse(atob(seed));
-        const boxId = `puzzleBox${index}`;
-
-        const container = document.createElement("div");
-        container.className = "puzzle-item";
-        container.style = "border: 1px solid #ccc; padding: 1em; margin-bottom: 2em; border-radius: 8px;";
-        container.innerHTML = `
-          <h3>🧩 ${title}</h3>
-          <p>작성자: ${author} | 게시일: ${date}</p>
-          <div id="${boxId}" style="margin-top:1em"></div>
-        `;
-
-        listEl.prepend(container);
-        createInteractiveBoard(parsed, boxId);
-        index++;
-      });
-    });
-
-    function createInteractiveBoard(data, mountId) {
-      const container = document.getElementById(mountId);
-
-      const table = document.createElement("table");
-      const status = document.createElement("div");
-      const timer = document.createElement("div");
-      const reset = document.createElement("button");
-      const undo = document.createElement("button");
-
-      let board = [], current = null, moveCount = 1, timerStart = null, timerInterval = null, history = [];
-
-      function renderBoard() {
-        table.innerHTML = "";
-        board = [];
-        for (let y = 0; y < data.rows; y++) {
-          const tr = document.createElement("tr");
-          const row = [];
-          for (let x = 0; x < data.cols; x++) {
-            const td = document.createElement("td");
-            td.dataset.x = x;
-            td.dataset.y = y;
-            td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
-            if (data.blocked.some(([bx, by]) => bx === x && by === y)) {
-              td.style.opacity = '0.4';
-              td.textContent = 'X';
-              row.push({ el: td, visited: true });
-            } else {
-              td.addEventListener("click", onClick);
-              row.push({ el: td, visited: false });
-            }
-            tr.appendChild(td);
-          }
-          board.push(row);
-          table.appendChild(tr);
-        }
-        const { x, y } = data.start;
-        board[y][x].visited = true;
-        board[y][x].el.textContent = "1";
-        board[y][x].el.classList.add("current");
-        current = { x, y };
-        startTimer();
-      }
-
-      function onClick(e) {
-        const x = +e.target.dataset.x;
-        const y = +e.target.dataset.y;
-        const dx = Math.abs(x - current.x);
-        const dy = Math.abs(y - current.y);
-        if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) return;
-        if (board[y][x].visited) return;
-
-        history.push(current);
-        board[current.y][current.x].el.classList.remove("current");
-        board[y][x].el.textContent = ++moveCount;
-        board[y][x].el.classList.add("current");
-        board[y][x].visited = true;
-        current = { x, y };
-        status.textContent = `현재 이동 수: ${moveCount}`;
-
-        if (moveCount === data.rows * data.cols - data.blocked.length) {
-          stopTimer();
-          status.textContent = `🎉 클리어 완료! 총 ${timer.textContent}`;
-        }
-      }
-
-      function startTimer() {
-        timerStart = Date.now();
-        timerInterval = setInterval(() => {
-          timer.textContent = `⏱ ${((Date.now() - timerStart)/1000).toFixed(2)}초`;
-        }, 100);
-      }
-
-      function stopTimer() {
-        clearInterval(timerInterval);
-      }
-
-      reset.textContent = "🔄 다시 시작";
-      undo.textContent = "↩ 되돌리기";
-      reset.onclick = () => {
-        stopTimer();
-        moveCount = 1;
-        current = null;
-        history = [];
-        renderBoard();
-      };
-      undo.onclick = () => {
-        if (!history.length) return;
-        const prev = history.pop();
-        const { x, y } = current;
-        board[y][x].visited = false;
-        board[y][x].el.textContent = "";
-        board[y][x].el.classList.remove("current");
-        board[prev.y][prev.x].el.classList.add("current");
-        current = prev;
-        moveCount--;
-      };
-
-      container.appendChild(status);
-      container.appendChild(timer);
-      container.appendChild(table);
-      container.appendChild(reset);
-      container.appendChild(undo);
-
-      renderBoard();
-    }
-  </script>
+  <!-- 퍼즐 게시판 기능 스크립트 -->
+  <script type="module" src="puzzle-board.js"></script>
 </body>
 </html>
