@@ -63,7 +63,13 @@ function showHints(x, y) {
 }
 
 function showBestHint() {
-  if (!current) return;
+  console.log("💡 showBestHint 호출됨", current);
+
+  if (!current) {
+    alert("먼저 보드에서 시작할 칸을 클릭해주세요!");
+    return;
+  }
+
   clearHints();
   const { x, y } = current;
   const options = [];
@@ -82,11 +88,22 @@ function showBestHint() {
     }
   });
 
-  if (options.length === 0) return;
+  if (options.length === 0) {
+    alert("추천할 수 있는 칸이 더 이상 없습니다.");
+    return;
+  }
+
   options.sort((a, b) => a.degree - b.degree);
   const best = options[0];
-  board[best.y][best.x].el.classList.add('hint-best');
-  setTimeout(() => board[best.y][best.x].el.classList.remove('hint-best'), 3000);
+
+  const el = board[best.y][best.x].el;
+  el.classList.add('hint-best');
+
+  console.log(`✅ 추천 위치 → (${best.x}, ${best.y}) with degree ${best.degree}`);
+
+  setTimeout(() => {
+    el.classList.remove('hint-best');
+  }, 3000);
 }
 
 function onClick(e) {
