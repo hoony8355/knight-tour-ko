@@ -71,8 +71,23 @@ function postPuzzle() {
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
   const seedObj = getSeedObject();
-  if (!seedObj || !title || !author) {
-    alert('제목, 닉네임, 시작 위치를 입력해주세요');
+
+  if (!seedObj) {
+    alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
+    return;
+  }
+
+  if (!title || !author) {
+    alert("제목과 닉네임을 입력해주세요.");
+    return;
+  }
+
+  let seed;
+  try {
+    seed = btoa(JSON.stringify(seedObj));
+  } catch (e) {
+    alert("시드 인코딩 오류 발생");
+    console.error(e);
     return;
   }
 
@@ -80,15 +95,18 @@ function postPuzzle() {
     title,
     author,
     description,
-    seed: btoa(JSON.stringify(seedObj)),
+    seed,
     createdAt: Date.now()
   };
+
+  console.log("📦 업로드 데이터 확인:", data); // 🔍 꼭 확인
 
   const dbPath = window.dbRef("puzzlePosts");
   window.dbPush(dbPath, data).then(() => {
     alert("✅ 퍼즐이 게시되었습니다!");
+    document.getElementById("seedOutput").textContent = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
   }).catch(err => {
     console.error("❌ 퍼즐 게시 실패", err);
-    alert("Firebase 저장 실패. 보안 규칙을 확인해주세요.");
+    alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
   });
 }
