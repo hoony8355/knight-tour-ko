@@ -32,7 +32,7 @@ darkToggle.onclick = () => {
 };
 
 function startTimer() {
-  console.log("⏱ 타이머 시작");
+  console.log("⏱ 타이머 시작됨");
   startTime = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -43,7 +43,7 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(timerInterval);
-  console.log("🛑 타이머 중지");
+  console.log("🛑 타이머 중단됨");
 }
 
 function clearHints() {
@@ -63,12 +63,16 @@ function showHints(x, y) {
 const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
 
 function onClick(e) {
+  console.log("📌 클릭됨");
   const x = +e.target.dataset.x;
   const y = +e.target.dataset.y;
   const square = board[y][x];
+
   if (square.visited) return;
 
-  if (!current && moveCount === 0) startTimer();
+  if (!current && moveCount === 0) {
+    startTimer();
+  }
 
   if (current) {
     const dx = Math.abs(x - current.x), dy = Math.abs(y - current.y);
@@ -89,18 +93,18 @@ function onClick(e) {
   clearHints();
   showHints(x, y);
 
-  if (moveCount === size * size) {
-  stopTimer();
-  const seconds = Math.floor((Date.now() - startTime) / 1000);
-  console.log("🏁 퍼즐 클리어!", seconds);
-  fireConfetti(() => {
-    estimateAndRegisterRanking(seconds);
-  });
-} else {
-  console.log(`🔍 moveCount: ${moveCount}, size*size: ${size * size}`);
-  statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
-}
+  console.log(`🔍 moveCount: ${moveCount} / ${size * size}`);
 
+  if (moveCount === size * size) {
+    console.log("🎯 퍼즐 클리어 조건 만족");
+    stopTimer();
+    const seconds = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    fireConfetti(() => {
+      estimateAndRegisterRanking(seconds);
+    });
+  } else {
+    statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
+  }
 }
 
 function fireConfetti(onComplete) {
@@ -117,9 +121,8 @@ function fireConfetti(onComplete) {
       requestAnimationFrame(frame);
     } else {
       confettiCanvas.style.display = 'none';
-      console.log("🎯 fireConfetti 종료");
+      console.log("🎊 fireConfetti 종료됨");
       if (typeof onComplete === 'function') {
-        console.log("🚀 fireConfetti → onComplete 호출");
         onComplete();
       }
     }
@@ -141,6 +144,7 @@ function undoMove() {
 }
 
 function createBoard() {
+  console.log("📋 보드 생성 시작");
   size = parseInt(sizeSelect.value);
   boardEl.innerHTML = '';
   board = [];
@@ -175,7 +179,7 @@ function estimateAndRegisterRanking(seconds) {
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000));
 
   window.dbGet(q).then(snapshot => {
-    console.log("📥 Firebase 데이터 불러옴");
+    console.log("📥 Firebase 데이터 로딩 완료");
     const list = [];
     snapshot.forEach(child => list.push(child.val()));
     const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
@@ -184,7 +188,7 @@ function estimateAndRegisterRanking(seconds) {
     resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
     nicknameInput.focus();
-    console.log("🎉 팝업 열림");
+    console.log("🎉 팝업 표시 완료");
   });
 }
 
@@ -197,7 +201,7 @@ function saveRanking(name, seconds) {
   }).then(() => {
     console.log("✅ 랭킹 저장 완료", name, seconds);
   }).catch(err => {
-    console.error("❌ 저장 실패", err);
+    console.error("❌ 랭킹 저장 실패", err);
   });
 }
 
@@ -218,7 +222,10 @@ function renderRanking() {
 resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
 sizeSelect.addEventListener('change', createBoard);
-window.addEventListener('load', createBoard);
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("🔁 DOMContentLoaded → 보드 생성");
+  createBoard();
+});
 
 submitScoreBtn.addEventListener("click", () => {
   const name = nicknameInput.value.trim();
@@ -232,14 +239,4 @@ submitScoreBtn.addEventListener("click", () => {
   saveRanking(name, seconds);
   resultModal.style.display = 'none';
   renderRanking();
-});
-
-resetBtn.addEventListener('click', createBoard);
-undoBtn.addEventListener('click', undoMove);
-sizeSelect.addEventListener('change', createBoard);
-
-// 🚨 보드 강제 생성
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("📋 DOM 완성 → createBoard() 실행");
-  createBoard();
 });
