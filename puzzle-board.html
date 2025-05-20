@@ -6,15 +6,6 @@
   <title>게시된 퍼즐 목록</title>
   <link rel="stylesheet" href="/knight-tour-ko/style.css">
   <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
-  <script src="/knight-tour-ko/game.js"></script>
-  <style>
-    .puzzle-preview {
-      display: none;
-      margin-top: 1em;
-      padding-top: 1em;
-      border-top: 1px dashed #ccc;
-    }
-  </style>
 </head>
 <body>
   <h1>퍼즐 공지장</h1>
@@ -23,87 +14,147 @@
   <div id="puzzleList" style="max-width: 800px; margin: 2em auto; text-align: left;"></div>
 
   <script type="module">
+    import {
+      getDatabase, ref, get, query, orderByChild
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
     const listEl = document.getElementById('puzzleList');
     const db = window.db;
-    const dbRef = window.dbRef('puzzlePosts');
-    const q = window.dbQuery(dbRef, window.dbOrderByChild('createdAt'));
+    const dbRef = ref(db, 'puzzlePosts');
+    const q = query(dbRef, orderByChild('createdAt'));
 
-    window.dbGet(q).then(snapshot => {
+    get(q).then(snapshot => {
       if (!snapshot.exists()) {
         listEl.innerHTML = '<p>아직 등록된 퍼즐이 없습니다.</p>';
         return;
       }
 
-      const items = [];
-      snapshot.forEach((child, index) => {
+      let index = 0;
+      snapshot.forEach(child => {
         const { title, author, seed, createdAt } = child.val();
         const date = new Date(createdAt).toLocaleString();
-        const containerId = `puzzle-${index}`;
+        const parsed = JSON.parse(atob(seed));
+        const boxId = `puzzleBox${index}`;
 
-        items.push(`
-          <div class="puzzle-item" style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 8px; cursor: pointer;" onclick="togglePuzzle('${containerId}', '${seed}')">
-            <h3 style="margin: 0 0 0.3em;">퍼즐: ${title}</h3>
-            <p style="margin: 0.2em 0;">작성자: ${author}</p>
-            <p style="margin: 0.2em 0; font-size: 0.9em; color: #666;">게시일: ${date}</p>
-            <div id="${containerId}" class="puzzle-preview"></div>
-          </div>
-        `);
+        const container = document.createElement("div");
+        container.className = "puzzle-item";
+        container.style = "border: 1px solid #ccc; padding: 1em; margin-bottom: 2em; border-radius: 8px;";
+        container.innerHTML = `
+          <h3>🧩 ${title}</h3>
+          <p>작성자: ${author} | 게시일: ${date}</p>
+          <div id="${boxId}" style="margin-top:1em"></div>
+        `;
+
+        listEl.prepend(container);
+        createInteractiveBoard(parsed, boxId);
+        index++;
       });
-
-      listEl.innerHTML = items.reverse().join('');
-    }).catch(err => {
-      console.error("퍼즐 불러오기 실패", err);
-      listEl.innerHTML = '<p style="color:red;">❌ 퍼즐을 불러오는 데 실패했습니다.</p>';
     });
 
-    window.togglePuzzle = function(containerId, seed) {
-      const container = document.getElementById(containerId);
-      if (container.style.display === 'block') {
-        container.style.display = 'none';
-        container.innerHTML = '';
-        return;
-      }
+    function createInteractiveBoard(data, mountId) {
+      const container = document.getElementById(mountId);
 
-      // 디코드 및 파싱
-      try {
-        const parsed = JSON.parse(atob(seed));
-        container.style.display = 'block';
+      const table = document.createElement("table");
+      const status = document.createElement("div");
+      const timer = document.createElement("div");
+      const reset = document.createElement("button");
+      const undo = document.createElement("button");
 
-        const canvas = document.createElement('canvas');
-        canvas.id = 'previewBoard';
-        canvas.width = 45 * parsed.cols;
-        canvas.height = 45 * parsed.rows;
-        canvas.style.border = '1px solid #ccc';
-        container.appendChild(canvas);
+      let board = [], current = null, moveCount = 1, timerStart = null, timerInterval = null, history = [];
 
-        const ctx = canvas.getContext('2d');
-
-        for (let y = 0; y < parsed.rows; y++) {
-          for (let x = 0; x < parsed.cols; x++) {
-            const isBlocked = parsed.blocked.some(([bx, by]) => bx === x && by === y);
-            ctx.fillStyle = (x + y) % 2 === 0 ? '#f0d9b5' : '#b58863';
-            ctx.fillRect(x * 45, y * 45, 45, 45);
-            if (isBlocked) {
-              ctx.fillStyle = 'rgba(0,0,0,0.3)';
-              ctx.fillRect(x * 45, y * 45, 45, 45);
+      function renderBoard() {
+        table.innerHTML = "";
+        board = [];
+        for (let y = 0; y < data.rows; y++) {
+          const tr = document.createElement("tr");
+          const row = [];
+          for (let x = 0; x < data.cols; x++) {
+            const td = document.createElement("td");
+            td.dataset.x = x;
+            td.dataset.y = y;
+            td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+            if (data.blocked.some(([bx, by]) => bx === x && by === y)) {
+              td.style.opacity = '0.4';
+              td.textContent = 'X';
+              row.push({ el: td, visited: true });
+            } else {
+              td.addEventListener("click", onClick);
+              row.push({ el: td, visited: false });
             }
+            tr.appendChild(td);
           }
+          board.push(row);
+          table.appendChild(tr);
         }
-
-        // 시작 지점 표시
-        if (parsed.start) {
-          ctx.strokeStyle = 'orange';
-          ctx.lineWidth = 3;
-          ctx.strokeRect(parsed.start.x * 45 + 5, parsed.start.y * 45 + 5, 35, 35);
-        }
-
-        const info = document.createElement('div');
-        info.innerHTML = `<p>시작 위치: (${parsed.start.x}, ${parsed.start.y}) | 보드 크기: ${parsed.rows}x${parsed.cols}</p>`;
-        container.appendChild(info);
-
-      } catch (err) {
-        container.innerHTML = '<p style="color:red;">❌ 퍼즐 표시 실패</p>';
+        const { x, y } = data.start;
+        board[y][x].visited = true;
+        board[y][x].el.textContent = "1";
+        board[y][x].el.classList.add("current");
+        current = { x, y };
+        startTimer();
       }
+
+      function onClick(e) {
+        const x = +e.target.dataset.x;
+        const y = +e.target.dataset.y;
+        const dx = Math.abs(x - current.x);
+        const dy = Math.abs(y - current.y);
+        if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) return;
+        if (board[y][x].visited) return;
+
+        history.push(current);
+        board[current.y][current.x].el.classList.remove("current");
+        board[y][x].el.textContent = ++moveCount;
+        board[y][x].el.classList.add("current");
+        board[y][x].visited = true;
+        current = { x, y };
+        status.textContent = `현재 이동 수: ${moveCount}`;
+
+        if (moveCount === data.rows * data.cols - data.blocked.length) {
+          stopTimer();
+          status.textContent = `🎉 클리어 완료! 총 ${timer.textContent}`;
+        }
+      }
+
+      function startTimer() {
+        timerStart = Date.now();
+        timerInterval = setInterval(() => {
+          timer.textContent = `⏱ ${((Date.now() - timerStart)/1000).toFixed(2)}초`;
+        }, 100);
+      }
+
+      function stopTimer() {
+        clearInterval(timerInterval);
+      }
+
+      reset.textContent = "🔄 다시 시작";
+      undo.textContent = "↩ 되돌리기";
+      reset.onclick = () => {
+        stopTimer();
+        moveCount = 1;
+        current = null;
+        history = [];
+        renderBoard();
+      };
+      undo.onclick = () => {
+        if (!history.length) return;
+        const prev = history.pop();
+        const { x, y } = current;
+        board[y][x].visited = false;
+        board[y][x].el.textContent = "";
+        board[y][x].el.classList.remove("current");
+        board[prev.y][prev.x].el.classList.add("current");
+        current = prev;
+        moveCount--;
+      };
+
+      container.appendChild(status);
+      container.appendChild(timer);
+      container.appendChild(table);
+      container.appendChild(reset);
+      container.appendChild(undo);
+
+      renderBoard();
     }
   </script>
 </body>
