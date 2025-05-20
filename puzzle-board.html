@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시된 퍼즐 목록</title>
+  <link rel="stylesheet" href="/knight-tour-ko/style.css">
+  <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
+</head>
+<body>
+  <h1>퍼즐 공지장</h1>
+  <p>사용자가 만들어 공개한 퍼즐들을 한 번 해결해 보세요!</p>
+
+  <div id="puzzleList" style="max-width: 600px; margin: 2em auto; text-align: left;"></div>
+
+  <script type="module">
+    const listEl = document.getElementById('puzzleList');
+
+    const db = window.db;
+    const dbRef = window.dbRef('puzzlePosts');
+    const q = window.dbQuery(dbRef, window.dbOrderByChild('createdAt'));
+
+    window.dbGet(q).then(snapshot => {
+      if (!snapshot.exists()) {
+        listEl.innerHTML = '<p>아직 등록된 퍼즐이 없습니다.</p>';
+        return;
+      }
+
+      const items = [];
+      snapshot.forEach(child => {
+        const { title, author, seed, createdAt } = child.val();
+        const date = new Date(createdAt).toLocaleString();
+        const url = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
+        items.push(`
+          <div class="puzzle-item" style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 8px;">
+            <h3 style="margin: 0 0 0.3em;">퍼즐: <a href="${url}" target="_blank">${title}</a></h3>
+            <p style="margin: 0.2em 0;">작성자: ${author}</p>
+            <p style="margin: 0.2em 0; font-size: 0.9em; color: #666;">게시일: ${date}</p>
+          </div>
+        `);
+      });
+
+      listEl.innerHTML = items.reverse().join('');
+    }).catch(err => {
+      console.error("퍼즐 불러오기 실패", err);
+      listEl.innerHTML = '<p style="color:red;">❌ 퍼즐을 불러오는 데 실패했습니다.</p>';
+    });
+  </script>
+</body>
+</html>
