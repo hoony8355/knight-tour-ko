@@ -16,9 +16,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 전역에서 사용할 수 있도록 export
+// ✅ 여기를 반드시 아래처럼 수정하세요
 window.db = db;
-window.dbRef = ref;
+window.dbRef = (path) => ref(db, path); // ✅ 이거 필수
 window.dbPush = push;
 window.dbGet = get;
 window.dbQuery = query;
