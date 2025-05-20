@@ -89,23 +89,29 @@ function onClick(e) {
   if (moveCount === size * size) {
     stopTimer();
     const seconds = Math.floor((Date.now() - startTime) / 1000);
-    fireConfetti();
-    estimateAndRegisterRanking(seconds);
+    fireConfetti(() => {
+      estimateAndRegisterRanking(seconds);
+    });
   } else {
     statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
   }
 }
 
-function fireConfetti() {
+function fireConfetti(onComplete) {
   confettiCanvas.style.display = 'block';
-  const duration = 2 * 1000;
+  const duration = 2000;
   const end = Date.now() + duration;
   const confettiInstance = confetti.create(confettiCanvas, { resize: true });
+
   (function frame() {
     confettiInstance({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
     confettiInstance({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
-    if (Date.now() < end) requestAnimationFrame(frame);
-    else confettiCanvas.style.display = 'none';
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    } else {
+      confettiCanvas.style.display = 'none';
+      if (typeof onComplete === 'function') onComplete();
+    }
   })();
 }
 
