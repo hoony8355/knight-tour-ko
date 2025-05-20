@@ -251,22 +251,57 @@
     }
 
     function estimateAndRegisterRanking(seconds) {
-      const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
-      const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+  const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
+  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(1000));
 
-      window.dbGet(q).then(snapshot => {
-        const list = [];
-        snapshot.forEach(child => list.push(child.val()));
-        const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10 ? list.length + 1 : null);
-        let msg = `🎉 ${seconds}초만에 퍼즐 완주!\n`;
-        msg += rank ? `예상 랭킹: ${rank}위\n` : `현재 랭킹권에는 들지 못했어요 😢\n`;
-        let name = localStorage.getItem("knightName") || prompt(msg + "닉네임을 입력해주세요:");
-        if (name && name.trim()) {
-          localStorage.setItem("knightName", name.trim());
-          saveRanking(name.trim(), seconds);
-        }
+  window.dbGet(q).then(snapshot => {
+    const list = [];
+    snapshot.forEach(child => list.push(child.val()));
+    const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 1000 ? list.length + 1 : null);
+
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '50%';
+    container.style.left = '50%';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.style.background = '#fff';
+    container.style.padding = '2rem';
+    container.style.border = '1px solid #ccc';
+    container.style.boxShadow = '0 0 20px rgba(0,0,0,0.3)';
+    container.style.zIndex = '10000';
+
+    const msg = document.createElement('p');
+    msg.textContent = `🎉 ${seconds}초만에 퍼즐 완주!
+` + (rank ? `예상 순위: ${rank}위` : '1000위권 밖입니다.');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = '닉네임을 입력해주세요';
+    input.style.width = '100%';
+    input.style.margin = '1em 0';
+
+    const btn = document.createElement('button');
+    btn.textContent = '등록하기';
+    btn.style.padding = '0.5em 1em';
+    btn.onclick = () => {
+      const name = input.value.trim();
+      if (name) {
+        localStorage.setItem("knightName", name);
+        saveRanking(name, seconds);
+        document.body.removeChild(container);
         renderRanking();
-      });
+      }
+    };
+
+    container.appendChild(msg);
+    container.appendChild(input);
+    container.appendChild(btn);
+    document.body.appendChild(container);
+
+    // focus default name if stored
+    const stored = localStorage.getItem("knightName");
+    if (stored) input.value = stored;
+  });
+}
     }
 
     function saveRanking(name, seconds) {
