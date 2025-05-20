@@ -60,9 +60,20 @@
     #ranking { max-width: 500px; margin: 2em auto; text-align: left; border-top: 1px solid #ccc; padding-top: 1em; }
     #ranking h3 { margin-bottom: 0.5em; }
     #ranking ol { padding-left: 1em; }
+  @media (max-width: 600px) {
+      td { width: 32px; height: 32px; font-size: 0.85em; }
+    }
+    table { margin: auto; border-collapse: collapse; }
+    td { width: 45px; height: 45px; text-align: center; vertical-align: middle; font-weight: bold; cursor: pointer; }
+    .light { background: #f0d9b5; }
+    .dark { background: #b58863; color: white; }
+    .current { outline: 3px solid orange; }
+    .hint { box-shadow: inset 0 0 0 3px limegreen; }
+    #darkToggle { position: fixed; top: 10px; right: 10px; }
   </style>
 </head>
 <body>
+  <button id="darkToggle">🌙</button>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
 
@@ -77,7 +88,7 @@
 
   <div id="status">시작할 칸을 클릭하세요.</div>
   <div id="timer">경과 시간: <span id="timeElapsed">0</span>초</div>
-
+  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;display:none;"></canvas>
   <table id="board"></table>
 
   <div style="margin-top: 1em;">
@@ -100,6 +111,7 @@
     </script>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
     const boardEl = document.getElementById('board');
     const statusEl = document.getElementById('status');
@@ -108,16 +120,25 @@
     const sizeSelect = document.getElementById('sizeSelect');
     const timerEl = document.getElementById('timeElapsed');
     const rankingList = document.getElementById('rankingList');
+    const confettiCanvas = document.getElementById('confetti');
+    const darkToggle = document.getElementById('darkToggle');
 
     let board = [], current = null, moveCount = 0;
     let size = parseInt(sizeSelect.value);
     let startTime = null, timerInterval = null;
     let moveHistory = [];
 
-    const knightMoves = [
-      [2, 1], [1, 2], [-1, 2], [-2, 1],
-      [-2, -1], [-1, -2], [1, -2], [2, -1]
-    ];
+    if (localStorage.theme === 'dark') {
+      document.documentElement.style.setProperty('--bg', '#111');
+      document.documentElement.style.setProperty('--fg', '#eee');
+    }
+
+    darkToggle.onclick = () => {
+      const dark = localStorage.theme !== 'dark';
+      localStorage.theme = dark ? 'dark' : 'light';
+      document.documentElement.style.setProperty('--bg', dark ? '#111' : '#fff');
+      document.documentElement.style.setProperty('--fg', dark ? '#eee' : '#000');
+    };
 
     function startTimer() {
       startTime = Date.now();
@@ -128,14 +149,8 @@
       }, 1000);
     }
 
-    function stopTimer() {
-      clearInterval(timerInterval);
-    }
-
-    function clearHints() {
-      document.querySelectorAll('.hint').forEach(el => el.classList.remove('hint'));
-    }
-
+    function stopTimer() { clearInterval(timerInterval); }
+    function clearHints() { document.querySelectorAll('.hint').forEach(el => el.classList.remove('hint')); }
     function showHints(x, y) {
       clearHints();
       knightMoves.forEach(([dx, dy]) => {
@@ -145,6 +160,7 @@
         }
       });
     }
+    const knightMoves = [[2,1],[1,2],[-1,2],[-2,1],[-2,-1],[-1,-2],[1,-2],[2,-1]];
 
     function onClick(e) {
       const x = +e.target.dataset.x;
@@ -153,16 +169,12 @@
       if (square.visited) return;
 
       if (!current) startTimer();
-
       if (current) {
-        const dx = Math.abs(x - current.x);
-        const dy = Math.abs(y - current.y);
+        const dx = Math.abs(x - current.x), dy = Math.abs(y - current.y);
         if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) {
-          statusEl.textContent = '❌ 나이트는 L자 형태로만 이동할 수 있어요!';
-          return;
+          statusEl.textContent = '❌ 나이트는 L자 형태로만 이동할 수 있어요!'; return;
         }
       }
-
       moveHistory.push(current);
       square.el.textContent = ++moveCount;
       square.visited = true;
@@ -174,11 +186,25 @@
 
       if (moveCount === size * size) {
         stopTimer();
-        const timeUsed = Math.floor((Date.now() - startTime) / 1000);
-        estimateAndRegisterRanking(timeUsed);
+        const seconds = Math.floor((Date.now() - startTime) / 1000);
+        fireConfetti();
+        estimateAndRegisterRanking(seconds);
       } else {
         statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
       }
+    }
+
+    function fireConfetti() {
+      confettiCanvas.style.display = 'block';
+      const duration = 2 * 1000;
+      const end = Date.now() + duration;
+      const confettiInstance = confetti.create(confettiCanvas, { resize: true });
+      (function frame() {
+        confettiInstance({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+        confettiInstance({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
+        if (Date.now() < end) requestAnimationFrame(frame);
+        else confettiCanvas.style.display = 'none';
+      })();
     }
 
     function undoMove() {
@@ -232,11 +258,13 @@
         const list = [];
         snapshot.forEach(child => list.push(child.val()));
         const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10 ? list.length + 1 : null);
-        let msg = `🎉 ${seconds}초만에 퍼즐 완주!
-`;
+        let msg = `🎉 ${seconds}초만에 퍼즐 완주!\n`;
         msg += rank ? `예상 랭킹: ${rank}위\n` : `현재 랭킹권에는 들지 못했어요 😢\n`;
-        const name = prompt(msg + "닉네임을 입력해주세요:");
-        if (name && name.trim()) saveRanking(name.trim(), seconds);
+        let name = localStorage.getItem("knightName") || prompt(msg + "닉네임을 입력해주세요:");
+        if (name && name.trim()) {
+          localStorage.setItem("knightName", name.trim());
+          saveRanking(name.trim(), seconds);
+        }
         renderRanking();
       });
     }
@@ -253,7 +281,6 @@
     function renderRanking() {
       const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
       const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
-
       window.dbGet(q).then(snapshot => {
         rankingList.innerHTML = "";
         snapshot.forEach((child, index) => {
@@ -272,4 +299,5 @@
   </script>
 </body>
 </html>
+
 
