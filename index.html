@@ -41,18 +41,16 @@
   </script>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-H78FYYLN2B"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-H78FYYLN2B');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-H78FYYLN2B"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-H78FYYLN2B');
+  </script>
 
   <link rel="stylesheet" href="style.css" />
   <link rel="search" type="application/opensearchdescription+xml" title="기사의 여행 퍼즐" href="/opensearch.xml" />
-
 </head>
 <body>
   <button id="darkToggle">🌙</button>
@@ -80,6 +78,14 @@
 
   <h2>🏆 글로벌 랭킹</h2>
   <ol id="rankingList"></ol>
+
+  <!-- ✅ 하단 공유 버튼 -->
+  <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
+    <h3>🔗 퍼즐 공유하기</h3>
+    <button onclick="shareOnTwitter()">X (트위터)</button>
+    <button onclick="shareOnFacebook()">Facebook</button>
+    <button onclick="copyLink()">🔗 링크 복사</button>
+  </div>
 
   <div id="utterances-container" style="margin-top: 2em;">
     <h2>💬 댓글</h2>
@@ -113,6 +119,13 @@
       <p id="resultMessage">총 시간: 0초</p>
       <input type="text" id="nicknameInput" placeholder="닉네임을 입력해주세요" />
       <button id="submitScoreBtn">등록하기</button>
+
+      <!-- ✅ 팝업 공유 버튼 -->
+      <div id="shareAreaPopup" style="margin-top: 1em;">
+        <h3>📣 친구에게 공유해보세요!</h3>
+        <button onclick="shareOnTwitter()">X 공유</button>
+        <button onclick="copyLink()">링크 복사</button>
+      </div>
     </div>
   </div>
 
