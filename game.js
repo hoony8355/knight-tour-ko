@@ -227,6 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
   createBoard();
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const submitScoreBtn = document.getElementById('submitScoreBtn');
 submitScoreBtn.addEventListener("click", () => {
   const name = nicknameInput.value.trim();
   const seconds = parseInt(resultMessage.dataset.seconds, 10);
@@ -239,4 +241,5 @@ submitScoreBtn.addEventListener("click", () => {
   saveRanking(name, seconds);
   resultModal.style.display = 'none';
   renderRanking();
+});
 });
