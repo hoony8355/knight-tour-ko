@@ -7,6 +7,8 @@ const timerEl = document.getElementById('timeElapsed');
 const rankingList = document.getElementById('rankingList');
 const confettiCanvas = document.getElementById('confetti');
 const darkToggle = document.getElementById('darkToggle');
+
+// 팝업 관련 요소
 const resultModal = document.getElementById('resultModal');
 const resultMessage = document.getElementById('resultMessage');
 const nicknameInput = document.getElementById('nicknameInput');
@@ -152,27 +154,17 @@ function createBoard() {
 
 function estimateAndRegisterRanking(seconds) {
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
-  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000)); // 🔁 10,000위까지
+  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10000));
 
   window.dbGet(q).then(snapshot => {
     const list = [];
     snapshot.forEach(child => list.push(child.val()));
     const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
 
-    resultMessage.textContent = `⏱ ${seconds}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '현재 랭킹 밖이에요 😢'}`;
+    resultMessage.textContent = `⏱ ${seconds}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
+    resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
-
-    submitScoreBtn.onclick = () => {
-      const name = nicknameInput.value.trim();
-      if (!name) {
-        alert("닉네임을 입력해주세요!");
-        return;
-      }
-      localStorage.setItem("knightName", name);
-      saveRanking(name, seconds);
-      resultModal.style.display = 'none';
-      renderRanking();
-    };
+    nicknameInput.focus();
   });
 }
 
@@ -182,6 +174,10 @@ function saveRanking(name, seconds) {
     name,
     time: seconds,
     createdAt: Date.now()
+  }).then(() => {
+    console.log("✅ 랭킹 저장 완료", name, seconds);
+  }).catch(err => {
+    console.error("❌ 저장 실패", err);
   });
 }
 
@@ -203,3 +199,18 @@ resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
 sizeSelect.addEventListener('change', createBoard);
 window.addEventListener('load', createBoard);
+
+// 모달 등록 이벤트 (한 번만)
+submitScoreBtn.addEventListener("click", () => {
+  const name = nicknameInput.value.trim();
+  const seconds = parseInt(resultMessage.dataset.seconds, 10);
+  if (!name) {
+    alert("닉네임을 입력해주세요!");
+    return;
+  }
+  console.log("닉네임 입력됨:", name, seconds);
+  localStorage.setItem("knightName", name);
+  saveRanking(name, seconds);
+  resultModal.style.display = 'none';
+  renderRanking();
+});
