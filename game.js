@@ -231,3 +231,13 @@ submitScoreBtn.addEventListener("click", () => {
   resultModal.style.display = 'none';
   renderRanking();
 });
+
+resetBtn.addEventListener('click', createBoard);
+undoBtn.addEventListener('click', undoMove);
+sizeSelect.addEventListener('change', createBoard);
+
+// 🚨 보드 강제 생성
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("📋 DOM 완성 → createBoard() 실행");
+  createBoard();
+});
