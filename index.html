@@ -82,13 +82,13 @@
 
   <!-- ✅ 하단 공유 버튼 -->
   <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
-  <h3>🔗 퍼즐 공유하기</h3>
-  <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
-  <button onclick="shareOnTwitter()">X (트위터)</button>
-  <button onclick="shareOnFacebook()">Facebook</button>
-  <button onclick="shareKakao()">🟡 카카오톡</button>
-  <button onclick="copyLink()">🔗 링크 복사</button>
-</div>
+    <h3>🔗 퍼즐 공유하기</h3>
+    <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
+    <button onclick="shareOnTwitter()">X (트위터)</button>
+    <button onclick="shareOnFacebook()">Facebook</button>
+    <button onclick="shareKakao()">🟡 카카오톡</button>
+    <button onclick="copyLink()">🔗 링크 복사</button>
+  </div>
 
   <div id="utterances-container" style="margin-top: 2em;">
     <h2>💬 댓글</h2>
@@ -102,7 +102,7 @@
     </script>
   </div>
 
-  <!-- 외부 참고 링크 섹션 (SEO 및 사용자 편의용) -->
+  <!-- 외부 참고 링크 -->
   <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
     <p>🔗 더 알아보기:</p>
     <ul style="list-style: none; padding: 0;">
@@ -112,43 +112,22 @@
     </ul>
   </footer>
 
+  <!-- ✅ 필수 스크립트 -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="firebase-init.js"></script>
-
-  <!-- ✅ 닉네임 팝업 모달 -->
-  <div id="resultModal" class="modal">
-    <div class="modal-content">
-      <h2>🎉 클리어 성공!</h2>
-      <p id="resultMessage">총 시간: 0초</p>
-      <input type="text" id="nicknameInput" placeholder="닉네임을 입력해주세요" />
-      <button id="submitScoreBtn">등록하기</button>
-
-      <!-- ✅ 팝업 공유 버튼 -->
-      <div id="shareAreaPopup" style="margin-top: 1em;">
-        <h3>📣 친구에게 공유해보세요!</h3>
-        <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
-        <button onclick="shareOnTwitter()">X 공유</button>
-        <button onclick="copyLink()">링크 복사</button>
-      </div>
-    </div>
-  </div>
-
   <script src="game.js"></script>
-  
-  <!-- ✅ Kakao SDK 먼저 로드 -->
-<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
-        integrity="sha384-xrF/y+KZjAxt3z07X8zQn3I0zVbCKIym92ApO0H6rIq0h1OMlz6Dx9aXigJHwNkm"
-        crossorigin="anonymous"></script>
 
-<!-- ✅ 공유 기능 js 파일 (kakao.min.js 이후에 위치) -->
-<script src="share.js"></script>
+  <!-- ✅ 순서 중요: Kakao SDK > 공유 기능 스크립트 -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
+          integrity="sha384-xrF/y+KZjAxt3z07X8zQn3I0zVbCKIym92ApO0H6rIq0h1OMlz6Dx9aXigJHwNkm"
+          crossorigin="anonymous"></script>
+  <script src="share.js"></script>
 
-<!-- ✅ Web Share API 미지원 시 버튼 숨기기 -->
-<script>
-  if (!navigator.share) {
-    document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
-  }
-</script>
-
+  <!-- ✅ Web Share API 비지원 브라우저 대응 -->
+  <script>
+    if (!navigator.share) {
+      document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
+    }
+  </script>
 </body>
 </html>
