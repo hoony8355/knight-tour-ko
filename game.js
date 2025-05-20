@@ -1,4 +1,4 @@
-// game.js
+// 전체 리팩토링된 game.js (x.xx초 단위 정밀 기록 포함)
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -40,11 +40,10 @@ function startTimer() {
   startTime = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    const seconds = ((Date.now() - startTime) / 1000).toFixed(2); // 🎯
+    const seconds = ((Date.now() - startTime) / 1000).toFixed(2);
     timerEl.textContent = seconds;
   }, 100);
 }
-
 
 function stopTimer() {
   clearInterval(timerInterval);
@@ -65,13 +64,10 @@ function showHints(x, y) {
 }
 
 function showBestHint() {
-  console.log("💡 showBestHint 호출됨", current);
-
   if (!current) {
     alert("먼저 보드에서 시작할 칸을 클릭해주세요!");
     return;
   }
-
   clearHints();
   const { x, y } = current;
   const options = [];
@@ -97,15 +93,9 @@ function showBestHint() {
 
   options.sort((a, b) => a.degree - b.degree);
   const best = options[0];
-
   const el = board[best.y][best.x].el;
   el.classList.add('hint-best');
-
-  console.log(`✅ 추천 위치 → (${best.x}, ${best.y}) with degree ${best.degree}`);
-
-  setTimeout(() => {
-    el.classList.remove('hint-best');
-  }, 3000);
+  setTimeout(() => el.classList.remove('hint-best'), 3000);
 }
 
 function onClick(e) {
@@ -136,9 +126,9 @@ function onClick(e) {
 
   if (moveCount === size * size) {
     stopTimer();
-    const seconds = Math.floor((Date.now() - startTime) / 1000);
+    const seconds = ((Date.now() - startTime) / 1000).toFixed(2);
     fireConfetti();
-    estimateAndRegisterRanking(seconds);
+    estimateAndRegisterRanking(parseFloat(seconds));
   } else {
     statusEl.textContent = `현재 이동 수: ${moveCount} / ${size * size}`;
   }
@@ -209,7 +199,7 @@ function estimateAndRegisterRanking(seconds) {
     snapshot.forEach(child => list.push(child.val()));
     const rank = list.findIndex(item => seconds < item.time) + 1 || (list.length < 10000 ? list.length + 1 : null);
 
-    resultMessage.textContent = `⏱ ${parseFloat(seconds).toFixed(2)}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
+    resultMessage.textContent = `⏱ ${seconds.toFixed(2)}초 걸렸어요! ${rank ? `예상 랭킹: ${rank}위` : '랭킹 밖이에요 😢'}`;
     resultMessage.dataset.seconds = seconds;
     resultModal.style.display = 'block';
     nicknameInput.focus();
@@ -220,7 +210,7 @@ function saveRanking(name, seconds) {
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
   window.dbPush(dbPath, {
     name,
-    time: seconds,
+    time: parseFloat(seconds),
     createdAt: Date.now()
   }).then(() => {
     console.log("✅ 랭킹 저장 완료", name, seconds);
@@ -234,17 +224,16 @@ function renderRanking() {
   const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
   window.dbGet(q).then(snapshot => {
     rankingList.innerHTML = "";
-    let index = 1; // 수동 인덱스 시작
+    let index = 1;
     snapshot.forEach(child => {
       const { name, time } = child.val();
       const li = document.createElement("li");
-      li.textContent = `${index}. ${name || "익명"} - ${time}초`;
+      li.textContent = `${index}. ${name || "익명"} - ${parseFloat(time).toFixed(2)}초`;
       rankingList.appendChild(li);
-      index++; // 순위 수동 증가
+      index++;
     });
   });
 }
-
 
 resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
@@ -254,7 +243,7 @@ hintBtn.addEventListener('click', showBestHint);
 
 submitScoreBtn.addEventListener("click", () => {
   const name = nicknameInput.value.trim();
-  const seconds = parseInt(resultMessage.dataset.seconds, 10);
+  const seconds = parseFloat(resultMessage.dataset.seconds);
   if (!name) {
     alert("닉네임을 입력해주세요!");
     return;
