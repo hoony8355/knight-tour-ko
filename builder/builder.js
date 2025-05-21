@@ -2,12 +2,14 @@
 import { renderBoard, playPuzzle } from '../game-custom.js';
 
 const boardContainer = document.getElementById('boardBuilder');
-const sizeSelect = document.getElementById('size') || document.getElementById('rowsInput');
-const postBtn = document.getElementById('postBtn');
-const testBtn = document.getElementById('testBtn');
-const titleInput = document.getElementById('title') || document.getElementById('puzzleTitle');
-const authorInput = document.getElementById('author') || document.getElementById('authorName');
-const descInput = document.getElementById('description') || document.getElementById('puzzleDesc');
+const sizeInputRow = document.getElementById('rowsInput');
+const sizeInputCol = document.getElementById('colsInput');
+const postBtn = document.querySelector('[onclick="postPuzzle()"]');
+const testBtn = document.querySelector('[onclick="testPuzzle()"]');
+const titleInput = document.getElementById('puzzleTitle');
+const authorInput = document.getElementById('authorName');
+const descInput = document.getElementById('puzzleDesc');
+const testResult = document.getElementById('testResult');
 
 let currentSeed = {
   rows: 6,
@@ -20,8 +22,8 @@ let testPassed = false;
 
 function saveSeedFromUI() {
   currentSeed.blocked = [];
-  currentSeed.rows = parseInt(document.getElementById('rowsInput')?.value || '6');
-  currentSeed.cols = parseInt(document.getElementById('colsInput')?.value || '6');
+  currentSeed.rows = parseInt(sizeInputRow.value);
+  currentSeed.cols = parseInt(sizeInputCol.value);
   const tds = boardContainer.querySelectorAll('td');
   tds.forEach(td => {
     const x = parseInt(td.dataset.x);
@@ -36,14 +38,11 @@ function saveSeedFromUI() {
 }
 
 function generateBoard() {
-  const rows = parseInt(document.getElementById('rowsInput')?.value || '6');
-  const cols = parseInt(document.getElementById('colsInput')?.value || '6');
-  currentSeed.rows = rows;
-  currentSeed.cols = cols;
+  currentSeed.rows = parseInt(sizeInputRow.value);
+  currentSeed.cols = parseInt(sizeInputCol.value);
   currentSeed.blocked = [];
   currentSeed.start = null;
   testPassed = false;
-
   renderBoard(boardContainer, currentSeed);
 
   const cells = boardContainer.querySelectorAll('td');
@@ -67,17 +66,19 @@ function generateBoard() {
 
 window.generateBoard = generateBoard;
 
-window.testPuzzle = () => {
+window.testPuzzle = function () {
   saveSeedFromUI();
   boardContainer.innerHTML = '';
   testPassed = false;
+  testResult.textContent = '';
+
   playPuzzle(boardContainer, currentSeed, () => {
     testPassed = true;
-    document.getElementById('testResult').textContent = '🎉 테스트 성공! 퍼즐 게시 가능.';
+    testResult.textContent = '🎉 테스트 성공! 퍼즐 게시 가능.';
   });
 };
 
-window.postPuzzle = () => {
+window.postPuzzle = function () {
   saveSeedFromUI();
 
   const title = titleInput.value.trim();
