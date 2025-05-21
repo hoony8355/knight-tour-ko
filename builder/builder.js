@@ -1,118 +1,112 @@
-// builder.js
-import { renderBoard, playPuzzle } from '../game-custom.js';
+let currentStart = null;
 
-const boardContainer = document.getElementById('boardBuilder');
-const sizeInputRow = document.getElementById('rowsInput');
-const sizeInputCol = document.getElementById('colsInput');
-const postBtn = document.querySelector('[onclick="postPuzzle()"]');
-const testBtn = document.querySelector('[onclick="testPuzzle()"]');
-const titleInput = document.getElementById('puzzleTitle');
-const authorInput = document.getElementById('authorName');
-const descInput = document.getElementById('puzzleDesc');
-const testResult = document.getElementById('testResult');
-
-let currentSeed = {
-  rows: 6,
-  cols: 6,
-  blocked: [],
-  start: null,
-};
-
-let testPassed = false;
-
-function saveSeedFromUI() {
-  currentSeed.blocked = [];
-  currentSeed.rows = parseInt(sizeInputRow.value);
-  currentSeed.cols = parseInt(sizeInputCol.value);
-  const tds = boardContainer.querySelectorAll('td');
-  tds.forEach(td => {
-    const x = parseInt(td.dataset.x);
-    const y = parseInt(td.dataset.y);
-    if (td.classList.contains('blocked')) {
-      currentSeed.blocked.push([x, y]);
-    }
-    if (td.classList.contains('start')) {
-      currentSeed.start = { x, y };
-    }
-  });
-}
+window.addEventListener('load', generateBoard);
 
 function generateBoard() {
-  currentSeed.rows = parseInt(sizeInputRow.value);
-  currentSeed.cols = parseInt(sizeInputCol.value);
-  currentSeed.blocked = [];
-  currentSeed.start = null;
-  testPassed = false;
-  renderBoard(boardContainer, currentSeed);
+  const rows = parseInt(document.getElementById('rowsInput').value);
+  const cols = parseInt(document.getElementById('colsInput').value);
+  const board = document.getElementById('boardBuilder');
+  board.innerHTML = '';
+  board.style.gridTemplateRows = `repeat(${rows}, 40px)`;
+  board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
+  currentStart = null;
 
-  const cells = boardContainer.querySelectorAll('td');
-  cells.forEach(td => {
-    td.addEventListener('click', () => {
-      const x = +td.dataset.x;
-      const y = +td.dataset.y;
-
-      if (td.classList.contains('start')) {
-        td.classList.remove('start');
-        currentSeed.start = null;
-      } else if (currentSeed.start === null) {
-        td.classList.add('start');
-        currentSeed.start = { x, y };
-      } else {
-        td.classList.toggle('blocked');
-      }
-    });
-  });
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const cell = document.createElement('div');
+      cell.className = 'builder-cell';
+      cell.dataset.x = x;
+      cell.dataset.y = y;
+      cell.addEventListener('click', () => handleCellClick(cell));
+      board.appendChild(cell);
+    }
+  }
 }
 
-window.generateBoard = generateBoard;
+function handleCellClick(cell) {
+  if (cell.classList.contains('start')) {
+    cell.classList.remove('start');
+    currentStart = null;
+    return;
+  }
+  if (!currentStart) {
+    if (cell.classList.contains('blocked')) return;
+    cell.classList.add('start');
+    currentStart = { x: parseInt(cell.dataset.x), y: parseInt(cell.dataset.y) };
+    return;
+  }
+  cell.classList.toggle('blocked');
+}
 
-window.testPuzzle = function () {
-  saveSeedFromUI();
-  boardContainer.innerHTML = '';
-  testPassed = false;
-  testResult.textContent = '';
+function getSeedObject() {
+  const rows = parseInt(document.getElementById('rowsInput').value);
+  const cols = parseInt(document.getElementById('colsInput').value);
+  const cells = document.querySelectorAll('.builder-cell');
+  const blocked = [];
 
-  playPuzzle(boardContainer, currentSeed, () => {
-    testPassed = true;
-    testResult.textContent = '🎉 테스트 성공! 퍼즐 게시 가능.';
+  cells.forEach(cell => {
+    if (cell.classList.contains('blocked')) {
+      blocked.push([parseInt(cell.dataset.x), parseInt(cell.dataset.y)]);
+    }
   });
-};
 
-window.postPuzzle = function () {
-  saveSeedFromUI();
+  if (!currentStart) {
+    alert("시작 위치를 설정해주세요 (주황색 칸)");
+    return null;
+  }
 
-  const title = titleInput.value.trim();
-  const author = authorInput.value.trim();
-  const description = descInput.value.trim();
+  return { rows, cols, blocked, start: currentStart };
+}
 
-  if (!title || !author || !currentSeed.start) {
-    alert("제목, 작성자, 시작 위치를 모두 설정해주세요.");
+function generateSeed() {
+  const seedObj = getSeedObject();
+  if (!seedObj) return;
+  const encoded = btoa(JSON.stringify(seedObj));
+  const url = `${window.location.origin}/knight-tour-ko/?custom=${encoded}`;
+  document.getElementById('seedOutput').textContent = url;
+}
+
+function postPuzzle() {
+  const title = document.getElementById('puzzleTitle').value.trim();
+  const author = document.getElementById('authorName').value.trim();
+  const description = document.getElementById('puzzleDesc').value.trim();
+  const seedObj = getSeedObject();
+
+  if (!seedObj) {
+    alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
     return;
   }
 
-  if (!testPassed) {
-    alert("퍼즐을 먼저 테스트하여 클리어한 뒤에만 게시할 수 있습니다.");
+  if (!title || !author) {
+    alert("제목과 닉네임을 입력해주세요.");
     return;
   }
 
-  const post = {
+  let seed;
+  try {
+    seed = btoa(JSON.stringify(seedObj));
+  } catch (e) {
+    alert("시드 인코딩 오류 발생");
+    console.error(e);
+    return;
+  }
+
+  const data = {
     title,
     author,
     description,
-    seed: btoa(JSON.stringify(currentSeed)),
+    seed,
     createdAt: Date.now()
   };
 
-  console.log("📦 업로드 데이터 확인:", post);
+  console.log("📦 업로드 데이터 확인:", data); // 🔍 꼭 확인
 
-  const postRef = window.dbRef(window.db, "puzzlePosts");
-  window.dbPush(postRef, post)
-    .then(() => {
-      alert("✅ 퍼즐 게시 완료!");
-      location.reload();
-    })
-    .catch(err => {
-      console.error("❌ 퍼즐 게시 실패", err);
-      alert("퍼즐 게시 중 오류가 발생했습니다. 콘솔을 확인해주세요.");
-    });
-};
+  const dbPath = window.dbRef("puzzlePosts");
+  window.dbPush(dbPath, data).then(() => {
+    alert("✅ 퍼즐이 게시되었습니다!");
+    document.getElementById("seedOutput").textContent = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
+  }).catch(err => {
+    console.error("❌ 퍼즐 게시 실패", err);
+    alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
+  });
+}
