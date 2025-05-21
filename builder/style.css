@@ -13,6 +13,7 @@ body {
 #boardContainer {
   display: flex;
   justify-content: center;
+  margin-top: 1em;
 }
 
 #boardBuilder {
@@ -64,4 +65,28 @@ body {
   text-align: center;
   font-size: 0.9em;
   color: #555;
+}
+
+/* ✅ 테스트용 보드 스타일 */
+table.board {
+  border-collapse: collapse;
+  margin: 1em auto;
+}
+
+table.board td {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+table.board td.light { background-color: #f0d9b5; }
+table.board td.dark  { background-color: #b58863; color: #fff; }
+
+table.board td.current {
+  outline: 3px solid orange;
 }
