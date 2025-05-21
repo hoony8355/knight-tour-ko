@@ -1,61 +1,25 @@
 // game-custom.js
 
-export function renderBoard(container, seed, options = {}) {
-  const { rows, cols, blocked, start } = seed;
-
-  // 초기화
-  container.innerHTML = '';
-  container.classList.add('custom-board');
-
-  const table = document.createElement('table');
-  table.className = 'board';
-
-  for (let y = 0; y < rows; y++) {
-    const tr = document.createElement('tr');
-    for (let x = 0; x < cols; x++) {
-      const td = document.createElement('td');
-      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
-      td.dataset.x = x;
-      td.dataset.y = y;
-
-      // 막힌 칸 표시
-      if (blocked.some(([bx, by]) => bx === x && by === y)) {
-        td.style.backgroundColor = '#999';
-      }
-
-      // 시작 위치 표시
-      if (start?.x === x && start?.y === y) {
-        td.style.outline = '3px solid orange';
-      }
-
-      tr.appendChild(td);
-    }
-    table.appendChild(tr);
-  }
-
-  container.appendChild(table);
-}
-
-export function playPuzzle(container, seed) {
+export function playPuzzle(container, seed, onClear) {
   const { rows, cols, blocked, start } = seed;
   if (!start) {
-    alert("시작 위치가 설정되지 않았습니다.");
+    alert("시작 위치가 없습니다!");
     return;
   }
 
+  container.innerHTML = "";
   const board = [];
-  container.innerHTML = '';
-  const table = document.createElement('table');
-  table.className = 'board';
+  const table = document.createElement("table");
+  table.className = "board";
 
   for (let y = 0; y < rows; y++) {
+    const tr = document.createElement("tr");
     const row = [];
-    const tr = document.createElement('tr');
     for (let x = 0; x < cols; x++) {
-      const td = document.createElement('td');
-      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+      const td = document.createElement("td");
       td.dataset.x = x;
       td.dataset.y = y;
+      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
       tr.appendChild(td);
       row.push({ el: td, visited: false, blocked: false });
     }
@@ -63,27 +27,23 @@ export function playPuzzle(container, seed) {
     table.appendChild(tr);
   }
 
-  // 막힌 칸 처리
+  container.appendChild(table);
+
+  // 막힌 칸 설정
   blocked.forEach(([x, y]) => {
     board[y][x].blocked = true;
-    board[y][x].el.style.backgroundColor = '#999';
+    board[y][x].el.style.backgroundColor = "#999";
   });
 
-  let current = null;
   let moveCount = 0;
+  const total = rows * cols - blocked.length;
+  let current = null;
 
-  function highlight(x, y) {
-    board[y][x].el.classList.add('current');
-  }
-
-  function clearHighlight() {
-    board.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
-  }
-
-  function onClick(e) {
-    const x = +e.target.dataset.x;
-    const y = +e.target.dataset.y;
+  function handleClick(e) {
+    const x = parseInt(e.target.dataset.x);
+    const y = parseInt(e.target.dataset.y);
     const cell = board[y][x];
+
     if (cell.visited || cell.blocked) return;
 
     if (!current) {
@@ -96,13 +56,24 @@ export function playPuzzle(container, seed) {
 
     cell.visited = true;
     cell.el.textContent = ++moveCount;
-    clearHighlight();
+    if (current) board[current.y][current.x].el.classList.remove('current');
     cell.el.classList.add('current');
     current = { x, y };
+
+    if (moveCount === total) {
+      setTimeout(() => {
+        onClear?.(); // 🎉 클리어 성공 시 콜백 호출
+      }, 300);
+    }
   }
 
-  board.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
+  // 이벤트 등록
+  board.forEach(row => row.forEach(cell => {
+    if (!cell.blocked) {
+      cell.el.addEventListener("click", handleClick);
+    }
+  }));
 
-  container.appendChild(table);
-  highlight(start.x, start.y);
+  // 시작 위치 강조
+  board[start.y][start.x].el.classList.add("current");
 }
