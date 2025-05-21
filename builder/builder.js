@@ -1,4 +1,5 @@
 let currentStart = null;
+let testPassed = false;
 
 window.addEventListener('load', generateBoard);
 
@@ -10,6 +11,7 @@ function generateBoard() {
   board.style.gridTemplateRows = `repeat(${rows}, 40px)`;
   board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
   currentStart = null;
+  testPassed = false; // 새 보드를 만들면 다시 테스트해야 함
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -66,11 +68,31 @@ function generateSeed() {
   document.getElementById('seedOutput').textContent = url;
 }
 
-function postPuzzle() {
+// ✅ 테스트용 게임 실행
+window.testPuzzle = function () {
+  const seed = getSeedObject();
+  if (!seed) return;
+
+  testPassed = false; // 초기화
+  const container = document.getElementById("boardBuilder");
+  container.innerHTML = '';
+
+  playPuzzle(container, seed, () => {
+    testPassed = true;
+    document.getElementById("testResult").textContent = "🎉 테스트 완료! 퍼즐 게시 가능.";
+  });
+};
+
+window.postPuzzle = function () {
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
   const seedObj = getSeedObject();
+
+  if (!testPassed) {
+    alert("❗ 퍼즐을 테스트 플레이로 클리어한 뒤에만 게시할 수 있습니다.");
+    return;
+  }
 
   if (!seedObj) {
     alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
@@ -99,7 +121,7 @@ function postPuzzle() {
     createdAt: Date.now()
   };
 
-  console.log("📦 업로드 데이터 확인:", data); // 🔍 꼭 확인
+  console.log("📦 업로드 데이터 확인:", data);
 
   const dbPath = window.dbRef("puzzlePosts");
   window.dbPush(dbPath, data).then(() => {
@@ -109,4 +131,4 @@ function postPuzzle() {
     console.error("❌ 퍼즐 게시 실패", err);
     alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
   });
-}
+};
