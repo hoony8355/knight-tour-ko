@@ -4,16 +4,17 @@ let currentStart = null;
 let testPassed = false;
 
 window.addEventListener('load', generateBoard);
+window.generateBoard = generateBoard;
+window.testPuzzle = testPuzzle;
+window.postPuzzle = postPuzzle;
 
 function generateBoard() {
   const rows = parseInt(document.getElementById('rowsInput').value);
   const cols = parseInt(document.getElementById('colsInput').value);
   const board = document.getElementById('boardBuilder');
-
   board.innerHTML = '';
-  board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
   board.style.gridTemplateRows = `repeat(${rows}, 40px)`;
-
+  board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
   currentStart = null;
   testPassed = false;
 
@@ -64,25 +65,24 @@ function getSeedObject() {
   return { rows, cols, blocked, start: currentStart };
 }
 
-function generateSeed() {
-  const seedObj = getSeedObject();
-  if (!seedObj) return;
-  const encoded = btoa(JSON.stringify(seedObj));
-  const url = `${window.location.origin}/knight-tour-ko/?custom=${encoded}`;
-  document.getElementById('seedOutput').textContent = url;
-}
-
 function testPuzzle() {
   const seed = getSeedObject();
   if (!seed) return;
 
-  const board = document.getElementById('boardBuilder');
-  board.innerHTML = '';
-  testPassed = false;
+  const testContainerId = 'testBoard';
+  let testBoard = document.getElementById(testContainerId);
+  if (!testBoard) {
+    testBoard = document.createElement('div');
+    testBoard.id = testContainerId;
+    testBoard.style.marginTop = '20px';
+    document.body.appendChild(testBoard);
+  } else {
+    testBoard.innerHTML = '';
+  }
 
-  playPuzzle(board, seed, () => {
+  playPuzzle(testBoard, seed, () => {
     testPassed = true;
-    document.getElementById('testResult').textContent = "🎉 테스트 클리어 성공! 게시가 가능합니다.";
+    document.getElementById('testResult').textContent = '🎉 테스트 클리어 성공! 게시가 가능합니다.';
   });
 }
 
@@ -103,7 +103,7 @@ function postPuzzle() {
   }
 
   if (!testPassed) {
-    alert("퍼즐을 먼저 테스트하여 클리어한 뒤에만 게시할 수 있습니다.");
+    alert("퍼즐을 먼저 테스트하고 클리어해야 게시할 수 있습니다.");
     return;
   }
 
@@ -134,10 +134,9 @@ function postPuzzle() {
     console.error("❌ 퍼즐 게시 실패", err);
     alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
   });
-}
+} 
 
-// 외부에서 실행될 수 있도록 전역 노출
-window.generateBoard = generateBoard;
-window.generateSeed = generateSeed;
-window.testPuzzle = testPuzzle;
-window.postPuzzle = postPuzzle;
+// 외부 의존 함수 연결
+window.playPuzzle = window.playPuzzle || function(container, seed, onSuccess) {
+  console.warn('playPuzzle 함수가 아직 로드되지 않았습니다.');
+};
