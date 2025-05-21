@@ -1,0 +1,131 @@
+
+## 🇯🇵 `/ja/index.html` (Knight’s Tour 일본어 페이지)
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ナイトツアーパズルゲーム – デビルズプラン シーズン2 体験</title>
+  <meta name="description" content="Netflix『デビルズプラン』シーズン2に登場するナイトツアーパズルを体験しよう！ナイトを動かして脳トレチャレンジに挑戦！" />
+  <meta name="keywords" content="ナイトツアー, チェスパズル, デビルズプラン, Netflix パズル, 脳トレ, Knight's Tour" />
+  <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+
+  <!-- hreflang for SEO -->
+  <link rel="alternate" hreflang="ko" href="https://hoony8355.github.io/knight-tour-ko/" />
+  <link rel="alternate" hreflang="en" href="https://hoony8355.github.io/knight-tour-ko/en/" />
+  <link rel="alternate" hreflang="ja" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <link rel="alternate" hreflang="es" href="https://hoony8355.github.io/knight-tour-ko/es/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+  <link rel="alternate" hreflang="fr" href="https://hoony8355.github.io/knight-tour-ko/fr/" />
+  <link rel="alternate" hreflang="de" href="https://hoony8355.github.io/knight-tour-ko/de/" />
+  <link rel="alternate" hreflang="id" href="https://hoony8355.github.io/knight-tour-ko/id/" />
+  <link rel="alternate" hreflang="vi" href="https://hoony8355.github.io/knight-tour-ko/vi/" />
+
+  <!-- SNS 공유 -->
+  <meta property="og:title" content="ナイトツアーパズルゲーム – デビルズプラン体験" />
+  <meta property="og:description" content="Netflix『デビルズプラン』で話題のナイトツアーパズルをプレイし、世界中のユーザーと競い合おう！" />
+  <meta property="og:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ナイトツアーパズル – デビルズプラン体験" />
+  <meta name="twitter:description" content="Netflix『デビルズプラン』のナイトツアーパズルを体験して、グローバルランキングに挑戦しよう！" />
+  <meta name="twitter:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <button id="darkToggle">🌙</button>
+  <h1>ナイトツアーパズル 🧩</h1>
+  <p>クリア時間を記録して、世界中のプレイヤーとランキングで競おう！</p>
+
+  <label>ボードサイズを選択:
+    <select id="sizeSelect">
+      <option value="5">5x5</option>
+      <option value="6">6x6</option>
+      <option value="7">7x7</option>
+      <option value="8" selected>8x8</option>
+    </select>
+  </label>
+
+  <div id="status">開始するマスをクリックしてください。</div>
+  <div id="timer">経過時間: <span id="timeElapsed">0</span> 秒</div>
+  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;display:none;"></canvas>
+  <table id="board"></table>
+
+  <div style="margin-top: 1em;">
+    <button id="resetBtn">🔄 再スタート</button>
+    <button id="undoBtn">↩️ 戻る</button>
+    <button id="hintBtn">💡 ヒント</button>
+  </div>
+
+  <div id="ranking">
+    <h2>🏆 グローバルランキング</h2>
+    <ol id="rankingList"></ol>
+  </div>
+
+  <!-- ニックネームモーダル -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <button id="closeModalBtn" title="閉じる" aria-label="閉じる">✖</button>
+      <h2>🎉 クリア成功！</h2>
+      <p id="resultMessage">クリアタイム: 0 秒</p>
+      <input type="text" id="nicknameInput" placeholder="ニックネームを入力" />
+      <button id="submitScoreBtn">登録する</button>
+    </div>
+  </div>
+
+  <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
+    <h3>🔗 パズルをシェア</h3>
+    <button id="shareNativeBtn" onclick="shareNative()">📱 共有</button>
+    <button onclick="shareOnTwitter()">X (ツイッター)</button>
+    <button onclick="shareOnFacebook()">Facebook</button>
+    <button onclick="shareKakao()">🟡 カカオトーク</button>
+    <button onclick="copyLink()">🔗 リンクをコピー</button>
+  </div>
+
+  <div id="utterances-container" style="margin-top: 2em;">
+    <h2>💬 コメント</h2>
+    <script src="https://utteranc.es/client.js"
+            repo="hoony8355/knight-tour-comments"
+            issue-term="pathname"
+            label="comment"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+  </div>
+
+  <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
+    <p>🔗 詳しくはこちら:</p>
+    <ul style="list-style: none; padding: 0;">
+      <li><a href="https://ja.wikipedia.org/wiki/ナイトツアー" target="_blank">📚 ナイトツアー - Wikipedia</a></li>
+      <li><a href="https://www.netflix.com/jp/title/81688109" target="_blank">🎬 Netflix「デビルズプラン」シーズン2</a></li>
+    </ul>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script type="module" src="../firebase-init.js"></script>
+  <script src="../game.js"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js" crossorigin="anonymous"></script>
+  <script src="../share.js"></script>
+  <script>
+    if (!navigator.share) {
+      document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
+    }
+  </script>
+</body>
+</html>
+```
+
+---
+
+## ✅ 다음 단계
+
+* 위 코드를 `/ja/index.html`로 저장
+* 동일한 방식으로 `/es/`(스페인어)를 다음으로 이어드릴게요
+
+필요하시면 ZIP으로 압축된 전체 언어 버전 묶음도 준비 가능해요. 계속 진행할까요?
