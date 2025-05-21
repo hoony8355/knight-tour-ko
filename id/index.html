@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle Knight's Tour – Terinspirasi dari Devil's Plan</title>
+  <meta name="description" content="Mainkan puzzle Knight's Tour dari serial Netflix 'Devil's Plan'. Gerakkan kuda dan uji kemampuan logikamu!" />
+  <meta name="keywords" content="Knight's Tour, Puzzle Catur, Devil's Plan, Puzzle Netflix, Game Logika, Puzzle Kuda" />
+  <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/id/" />
+
+  <!-- hreflang -->
+  <link rel="alternate" hreflang="ko" href="https://hoony8355.github.io/knight-tour-ko/" />
+  <link rel="alternate" hreflang="en" href="https://hoony8355.github.io/knight-tour-ko/en/" />
+  <link rel="alternate" hreflang="ja" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <link rel="alternate" hreflang="es" href="https://hoony8355.github.io/knight-tour-ko/es/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+  <link rel="alternate" hreflang="fr" href="https://hoony8355.github.io/knight-tour-ko/fr/" />
+  <link rel="alternate" hreflang="de" href="https://hoony8355.github.io/knight-tour-ko/de/" />
+  <link rel="alternate" hreflang="id" href="https://hoony8355.github.io/knight-tour-ko/id/" />
+  <link rel="alternate" hreflang="vi" href="https://hoony8355.github.io/knight-tour-ko/vi/" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Puzzle Knight's Tour – Uji Logikamu!" />
+  <meta property="og:description" content="Mainkan puzzle Knight's Tour dari serial Netflix 'Devil's Plan' dan bersaing di papan peringkat global!" />
+  <meta property="og:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/id/" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Puzzle Knight's Tour – Tantangan Netflix" />
+  <meta name="twitter:description" content="Bergabunglah dalam tantangan logika dari Devil's Plan Netflix dan catat waktumu!" />
+  <meta name="twitter:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <button id="darkToggle">🌙</button>
+  <h1>Puzzle Knight's Tour 🧩</h1>
+  <p>Catat waktumu dan bersaing dengan pemain dari seluruh dunia dalam tantangan logika ini!</p>
+
+  <label>Pilih ukuran papan:
+    <select id="sizeSelect">
+      <option value="5">5x5</option>
+      <option value="6">6x6</option>
+      <option value="7">7x7</option>
+      <option value="8" selected>8x8</option>
+    </select>
+  </label>
+
+  <div id="status">Klik salah satu kotak untuk mulai bermain.</div>
+  <div id="timer">Waktu berlalu: <span id="timeElapsed">0</span> detik</div>
+  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;display:none;"></canvas>
+  <table id="board"></table>
+
+  <div style="margin-top: 1em;">
+    <button id="resetBtn">🔄 Mulai Ulang</button>
+    <button id="undoBtn">↩️ Batalkan</button>
+    <button id="hintBtn">💡 Petunjuk</button>
+  </div>
+
+  <div id="ranking">
+    <h2>🏆 Peringkat Global</h2>
+    <ol id="rankingList"></ol>
+  </div>
+
+  <!-- Modal skor -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <button id="closeModalBtn" title="Tutup" aria-label="Tutup">✖</button>
+      <h2>🎉 Selesai!</h2>
+      <p id="resultMessage">Waktumu: 0 detik</p>
+      <input type="text" id="nicknameInput" placeholder="Masukkan nama panggilan" />
+      <button id="submitScoreBtn">Kirim</button>
+    </div>
+  </div>
+
+  <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
+    <h3>🔗 Bagikan Puzzle</h3>
+    <button id="shareNativeBtn" onclick="shareNative()">📱 Bagikan</button>
+    <button onclick="shareOnTwitter()">X (Twitter)</button>
+    <button onclick="shareOnFacebook()">Facebook</button>
+    <button onclick="shareKakao()">🟡 KakaoTalk</button>
+    <button onclick="copyLink()">🔗 Salin Tautan</button>
+  </div>
+
+  <div id="utterances-container" style="margin-top: 2em;">
+    <h2>💬 Komentar</h2>
+    <script src="https://utteranc.es/client.js"
+            repo="hoony8355/knight-tour-comments"
+            issue-term="pathname"
+            label="comment"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+  </div>
+
+  <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
+    <p>🔗 Pelajari lebih lanjut:</p>
+    <ul style="list-style: none; padding: 0;">
+      <li><a href="https://id.wikipedia.org/wiki/Tur_Kuda" target="_blank">📚 Knight's Tour – Wikipedia</a></li>
+      <li><a href="https://www.netflix.com/id/title/81688109" target="_blank">🎬 Devil's Plan – Netflix</a></li>
+    </ul>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script type="module" src="../firebase-init.js"></script>
+  <script src="../game.js"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js" crossorigin="anonymous"></script>
+  <script src="../share.js"></script>
+  <script>
+    if (!navigator.share) {
+      document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
+    }
+  </script>
+</body>
+</html>
