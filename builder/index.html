@@ -9,7 +9,7 @@
 </head>
 <body>
   <h1>🛠 커스텀 퍼즐 만들기</h1>
-  <p>보드 크기와 막힌 칸, 시작 위치를 설정하세요.</p>
+  <p>보드 크기와 막힌 칸, 시작 위치를 설정한 뒤, 실제 플레이로 테스트한 후 게시할 수 있습니다.</p>
 
   <div class="builder-controls">
     <label>행 (Rows): <input type="number" id="rowsInput" value="6" /></label>
@@ -24,9 +24,9 @@
   <div class="guide-box">
     <strong>📘 사용 방법 안내</strong>
     <ul>
-      <li>⬛ 셀 클릭 → 막힌 칸 (회색)</li>
-      <li>🟧 첫 클릭 → 시작 위치 설정 (주황색)</li>
-      <li>다시 클릭 → 해제됨</li>
+      <li>⬛ 셀 클릭 → 막힌 칸으로 전환 (회색)</li>
+      <li>🟧 첫 클릭 → 시작 위치로 설정 (주황색, 단 하나만 가능)</li>
+      <li>다시 클릭 → 선택 해제됨</li>
     </ul>
   </div>
 
@@ -39,9 +39,12 @@
 
   <div class="action-buttons">
     <button onclick="generateSeed()">🔗 퍼즐 시드 만들기</button>
+    <button onclick="testPuzzle()">👀 테스트 플레이</button>
     <button onclick="postPuzzle()">📬 퍼즐 게시하기</button>
   </div>
+
   <p id="seedOutput"></p>
+  <p id="testResult" style="font-weight: bold; color: green;"></p>
 
   <script src="builder.js"></script>
 </body>
