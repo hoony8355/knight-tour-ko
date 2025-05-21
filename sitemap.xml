@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
   <url>
     <loc>https://hoony8355.github.io/knight-tour-ko/</loc>
-    <lastmod>2025-05-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hoony8355.github.io/knight-tour-ko/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://hoony8355.github.io/knight-tour-ko/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://hoony8355.github.io/knight-tour-ko/es/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://hoony8355.github.io/knight-tour-ko/fr/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://hoony8355.github.io/knight-tour-ko/de/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://hoony8355.github.io/knight-tour-ko/id/" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://hoony8355.github.io/knight-tour-ko/vi/" />
   </url>
+
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/en/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/ja/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/es/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/zh-cn/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/fr/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/de/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/id/</loc></url>
+  <url><loc>https://hoony8355.github.io/knight-tour-ko/vi/</loc></url>
+
 </urlset>
