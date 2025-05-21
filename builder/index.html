@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>커스텀 퍼즐 만들기</title>
+  <title>컸스텀 퍼즐 만들기</title>
   <link rel="stylesheet" href="style.css" />
   <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
 </head>
 <body>
-  <h1>🛠 커스텀 퍼즐 만들기</h1>
-  <p>보드 크기와 막힌 칸, 시작 위치를 설정한 뒤, 반드시 직접 플레이로 클리어 테스트를 완료해야 게시할 수 있습니다.</p>
+  <h1>🛠 케스텀 퍼즐 만들기</h1>
+  <p>보드 크기와 막히는 칸, 시작 위치를 설정한 후, 반드시 직접 플레이로 클리어 테스트를 완료해야 게시할 수 있습니다.</p>
 
   <div class="builder-controls">
     <label>행 (Rows): <input type="number" id="rowsInput" value="6" /></label>
@@ -24,8 +24,8 @@
   <div class="guide-box">
     <strong>📘 사용 방법 안내</strong>
     <ul>
-      <li>⬛ 셀 클릭 → 막힌 칸 (회색)</li>
-      <li>🟧 첫 클릭 → 시작 위치 설정 (주황색)</li>
+      <li>⬛ 셀 클릭 → 막히는 칸 (회색)</li>
+      <li>🟧 처음 클릭 → 시작 위치 설정 (주황색)</li>
       <li>다시 클릭 → 해제됨</li>
     </ul>
   </div>
@@ -33,7 +33,7 @@
   <div class="input-section">
     <h3>퍼즐 정보 입력</h3>
     <input type="text" id="puzzleTitle" placeholder="퍼즐 제목" />
-    <input type="text" id="authorName" placeholder="작성자 닉네임" />
+    <input type="text" id="authorName" placeholder="작성자 닉니링" />
     <textarea id="puzzleDesc" placeholder="퍼즐 설명 (선택)"></textarea>
   </div>
 
@@ -45,6 +45,6 @@
   <p id="seedOutput"></p>
   <p id="testResult" style="font-weight: bold; color: green;"></p>
 
-  <script type="module" src="builder.js"></script>
+  <script src="builder.js"></script>
 </body>
 </html>
