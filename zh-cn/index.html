@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>骑士之旅谜题游戏 – 灵感来自《恶魔的计谋》第二季</title>
+  <meta name="description" content="体验 Netflix《恶魔的计谋》第二季中的骑士之旅谜题。移动骑士，挑战你的逻辑思维！" />
+  <meta name="keywords" content="骑士之旅, 国际象棋谜题, Netflix谜题, 恶魔的计谋, 骑士挑战, 逻辑游戏" />
+  <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+
+  <!-- hreflang 多语言互联 -->
+  <link rel="alternate" hreflang="ko" href="https://hoony8355.github.io/knight-tour-ko/" />
+  <link rel="alternate" hreflang="en" href="https://hoony8355.github.io/knight-tour-ko/en/" />
+  <link rel="alternate" hreflang="ja" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <link rel="alternate" hreflang="es" href="https://hoony8355.github.io/knight-tour-ko/es/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+  <link rel="alternate" hreflang="fr" href="https://hoony8355.github.io/knight-tour-ko/fr/" />
+  <link rel="alternate" hreflang="de" href="https://hoony8355.github.io/knight-tour-ko/de/" />
+  <link rel="alternate" hreflang="id" href="https://hoony8355.github.io/knight-tour-ko/id/" />
+  <link rel="alternate" hreflang="vi" href="https://hoony8355.github.io/knight-tour-ko/vi/" />
+
+  <!-- Open Graph / Twitter 分享 -->
+  <meta property="og:title" content="骑士之旅谜题游戏 – 恶魔的计谋体验" />
+  <meta property="og:description" content="挑战 Netflix《恶魔的计谋》中的热门谜题骑士之旅，加入全球排行榜！" />
+  <meta property="og:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/zh-cn/" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="骑士之旅谜题 – 来自 Netflix 的挑战" />
+  <meta name="twitter:description" content="参与 Netflix《恶魔的计谋》中的经典骑士之旅挑战，看看你能多快完成！" />
+  <meta name="twitter:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <button id="darkToggle">🌙</button>
+  <h1>骑士之旅谜题 🧩</h1>
+  <p>记录你的完成时间，与来自全球的玩家一决高下！</p>
+
+  <label>选择棋盘大小：
+    <select id="sizeSelect">
+      <option value="5">5x5</option>
+      <option value="6">6x6</option>
+      <option value="7">7x7</option>
+      <option value="8" selected>8x8</option>
+    </select>
+  </label>
+
+  <div id="status">点击任意方格开始游戏。</div>
+  <div id="timer">已用时间：<span id="timeElapsed">0</span> 秒</div>
+  <canvas id="confetti" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;display:none;"></canvas>
+  <table id="board"></table>
+
+  <div style="margin-top: 1em;">
+    <button id="resetBtn">🔄 重新开始</button>
+    <button id="undoBtn">↩️ 撤销</button>
+    <button id="hintBtn">💡 提示</button>
+  </div>
+
+  <div id="ranking">
+    <h2>🏆 全球排行榜</h2>
+    <ol id="rankingList"></ol>
+  </div>
+
+  <!-- 昵称弹窗 -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <button id="closeModalBtn" title="关闭" aria-label="关闭">✖</button>
+      <h2>🎉 完成啦！</h2>
+      <p id="resultMessage">你的用时：0 秒</p>
+      <input type="text" id="nicknameInput" placeholder="请输入昵称" />
+      <button id="submitScoreBtn">提交成绩</button>
+    </div>
+  </div>
+
+  <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
+    <h3>🔗 分享此游戏</h3>
+    <button id="shareNativeBtn" onclick="shareNative()">📱 原生分享</button>
+    <button onclick="shareOnTwitter()">X（推特）</button>
+    <button onclick="shareOnFacebook()">Facebook</button>
+    <button onclick="shareKakao()">🟡 KakaoTalk</button>
+    <button onclick="copyLink()">🔗 复制链接</button>
+  </div>
+
+  <div id="utterances-container" style="margin-top: 2em;">
+    <h2>💬 评论区</h2>
+    <script src="https://utteranc.es/client.js"
+            repo="hoony8355/knight-tour-comments"
+            issue-term="pathname"
+            label="comment"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+  </div>
+
+  <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
+    <p>🔗 了解更多：</p>
+    <ul style="list-style: none; padding: 0;">
+      <li><a href="https://zh.wikipedia.org/wiki/骑士周游" target="_blank">📚 骑士之旅 – 维基百科</a></li>
+      <li><a href="https://www.netflix.com/cn/title/81688109" target="_blank">🎬 Netflix《恶魔的计谋》</a></li>
+    </ul>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script type="module" src="../firebase-init.js"></script>
+  <script src="../game.js"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js" crossorigin="anonymous"></script>
+  <script src="../share.js"></script>
+  <script>
+    if (!navigator.share) {
+      document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
+    }
+  </script>
+</body>
+</html>
