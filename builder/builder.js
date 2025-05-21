@@ -1,26 +1,21 @@
-// ✅ builder.js (리팩토링 완료)
-import { renderBoard, playPuzzle } from '../game-custom.js';
+// builder.js
 
-const boardContainer = document.getElementById('boardBuilder');
-const testResult = document.getElementById('testResult');
-
-let currentSeed = {
-  rows: 6,
-  cols: 6,
-  blocked: [],
-  start: null,
-};
-
+let currentStart = null;
 let testPassed = false;
 
-window.generateBoard = function () {
+window.addEventListener('load', generateBoard);
+
+function generateBoard() {
   const rows = parseInt(document.getElementById('rowsInput').value);
   const cols = parseInt(document.getElementById('colsInput').value);
-  currentSeed = { rows, cols, blocked: [], start: null };
+  const board = document.getElementById('boardBuilder');
+
+  board.innerHTML = '';
+  board.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
+  board.style.gridTemplateRows = `repeat(${rows}, 40px)`;
+
+  currentStart = null;
   testPassed = false;
-  boardContainer.innerHTML = '';
-  boardContainer.style.gridTemplateRows = `repeat(${rows}, 40px)`;
-  boardContainer.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -28,99 +23,121 @@ window.generateBoard = function () {
       cell.className = 'builder-cell';
       cell.dataset.x = x;
       cell.dataset.y = y;
-      cell.addEventListener('click', () => handleClick(cell));
-      boardContainer.appendChild(cell);
+      cell.addEventListener('click', () => handleCellClick(cell));
+      board.appendChild(cell);
     }
   }
-};
+}
 
-function handleClick(cell) {
+function handleCellClick(cell) {
   if (cell.classList.contains('start')) {
     cell.classList.remove('start');
-    currentSeed.start = null;
+    currentStart = null;
     return;
   }
-
-  if (!currentSeed.start) {
+  if (!currentStart) {
     if (cell.classList.contains('blocked')) return;
     cell.classList.add('start');
-    currentSeed.start = { x: +cell.dataset.x, y: +cell.dataset.y };
+    currentStart = { x: parseInt(cell.dataset.x), y: parseInt(cell.dataset.y) };
     return;
   }
-
   cell.classList.toggle('blocked');
 }
 
-function getSeed() {
+function getSeedObject() {
+  const rows = parseInt(document.getElementById('rowsInput').value);
+  const cols = parseInt(document.getElementById('colsInput').value);
   const cells = document.querySelectorAll('.builder-cell');
-  currentSeed.blocked = [];
+  const blocked = [];
 
   cells.forEach(cell => {
     if (cell.classList.contains('blocked')) {
-      currentSeed.blocked.push([+cell.dataset.x, +cell.dataset.y]);
+      blocked.push([parseInt(cell.dataset.x), parseInt(cell.dataset.y)]);
     }
   });
 
-  return currentSeed;
+  if (!currentStart) {
+    alert("시작 위치를 설정해주세요 (주황색 칸)");
+    return null;
+  }
+
+  return { rows, cols, blocked, start: currentStart };
 }
 
-window.generateSeed = function () {
-  getSeed();
-  if (!currentSeed.start) {
-    alert("시작 위치를 설정해주세요");
-    return;
-  }
-  const encoded = btoa(JSON.stringify(currentSeed));
-  document.getElementById('seedOutput').textContent = `${location.origin}/knight-tour-ko/?custom=${encoded}`;
-};
+function generateSeed() {
+  const seedObj = getSeedObject();
+  if (!seedObj) return;
+  const encoded = btoa(JSON.stringify(seedObj));
+  const url = `${window.location.origin}/knight-tour-ko/?custom=${encoded}`;
+  document.getElementById('seedOutput').textContent = url;
+}
 
-window.testPuzzle = function () {
-  getSeed();
-  if (!currentSeed.start) {
-    alert("시작 위치가 설정되지 않았습니다");
-    return;
-  }
-  boardContainer.innerHTML = '';
+function testPuzzle() {
+  const seed = getSeedObject();
+  if (!seed) return;
+
+  const board = document.getElementById('boardBuilder');
+  board.innerHTML = '';
   testPassed = false;
-  testResult.textContent = '';
 
-  playPuzzle(boardContainer, currentSeed, () => {
+  playPuzzle(board, seed, () => {
     testPassed = true;
-    testResult.textContent = '🎉 테스트 클리어 완료! 퍼즐 게시 가능';
+    document.getElementById('testResult').textContent = "🎉 테스트 클리어 성공! 게시가 가능합니다.";
   });
-};
+}
 
-window.postPuzzle = function () {
+function postPuzzle() {
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
-  const seed = getSeed();
+  const seedObj = getSeedObject();
 
-  if (!title || !author || !seed.start) {
-    alert("제목, 작성자, 시작 위치를 모두 입력해주세요.");
+  if (!seedObj) {
+    alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
     return;
   }
+
+  if (!title || !author) {
+    alert("제목과 닉네임을 입력해주세요.");
+    return;
+  }
+
   if (!testPassed) {
-    alert("먼저 테스트 플레이를 완료해야 게시할 수 있습니다.");
+    alert("퍼즐을 먼저 테스트하여 클리어한 뒤에만 게시할 수 있습니다.");
     return;
   }
 
-  const payload = {
+  let seed;
+  try {
+    seed = btoa(JSON.stringify(seedObj));
+  } catch (e) {
+    alert("시드 인코딩 오류 발생");
+    console.error(e);
+    return;
+  }
+
+  const data = {
     title,
     author,
     description,
-    seed: btoa(JSON.stringify(seed)),
-    createdAt: Date.now(),
+    seed,
+    createdAt: Date.now()
   };
 
-  const ref = window.dbRef(window.db, 'puzzlePosts');
-  window.dbPush(ref, payload)
-    .then(() => {
-      alert("✅ 퍼즐 게시 완료!");
-      location.reload();
-    })
-    .catch(err => {
-      console.error("❌ 게시 실패", err);
-      alert("게시 중 오류가 발생했습니다.");
-    });
-};
+  console.log("📦 업로드 데이터 확인:", data);
+
+  const dbPath = window.dbRef("puzzlePosts");
+  window.dbPush(dbPath, data).then(() => {
+    alert("✅ 퍼즐이 게시되었습니다!");
+    document.getElementById("seedOutput").textContent = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
+  }).catch(err => {
+    console.error("❌ 퍼즐 게시 실패", err);
+    alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
+  });
+}
+
+// 외부에서 실행될 수 있도록 전역 노출
+window.generateBoard = generateBoard;
+window.generateSeed = generateSeed;
+window.testPuzzle = testPuzzle;
+window.postPuzzle = postPuzzle;
