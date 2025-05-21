@@ -1,13 +1,13 @@
 // builder.js
 import { renderBoard, playPuzzle } from './game-custom.js';
 
-const boardContainer = document.getElementById('board');
-const sizeSelect = document.getElementById('size');
+const boardContainer = document.getElementById('boardBuilder');
+const sizeSelect = document.getElementById('size') || document.getElementById('rowsInput');
 const postBtn = document.getElementById('postBtn');
 const testBtn = document.getElementById('testBtn');
-const titleInput = document.getElementById('title');
-const authorInput = document.getElementById('author');
-const descInput = document.getElementById('description');
+const titleInput = document.getElementById('title') || document.getElementById('puzzleTitle');
+const authorInput = document.getElementById('author') || document.getElementById('authorName');
+const descInput = document.getElementById('description') || document.getElementById('puzzleDesc');
 
 let currentSeed = {
   rows: 6,
@@ -20,8 +20,8 @@ let testPassed = false;
 
 function saveSeedFromUI() {
   currentSeed.blocked = [];
-  currentSeed.rows = parseInt(sizeSelect.value);
-  currentSeed.cols = parseInt(sizeSelect.value);
+  currentSeed.rows = parseInt(document.getElementById('rowsInput')?.value || '6');
+  currentSeed.cols = parseInt(document.getElementById('colsInput')?.value || '6');
   const tds = boardContainer.querySelectorAll('td');
   tds.forEach(td => {
     const x = parseInt(td.dataset.x);
@@ -35,13 +35,15 @@ function saveSeedFromUI() {
   });
 }
 
-function setupBuilderBoard() {
-  const size = parseInt(sizeSelect.value);
-  currentSeed.rows = size;
-  currentSeed.cols = size;
+function generateBoard() {
+  const rows = parseInt(document.getElementById('rowsInput')?.value || '6');
+  const cols = parseInt(document.getElementById('colsInput')?.value || '6');
+  currentSeed.rows = rows;
+  currentSeed.cols = cols;
   currentSeed.blocked = [];
   currentSeed.start = null;
   testPassed = false;
+
   renderBoard(boardContainer, currentSeed);
 
   const cells = boardContainer.querySelectorAll('td');
@@ -63,20 +65,19 @@ function setupBuilderBoard() {
   });
 }
 
-sizeSelect.addEventListener('change', setupBuilderBoard);
-window.addEventListener('DOMContentLoaded', setupBuilderBoard);
+window.generateBoard = generateBoard;
 
-testBtn.addEventListener('click', () => {
+window.testPuzzle = () => {
   saveSeedFromUI();
-  boardContainer.innerHTML = ''; // 초기화 후 플레이 시작
+  boardContainer.innerHTML = '';
   testPassed = false;
   playPuzzle(boardContainer, currentSeed, () => {
     testPassed = true;
-    alert("🎉 테스트 클리어 성공! 퍼즐 게시가 가능합니다.");
+    document.getElementById('testResult').textContent = '🎉 테스트 성공! 퍼즐 게시 가능.';
   });
-});
+};
 
-postBtn.addEventListener('click', () => {
+window.postPuzzle = () => {
   saveSeedFromUI();
 
   const title = titleInput.value.trim();
@@ -113,4 +114,4 @@ postBtn.addEventListener('click', () => {
       console.error("❌ 퍼즐 게시 실패", err);
       alert("퍼즐 게시 중 오류가 발생했습니다. 콘솔을 확인해주세요.");
     });
-});
+};
