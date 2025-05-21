@@ -1,6 +1,6 @@
 let currentStart = null;
 let testPassed = false;
-
+import { playPuzzle } from '../game-custom.js'; //
 window.addEventListener('load', generateBoard);
 
 function generateBoard() {
