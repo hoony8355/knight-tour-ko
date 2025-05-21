@@ -229,7 +229,7 @@ function renderRanking() {
 
   const size = parseInt(document.getElementById("sizeSelect")?.value || "8");
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
-  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(10));
+  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(30)); // 수정: 10 → 30
 
   window.dbGet(q).then(snapshot => {
     rankingList.innerHTML = "";
