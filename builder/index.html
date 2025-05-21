@@ -17,9 +17,9 @@
     <button onclick="generateBoard()">보드 만들기</button>
   </div>
 
-  
-    <script type="module" src="builder.js"></script>
-  
+  <div id="boardContainer">
+    <div id="boardBuilder"></div>
+  </div>
 
   <div class="guide-box">
     <strong>📘 사용 방법 안내</strong>
@@ -38,7 +38,6 @@
   </div>
 
   <div class="action-buttons">
-    <button onclick="generateSeed()">🔗 퍼즐 시드 만들기</button>
     <button onclick="testPuzzle()">👀 테스트 플레이</button>
     <button onclick="postPuzzle()">📬 퍼즐 게시하기</button>
   </div>
@@ -46,6 +45,7 @@
   <p id="seedOutput"></p>
   <p id="testResult" style="font-weight: bold; color: green;"></p>
 
-  <script src="builder.js"></script>
+  <!-- ✅ 모듈 스크립트 하나로 통일 -->
+  <script type="module" src="builder.js"></script>
 </body>
 </html>
