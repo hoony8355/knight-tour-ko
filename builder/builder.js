@@ -1,5 +1,5 @@
 // builder.js
-import { renderBoard, playPuzzle } from './game-custom.js';
+import { renderBoard, playPuzzle } from '../game-custom.js';
 
 const boardContainer = document.getElementById('boardBuilder');
 const sizeSelect = document.getElementById('size') || document.getElementById('rowsInput');
