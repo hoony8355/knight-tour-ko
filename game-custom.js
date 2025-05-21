@@ -1,11 +1,13 @@
+// game-custom.js
+
 export function renderBoard(container, seed, options = {}) {
   const { rows, cols, blocked, start } = seed;
-
   container.innerHTML = '';
   container.classList.add('custom-board');
 
   const table = document.createElement('table');
   table.className = 'board';
+  table.style.margin = 'auto';
 
   for (let y = 0; y < rows; y++) {
     const tr = document.createElement('tr');
@@ -31,7 +33,7 @@ export function renderBoard(container, seed, options = {}) {
   container.appendChild(table);
 }
 
-export function playPuzzle(container, seed, onClear) {
+export function playPuzzle(container, seed, onComplete) {
   const { rows, cols, blocked, start } = seed;
   if (!start) {
     alert("시작 위치가 설정되지 않았습니다.");
@@ -39,15 +41,18 @@ export function playPuzzle(container, seed, onClear) {
   }
 
   container.innerHTML = '';
+  container.classList.add('custom-board');
   const table = document.createElement('table');
   table.className = 'board';
+  table.style.margin = 'auto';
 
   const board = [];
-  const total = rows * cols - blocked.length;
+  let moveCount = 0;
+  let current = null;
 
   for (let y = 0; y < rows; y++) {
-    const tr = document.createElement('tr');
     const row = [];
+    const tr = document.createElement('tr');
     for (let x = 0; x < cols; x++) {
       const td = document.createElement('td');
       td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
@@ -65,8 +70,9 @@ export function playPuzzle(container, seed, onClear) {
     board[y][x].el.style.backgroundColor = '#999';
   });
 
-  let current = null;
-  let moveCount = 0;
+  function highlight(x, y) {
+    board[y][x].el.classList.add('current');
+  }
 
   function clearHighlight() {
     board.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
@@ -93,21 +99,25 @@ export function playPuzzle(container, seed, onClear) {
     cell.el.classList.add('current');
     current = { x, y };
 
-    if (moveCount === total) {
+    if (checkAllVisited()) {
       setTimeout(() => {
-        if (typeof onClear === 'function') {
-          onClear();
-        }
-      }, 300);
+        alert('🎉 클리어 성공! 퍼즐을 게시할 수 있습니다.');
+        if (typeof onComplete === 'function') onComplete();
+      }, 200);
     }
   }
 
-  board.forEach(row => row.forEach(cell => {
-    if (!cell.blocked) {
-      cell.el.addEventListener('click', onClick);
+  function checkAllVisited() {
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cell = board[y][x];
+        if (!cell.visited && !cell.blocked) return false;
+      }
     }
-  }));
+    return true;
+  }
 
+  board.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
   container.appendChild(table);
-  board[start.y][start.x].el.classList.add('current');
+  highlight(start.x, start.y);
 }
