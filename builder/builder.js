@@ -1,12 +1,9 @@
-// builder.js
+// ✅ 통합된 builder.js (playPuzzle + renderBoard 포함)
 
 let currentStart = null;
 let testPassed = false;
 
 window.addEventListener('load', generateBoard);
-window.generateBoard = generateBoard;
-window.testPuzzle = testPuzzle;
-window.postPuzzle = postPuzzle;
 
 function generateBoard() {
   const rows = parseInt(document.getElementById('rowsInput').value);
@@ -65,54 +62,133 @@ function getSeedObject() {
   return { rows, cols, blocked, start: currentStart };
 }
 
-function testPuzzle() {
-  const seed = getSeedObject();
-  if (!seed) return;
+function renderBoard(container, seed) {
+  const { rows, cols, blocked, start } = seed;
+  container.innerHTML = '';
 
-  const testContainerId = 'testBoard';
-  let testBoard = document.getElementById(testContainerId);
-  if (!testBoard) {
-    testBoard = document.createElement('div');
-    testBoard.id = testContainerId;
-    testBoard.style.marginTop = '20px';
-    document.body.appendChild(testBoard);
-  } else {
-    testBoard.innerHTML = '';
+  const table = document.createElement('table');
+  table.className = 'board';
+
+  for (let y = 0; y < rows; y++) {
+    const tr = document.createElement('tr');
+    for (let x = 0; x < cols; x++) {
+      const td = document.createElement('td');
+      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+      td.dataset.x = x;
+      td.dataset.y = y;
+
+      if (blocked.some(([bx, by]) => bx === x && by === y)) {
+        td.style.backgroundColor = '#999';
+      }
+
+      if (start?.x === x && start?.y === y) {
+        td.style.outline = '3px solid orange';
+      }
+
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
   }
 
-  playPuzzle(testBoard, seed, () => {
-    testPassed = true;
-    document.getElementById('testResult').textContent = '🎉 테스트 클리어 성공! 게시가 가능합니다.';
-  });
+  container.appendChild(table);
 }
 
-function postPuzzle() {
+function playPuzzle(container, seed) {
+  const { rows, cols, blocked, start } = seed;
+  if (!start) {
+    alert("시작 위치가 설정되지 않았습니다.");
+    return;
+  }
+
+  const board = [];
+  container.innerHTML = '';
+  const table = document.createElement('table');
+  table.className = 'board';
+
+  for (let y = 0; y < rows; y++) {
+    const row = [];
+    const tr = document.createElement('tr');
+    for (let x = 0; x < cols; x++) {
+      const td = document.createElement('td');
+      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+      td.dataset.x = x;
+      td.dataset.y = y;
+      tr.appendChild(td);
+      row.push({ el: td, visited: false, blocked: false });
+    }
+    board.push(row);
+    table.appendChild(tr);
+  }
+
+  blocked.forEach(([x, y]) => {
+    board[y][x].blocked = true;
+    board[y][x].el.style.backgroundColor = '#999';
+  });
+
+  let current = null;
+  let moveCount = 0;
+
+  function highlight(x, y) {
+    board[y][x].el.classList.add('current');
+  }
+
+  function clearHighlight() {
+    board.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
+  }
+
+  function onClick(e) {
+    const x = +e.target.dataset.x;
+    const y = +e.target.dataset.y;
+    const cell = board[y][x];
+    if (cell.visited || cell.blocked) return;
+
+    if (!current) {
+      if (x !== start.x || y !== start.y) return;
+    } else {
+      const dx = Math.abs(x - current.x);
+      const dy = Math.abs(y - current.y);
+      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
+    }
+
+    cell.visited = true;
+    cell.el.textContent = ++moveCount;
+    clearHighlight();
+    cell.el.classList.add('current');
+    current = { x, y };
+
+    if (moveCount === rows * cols - blocked.length) {
+      testPassed = true;
+      document.getElementById('testResult').textContent = '🎉 테스트 성공! 퍼즐 게시 가능';
+    }
+  }
+
+  board.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
+  container.appendChild(table);
+  highlight(start.x, start.y);
+}
+
+window.testPuzzle = function () {
+  const seed = getSeedObject();
+  if (!seed) return;
+  const container = document.getElementById('boardContainer');
+  playPuzzle(container, seed);
+};
+
+window.postPuzzle = function () {
+  const seedObj = getSeedObject();
+  if (!seedObj) return;
+
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
-  const seedObj = getSeedObject();
 
-  if (!seedObj) {
-    alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
+  if (!testPassed) {
+    alert("퍼즐을 먼저 테스트하여 클리어한 뒤에만 게시할 수 있습니다.");
     return;
   }
 
   if (!title || !author) {
-    alert("제목과 닉네임을 입력해주세요.");
-    return;
-  }
-
-  if (!testPassed) {
-    alert("퍼즐을 먼저 테스트하고 클리어해야 게시할 수 있습니다.");
-    return;
-  }
-
-  let seed;
-  try {
-    seed = btoa(JSON.stringify(seedObj));
-  } catch (e) {
-    alert("시드 인코딩 오류 발생");
-    console.error(e);
+    alert("제목과 작성자 닉네임을 입력해주세요.");
     return;
   }
 
@@ -120,23 +196,18 @@ function postPuzzle() {
     title,
     author,
     description,
-    seed,
-    createdAt: Date.now()
+    seed: btoa(JSON.stringify(seedObj)),
+    createdAt: Date.now(),
   };
 
-  console.log("📦 업로드 데이터 확인:", data);
-
-  const dbPath = window.dbRef("puzzlePosts");
-  window.dbPush(dbPath, data).then(() => {
-    alert("✅ 퍼즐이 게시되었습니다!");
-    document.getElementById("seedOutput").textContent = `${window.location.origin}/knight-tour-ko/?custom=${seed}`;
-  }).catch(err => {
-    console.error("❌ 퍼즐 게시 실패", err);
-    alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
-  });
-} 
-
-// 외부 의존 함수 연결
-window.playPuzzle = window.playPuzzle || function(container, seed, onSuccess) {
-  console.warn('playPuzzle 함수가 아직 로드되지 않았습니다.');
+  const dbPath = window.dbRef(window.db, 'puzzlePosts');
+  window.dbPush(dbPath, data)
+    .then(() => {
+      alert('✅ 퍼즐이 게시되었습니다!');
+      document.getElementById("seedOutput").textContent = `${window.location.origin}/knight-tour-ko/?custom=${data.seed}`;
+    })
+    .catch((err) => {
+      console.error('❌ 퍼즐 게시 실패', err);
+      alert('Firebase 저장 실패. 콘솔을 확인해주세요.');
+    });
 };
