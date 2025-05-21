@@ -3,7 +3,6 @@
 export function renderBoard(container, seed, options = {}) {
   const { rows, cols, blocked, start } = seed;
 
-  // 초기화
   container.innerHTML = '';
   container.classList.add('custom-board');
 
@@ -18,14 +17,12 @@ export function renderBoard(container, seed, options = {}) {
       td.dataset.x = x;
       td.dataset.y = y;
 
-      // 막힌 칸 표시
       if (blocked.some(([bx, by]) => bx === x && by === y)) {
-        td.style.backgroundColor = '#999';
+        td.classList.add('blocked');
       }
 
-      // 시작 위치 표시
       if (start?.x === x && start?.y === y) {
-        td.style.outline = '3px solid orange';
+        td.classList.add('start');
       }
 
       tr.appendChild(td);
@@ -36,7 +33,7 @@ export function renderBoard(container, seed, options = {}) {
   container.appendChild(table);
 }
 
-export function playPuzzle(container, seed) {
+export function playPuzzle(container, seed, onComplete) {
   const { rows, cols, blocked, start } = seed;
   if (!start) {
     alert("시작 위치가 설정되지 않았습니다.");
@@ -63,14 +60,14 @@ export function playPuzzle(container, seed) {
     table.appendChild(tr);
   }
 
-  // 막힌 칸 처리
   blocked.forEach(([x, y]) => {
     board[y][x].blocked = true;
-    board[y][x].el.style.backgroundColor = '#999';
+    board[y][x].el.classList.add('blocked');
   });
 
   let current = null;
   let moveCount = 0;
+  const totalCells = rows * cols - blocked.length;
 
   function highlight(x, y) {
     board[y][x].el.classList.add('current');
@@ -99,10 +96,13 @@ export function playPuzzle(container, seed) {
     clearHighlight();
     cell.el.classList.add('current');
     current = { x, y };
+
+    if (moveCount === totalCells && typeof onComplete === 'function') {
+      onComplete();
+    }
   }
 
   board.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
-
   container.appendChild(table);
   highlight(start.x, start.y);
 }
