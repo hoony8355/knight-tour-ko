@@ -1,52 +1,53 @@
-
-## 🇯🇵 `/ja/index.html` (Knight’s Tour 일본어 페이지)
-
-```html
 <!DOCTYPE html>
 <html lang="ja">
-<title>ナイトの巡回パズル – デビルズ・プランに登場</title>
-<meta name="description" content="Netflix『デビルズ・プラン』シーズン2に登場したナイトの巡回パズルを体験しよう！ナイトで盤面を巡り、頭脳に挑戦。" />
-<meta name="keywords" content="ナイトツアー, チェスパズル, デビルズプラン, Netflixパズル, ナイトの巡回, 脳トレ, 思考力パズル, ゲーム, ランキング" />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
-<link rel="icon" href="/favicon.ico" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ナイトの巡回パズル – デビルズ・プランに登場</title>
+  <meta name="description" content="Netflix『デビルズ・プラン』シーズン2に登場したナイトの巡回パズルを体験しよう！ナイトで盤面を巡り、頭脳に挑戦。" />
+  <meta name="keywords" content="ナイトツアー, チェスパズル, デビルズプラン, Netflixパズル, ナイトの巡回, 脳トレ, 思考力パズル, ゲーム, ランキング" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="../style.css" />
 
-<!-- Open Graph / Twitter -->
-<meta property="og:title" content="ナイトの巡回パズル – デビルズ・プランで話題の脳トレゲーム" />
-<meta property="og:description" content="Netflix『デビルズ・プラン』に登場したチェスパズルに挑戦！タイムを記録して世界中のプレイヤーと競おう。" />
-<meta property="og:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
-<meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/ja/" />
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="Knight’s Tour Puzzle" />
-<meta property="og:locale" content="ja_JP" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="ナイトの巡回パズル – デビルズ・プランで話題の脳トレゲーム" />
+  <meta property="og:description" content="Netflix『デビルズ・プラン』に登場したチェスパズルに挑戦！タイムを記録して世界中のプレイヤーと競おう。" />
+  <meta property="og:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+  <meta property="og:url" content="https://hoony8355.github.io/knight-tour-ko/ja/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Knight’s Tour Puzzle" />
+  <meta property="og:locale" content="ja_JP" />
 
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="ナイトの巡回パズル – Netflix版" />
-<meta name="twitter:description" content="思考力を試すナイトの巡回パズル！世界ランキングに挑戦しよう。" />
-<meta name="twitter:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ナイトの巡回パズル – Netflix版" />
+  <meta name="twitter:description" content="思考力を試すナイトの巡回パズル！世界ランキングに挑戦しよう。" />
+  <meta name="twitter:image" content="https://hoony8355.github.io/knight-tour-ko/Frame165.png" />
 
-<!-- Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "VideoGame",
-  "name": "ナイトの巡回パズルゲーム",
-  "url": "https://hoony8355.github.io/knight-tour-ko/ja/",
-  "image": "https://hoony8355.github.io/knight-tour-ko/Frame165.png",
-  "description": "Netflix『デビルズ・プラン』に登場したチェスのナイトパズル。ボードのすべてのマスを1回ずつ移動し、世界中のプレイヤーとランキングを競おう！",
-  "applicationCategory": "Game",
-  "operatingSystem": "All",
-  "author": {
-    "@type": "Person",
-    "name": "Kwanghun Kim"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "120"
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "ナイトの巡回パズルゲーム",
+    "url": "https://hoony8355.github.io/knight-tour-ko/ja/",
+    "image": "https://hoony8355.github.io/knight-tour-ko/Frame165.png",
+    "description": "Netflix『デビルズ・プラン』に登場したチェスのナイトパズル。ボードのすべてのマスを1回ずつ移動し、世界中のプレイヤーとランキングを競おう！",
+    "applicationCategory": "Game",
+    "operatingSystem": "All",
+    "author": {
+      "@type": "Person",
+      "name": "Kwanghun Kim"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "120"
+    }
   }
-}
-</script>
+  </script>
+</head>
 <body>
   <button id="darkToggle">🌙</button>
   <h1>ナイトツアーパズル 🧩</h1>
@@ -105,8 +106,7 @@
             label="comment"
             theme="github-light"
             crossorigin="anonymous"
-            async>
-    </script>
+            async></script>
   </div>
 
   <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
@@ -122,21 +122,11 @@
   <script src="../game.js"></script>
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js" crossorigin="anonymous"></script>
   <script src="../share.js"></script>
+  <script src="https://hoony8355.github.io/knight-tour-ko/lang-menu.js"></script>
   <script>
     if (!navigator.share) {
       document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
     }
   </script>
-  <script src="https://hoony8355.github.io/knight-tour-ko/lang-menu.js"></script>
 </body>
 </html>
-```
-
----
-
-## ✅ 다음 단계
-
-* 위 코드를 `/ja/index.html`로 저장
-* 동일한 방식으로 `/es/`(스페인어)를 다음으로 이어드릴게요
-
-필요하시면 ZIP으로 압축된 전체 언어 버전 묶음도 준비 가능해요. 계속 진행할까요?
