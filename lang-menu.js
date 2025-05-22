@@ -14,9 +14,9 @@
   const currentLang = document.documentElement.lang;
 
   // 버튼 박스 생성
-  const box = document.createElement("div");
-  box.id = "topRightButtons";
-  box.innerHTML = `
+  const container = document.createElement("div");
+  container.id = "topRightButtons";
+  container.innerHTML = `
     <button id="darkToggle" class="top-button">🌙</button>
     <div class="lang-wrapper">
       <button id="langToggleBtn" class="top-button">🌐</button>
@@ -27,19 +27,23 @@
       </ul>
     </div>
   `;
-  document.body.appendChild(box);
+  document.body.appendChild(container);
 
-  // 드롭다운 열고 닫기
+  // 드롭다운 토글
   document.getElementById('langToggleBtn').addEventListener('click', () => {
     const list = document.getElementById('langList');
     list.style.display = list.style.display === 'block' ? 'none' : 'block';
   });
 
-  // 외부 클릭 시 닫기
   document.addEventListener('click', (e) => {
     const wrapper = document.querySelector('.lang-wrapper');
     if (!wrapper.contains(e.target)) {
       document.getElementById('langList').style.display = 'none';
     }
+  });
+
+  // 다크모드 기능도 함께 처리
+  document.getElementById('darkToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
   });
 })();
