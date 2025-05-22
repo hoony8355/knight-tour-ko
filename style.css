@@ -227,3 +227,53 @@ body.dark-mode #ranking li {
   h2 { font-size: 1.2em; }
   .modal-content { padding: 1.5em; }
 }
+
+/* 🌐 언어 선택 드롭다운 메뉴 스타일 */
+#langMenuContainer {
+  position: fixed;
+  top: 10px;
+  right: 60px;
+  z-index: 1000;
+}
+
+#langToggleBtn {
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  color: var(--font-color);
+  cursor: pointer;
+}
+
+#langList {
+  display: none;
+  position: absolute;
+  right: 0;
+  margin-top: 0.5em;
+  padding: 0;
+  background: var(--modal-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  list-style: none;
+  box-shadow: 0 2px 6px var(--modal-shadow);
+  overflow: hidden;
+  font-size: 0.9em;
+  min-width: 140px;
+}
+
+#langList li a {
+  display: block;
+  padding: 0.5em 1em;
+  color: var(--font-color);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#langList li a:hover {
+  background-color: var(--button-hover);
+}
+
+#langList li a:focus {
+  background-color: var(--hint-color);
+  color: white;
+  outline: none;
+}
