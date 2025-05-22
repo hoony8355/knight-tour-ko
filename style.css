@@ -1,4 +1,5 @@
-/* 🌈 공통 색상 변수 */
+      /* 🌈 통합 스타일 (다크모드 + 반응형 + 고도화된 인터랙션 및 색상체계) */
+
 :root {
   --light-color: #f0d9b5;
   --dark-color: #b58863;
@@ -26,7 +27,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* 🌙 다크모드 적용 시 변수 재정의 */
 body.dark-mode {
   --bg-color: #111;
   --font-color: #eee;
@@ -41,11 +41,9 @@ body.dark-mode {
   --input-color: #fff;
 }
 
-/* 타이포그래피 */
 h1 { font-size: 1.8em; margin-bottom: 0.5em; }
 h2 { font-size: 1.4em; margin-top: 2em; }
 
-/* 버튼 및 셀렉트 공통 스타일 */
 button, select {
   margin-top: 1em;
   padding: 0.5em 1em;
@@ -57,71 +55,25 @@ button, select {
   color: var(--font-color);
   transition: background-color 0.3s, transform 0.2s, color 0.3s;
 }
-button:hover { background: var(--button-hover); }
-button:active { transform: scale(0.96); }
+button:hover {
+  background: var(--button-hover);
+}
+button:active {
+  transform: scale(0.96);
+}
 
-/* 🌙 + 🌐 버튼 박스 */
-#topRightButtons {
+#darkToggle {
   position: fixed;
   top: 10px;
   right: 10px;
   z-index: 1000;
-  display: flex;
-  gap: 8px;
-}
-.top-button {
-  font-size: 1.2em;
-  background: var(--button-bg);
-  color: var(--font-color);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  padding: 0.4em 0.6em;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.top-button:hover {
-  background: var(--button-hover);
 }
 
-/* 🌐 언어 드롭다운 */
-.lang-wrapper {
-  position: relative;
-}
-.lang-list {
-  display: none;
-  position: absolute;
-  top: 110%;
-  right: 0;
-  background: var(--modal-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  box-shadow: 0 2px 6px var(--modal-shadow);
-  font-size: 0.9em;
-  min-width: 140px;
-}
-.lang-list li a {
-  display: block;
-  padding: 0.5em 1em;
-  color: var(--font-color);
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-.lang-list li a:hover {
-  background-color: var(--button-hover);
-}
-.lang-list li a.active-lang {
-  font-weight: bold;
-  background: #eee;
-}
-
-/* 체스판 */
 table {
   margin: auto;
   border-collapse: collapse;
 }
+
 td {
   width: 45px;
   height: 45px;
@@ -134,40 +86,70 @@ td {
   transition: box-shadow 0.3s ease, transform 0.2s ease, background-color 0.3s;
   border-radius: 4px;
 }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
 .light { background: var(--light-color); }
 .dark { background: var(--dark-color); color: white; }
-.current { outline: 3px solid var(--highlight-color); }
+
+.current {
+  outline: 3px solid var(--highlight-color);
+  z-index: 1;
+}
+
 .hint {
   box-shadow: inset 0 0 0 3px var(--hint-color);
   border-radius: 3px;
 }
+
 .hint-best {
   box-shadow: inset 0 0 0 4px var(--hint-best-color) !important;
   animation: pulse 1s ease-in-out infinite;
   border-radius: 3px;
 }
+
 @keyframes pulse {
   0%, 100% { box-shadow: inset 0 0 0 4px var(--hint-best-color); }
   50% { box-shadow: inset 0 0 0 6px orange; }
 }
 
-/* 상태표시 */
 #status { margin-top: 1em; font-weight: bold; }
 #timer { margin-top: 0.5em; font-size: 1em; color: #888; }
 
-/* 랭킹 */
-#ranking { text-align: center; }
+#utterances-container {
+  max-width: 700px;
+  margin: 3em auto;
+  text-align: left;
+}
+
+.sns-share {
+  margin: 2em auto;
+  font-size: 1em;
+}
+
+.sns-share a {
+  margin: 0 0.5em;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#ranking {
+  text-align: center;
+}
+
 #ranking ol {
   list-style: none;
-  padding: 0;
-  margin: 0 auto;
+  padding-left: 0;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 320px;
 }
+
 #ranking li {
+  display: block;
   background: #fffaf0;
   border: 1px solid #e0e0e0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -178,21 +160,24 @@ td {
   border-radius: 6px;
   transition: background 0.3s;
 }
+
 body.dark-mode #ranking li {
   background: #1a1a1a;
   border-color: #444;
 }
 
-/* 모달 */
 .modal {
   display: none;
   position: fixed;
   z-index: 9999;
-  left: 0; top: 0;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
   background-color: var(--modal-overlay);
+  transition: background-color 0.3s;
 }
+
 .modal-content {
   background-color: var(--modal-bg);
   margin: 15% auto;
@@ -205,6 +190,7 @@ body.dark-mode #ranking li {
   color: inherit;
   position: relative;
 }
+
 #closeModalBtn {
   position: absolute;
   top: 10px;
@@ -215,6 +201,7 @@ body.dark-mode #ranking li {
   color: var(--font-color);
   cursor: pointer;
 }
+
 #nicknameInput {
   margin-top: 1em;
   padding: 0.5em;
@@ -224,7 +211,9 @@ body.dark-mode #ranking li {
   color: var(--input-color);
   border: 1px solid var(--border-color);
   border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
 }
+
 #submitScoreBtn {
   margin-top: 1em;
   padding: 0.5em 1em;
@@ -232,26 +221,59 @@ body.dark-mode #ranking li {
   cursor: pointer;
 }
 
-/* 기타 */
-#utterances-container {
-  max-width: 700px;
-  margin: 3em auto;
-  text-align: left;
-}
-.sns-share {
-  margin: 2em auto;
-  font-size: 1em;
-}
-.sns-share a {
-  margin: 0 0.5em;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-/* 반응형 */
 @media (max-width: 600px) {
   td { width: 32px; height: 32px; font-size: 0.85em; }
   h1 { font-size: 1.4em; }
   h2 { font-size: 1.2em; }
   .modal-content { padding: 1.5em; }
+}
+
+/* 🌐 언어 선택 드롭다운 메뉴 스타일 */
+#langMenuContainer {
+  position: fixed;
+  top: 10px;
+  right: 60px;
+  z-index: 1000;
+}
+
+#langToggleBtn {
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  color: var(--font-color);
+  cursor: pointer;
+}
+
+#langList {
+  display: none;
+  position: absolute;
+  right: 0;
+  margin-top: 0.5em;
+  padding: 0;
+  background: var(--modal-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  list-style: none;
+  box-shadow: 0 2px 6px var(--modal-shadow);
+  overflow: hidden;
+  font-size: 0.9em;
+  min-width: 140px;
+}
+
+#langList li a {
+  display: block;
+  padding: 0.5em 1em;
+  color: var(--font-color);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#langList li a:hover {
+  background-color: var(--button-hover);
+}
+
+#langList li a:focus {
+  background-color: var(--hint-color);
+  color: white;
+  outline: none;
 }
