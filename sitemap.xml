@@ -3,6 +3,7 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
+  <!-- 메인 페이지 -->
   <url>
     <loc>https://hoony8355.github.io/knight-tour-ko/</loc>
     <xhtml:link rel="alternate" hreflang="ko" href="https://hoony8355.github.io/knight-tour-ko/" />
@@ -14,15 +15,59 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://hoony8355.github.io/knight-tour-ko/de/" />
     <xhtml:link rel="alternate" hreflang="id" href="https://hoony8355.github.io/knight-tour-ko/id/" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://hoony8355.github.io/knight-tour-ko/vi/" />
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
 
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/en/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/ja/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/es/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/zh-cn/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/fr/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/de/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/id/</loc></url>
-  <url><loc>https://hoony8355.github.io/knight-tour-ko/vi/</loc></url>
+  <!-- 언어별 페이지들 -->
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/en/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/ja/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/es/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/zh-cn/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/fr/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/de/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/id/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hoony8355.github.io/knight-tour-ko/vi/</loc>
+    <lastmod>2025-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
 </urlset>
