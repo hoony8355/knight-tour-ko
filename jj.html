@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>빠빰 삭제기</title>
+</head>
+<body>
+  <h2>🔥 Firebase 데이터 정리 중...</h2>
+  <div id="log"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, get, remove, child } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
+      authDomain: "knight-tour-ranking.firebaseapp.com",
+      databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "knight-tour-ranking",
+      storageBucket: "knight-tour-ranking.appspot.com",
+      messagingSenderId: "218471911886",
+      appId: "1:218471911886:web:6c81f7d927ad3f69a4e83b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, "rankings");
+
+    get(dbRef).then(snapshot => {
+      let count = 0;
+      snapshot.forEach(childSnap => {
+        const val = childSnap.val();
+        const key = childSnap.key;
+        if (val.name === "빠빰") {
+          remove(child(dbRef, key)).then(() => {
+            console.log(`삭제됨: ${key}`);
+            document.getElementById("log").innerHTML += `<div>삭제됨: ${key}</div>`;
+            count++;
+          });
+        }
+      });
+      if (count === 0) {
+        document.getElementById("log").innerText = "삭제할 '빠빰' 데이터가 없습니다.";
+      }
+    }).catch(err => {
+      console.error(err);
+      document.getElementById("log").innerText = "삭제 중 오류 발생: " + err;
+    });
+  </script>
+</body>
+</html>
