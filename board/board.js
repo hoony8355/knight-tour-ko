@@ -212,47 +212,64 @@ function playPuzzleInModal(seed) {
   }
 
   function onClick(e) {
-    const x = +e.target.dataset.x;
-    const y = +e.target.dataset.y;
-    const cell = boardData[y][x];
-    if (cell.visited || cell.blocked) return;
+  const x = +e.target.dataset.x;
+  const y = +e.target.dataset.y;
+  const cell = boardData[y][x];
 
-    if (!current) {
-      if (x !== seed.start.x || y !== seed.start.y) return;
-      console.log("[onClick] ⏱️ 첫 클릭 - 타이머 시작");
-      startGameTimer();
-    } else {
-      const dx = Math.abs(x - current.x);
-      const dy = Math.abs(y - current.y);
-      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
+  if (cell.visited || cell.blocked) {
+    console.log(`[onClick] 🚫 방문 불가한 칸 (x:${x}, y:${y})`);
+    return;
+  }
+
+  if (!current) {
+    // 최초 클릭: 시작 위치인지 확인
+    if (x !== seed.start.x || y !== seed.start.y) {
+      console.log(`[onClick] ❌ 시작 위치가 아님 (x:${x}, y:${y})`);
+      return;
     }
-
-    moveHistory.push({ x, y });
-    cell.visited = true;
-    cell.el.textContent = moveHistory.length;
-    clearHighlight();
-    cell.el.classList.add("current");
-    current = { x, y };
-
-    if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
-      const timeTaken = getTimeTaken().toFixed(2);
-      console.log(`[✔ 완료] 퍼즐 클리어, 시간: ${timeTaken}s`);
-      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
-      if (nickname && nickname.trim()) {
-        const rankingRef = ref(db, `rankings/${seed.id || 'custom'}`);
-        const record = {
-          nickname: nickname.trim(),
-          time: parseFloat(timeTaken),
-          createdAt: Date.now()
-        };
-        push(rankingRef, record);
-        alert("✅ 기록이 저장되었습니다!");
-        loadRankingForPuzzle(seed.id || "custom");
-      } else {
-        alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
-      }
+    console.log("[onClick] ✅ 첫 클릭 - 타이머 시작");
+    startGameTimer();
+  } else {
+    // 나이트 이동 규칙 검증
+    const dx = Math.abs(x - current.x);
+    const dy = Math.abs(y - current.y);
+    if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
+      console.log(`[onClick] ❌ 나이트 이동 아님 (from x:${current.x}, y:${current.y} → x:${x}, y:${y})`);
+      return;
     }
   }
+
+  // 이동 처리
+  moveHistory.push({ x, y });
+  cell.visited = true;
+  cell.el.textContent = moveHistory.length;
+
+  boardData.forEach(row => row.forEach(c => c.el.classList.remove("current")));
+  cell.el.classList.add("current");
+  current = { x, y };
+
+  const totalMoves = seed.rows * seed.cols - seed.blocked.length;
+  if (moveHistory.length === totalMoves) {
+    const timeTaken = getTimeTaken().toFixed(2);
+    console.log(`[✔ 완료] 퍼즐 클리어, 소요 시간: ${timeTaken}s`);
+
+    const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
+    if (nickname && nickname.trim()) {
+      const rankingRef = ref(db, `rankings/${seed.id || 'custom'}`);
+      const record = {
+        nickname: nickname.trim(),
+        time: parseFloat(timeTaken),
+        createdAt: Date.now()
+      };
+      push(rankingRef, record);
+      alert("✅ 기록이 저장되었습니다!");
+      loadRankingForPuzzle(seed.id || "custom");
+    } else {
+      alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
+    }
+  }
+}
+
 
   boardData.forEach(row => row.forEach(cell => cell.el.addEventListener("click", onClick)));
   boardArea.appendChild(table);
