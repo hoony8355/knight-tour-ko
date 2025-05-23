@@ -1,9 +1,9 @@
+// board.js
 import {
   getDatabase, ref, get, query, orderByChild
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
-// Firebase 초기화
 const firebaseConfig = {
   apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
   authDomain: "knight-tour-ranking.firebaseapp.com",
@@ -21,45 +21,56 @@ const puzzleListDiv = document.getElementById("puzzleList");
 const topPuzzleListDiv = document.getElementById("topPuzzleList");
 const sortSelect = document.getElementById("sortSelect");
 
-const recommendedIds = [
-  "RECOMMEND_ID_1",
-  "RECOMMEND_ID_2",
-  "RECOMMEND_ID_3",
-  "RECOMMEND_ID_4",
-  "RECOMMEND_ID_5"
-];
-
+const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
+let boardData = [], moveHistory = [], currentSeed = null;
 
 window.closePreview = function () {
   document.getElementById("previewModal").classList.add("hidden");
-  document.getElementById("modalBoard").innerHTML = "";
+  document.getElementById("modalBoard").querySelector("table")?.remove();
   document.getElementById("rankingList").innerHTML = "";
+  boardData = [];
+  moveHistory = [];
+};
+
+window.undoMove = function () {
+  if (moveHistory.length === 0) return;
+  const last = moveHistory.pop();
+  const cell = boardData[last.y][last.x];
+  cell.visited = false;
+  cell.el.textContent = "";
+  cell.el.classList.remove("current");
+  if (moveHistory.length > 0) {
+    const prev = moveHistory[moveHistory.length - 1];
+    boardData[prev.y][prev.x].el.classList.add("current");
+  }
+};
+
+window.restartPuzzle = function () {
+  if (currentSeed) playPuzzleInModal(currentSeed);
 };
 
 function openPreview(puzzle) {
-  console.log("[미리보기 열기]", puzzle.title);
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
 
-  const seedObj = JSON.parse(atob(puzzle.seed));
-  playPuzzleInModal(seedObj);
+  currentSeed = JSON.parse(atob(puzzle.seed));
+  playPuzzleInModal(currentSeed);
   loadRankingForPuzzle(puzzle.id);
 
   document.getElementById("previewModal").classList.remove("hidden");
 }
 
-function playPuzzleInModal(seedData) {
+function playPuzzleInModal(seed) {
   const boardArea = document.getElementById("modalBoard");
-  boardArea.innerHTML = "";
-  const rows = seedData.rows;
-  const cols = seedData.cols;
+  boardArea.querySelector("table")?.remove();
+  const rows = seed.rows, cols = seed.cols;
 
   const table = document.createElement('table');
   table.className = 'board';
+  boardData = [], moveHistory = [];
 
-  const boardData = [];
   for (let y = 0; y < rows; y++) {
     const tr = document.createElement('tr');
     const row = [];
@@ -75,17 +86,12 @@ function playPuzzleInModal(seedData) {
     boardData.push(row);
   }
 
-  seedData.blocked.forEach(([x, y]) => {
+  seed.blocked.forEach(([x, y]) => {
     boardData[y][x].blocked = true;
     boardData[y][x].el.style.backgroundColor = '#999';
   });
 
   let current = null;
-  let moveCount = 0;
-
-  function highlight(x, y) {
-    boardData[y][x].el.classList.add('current');
-  }
 
   function clearHighlight() {
     boardData.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
@@ -98,39 +104,41 @@ function playPuzzleInModal(seedData) {
     if (cell.visited || cell.blocked) return;
 
     if (!current) {
-      if (x !== seedData.start.x || y !== seedData.start.y) return;
+      if (x !== seed.start.x || y !== seed.start.y) return;
     } else {
       const dx = Math.abs(x - current.x);
       const dy = Math.abs(y - current.y);
       if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
     }
 
+    moveHistory.push({ x, y });
     cell.visited = true;
-    cell.el.textContent = ++moveCount;
+    cell.el.textContent = moveHistory.length;
     clearHighlight();
     cell.el.classList.add('current');
     current = { x, y };
 
-    if (moveCount === (rows * cols - seedData.blocked.length)) {
+    if (moveHistory.length === (rows * cols - seed.blocked.length)) {
       alert("🎉 클리어! 축하합니다.");
     }
   }
 
   boardData.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
   boardArea.appendChild(table);
-  highlight(seedData.start.x, seedData.start.y);
+  boardData[seed.start.y][seed.start.x].el.classList.add('current');
+  current = { x: seed.start.x, y: seed.start.y };
+  boardData[seed.start.y][seed.start.x].visited = true;
+  boardData[seed.start.y][seed.start.x].el.textContent = 1;
+  moveHistory.push(current);
 }
 
 function loadRankingForPuzzle(puzzleId) {
   const rankRef = ref(db, `rankings/${puzzleId}`);
   get(rankRef).then(snapshot => {
     if (snapshot.exists()) {
-      const rankArray = Object.values(snapshot.val());
-      rankArray.sort((a, b) => a.time - b.time);
-      const top5 = rankArray.slice(0, 5);
-
-      const html = top5.map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time}s</p>`).join('');
-      document.getElementById("rankingList").innerHTML = html;
+      const rankArray = Object.values(snapshot.val()).sort((a, b) => a.time - b.time).slice(0, 5);
+      document.getElementById("rankingList").innerHTML = rankArray
+        .map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time}s</p>`).join('');
     } else {
       document.getElementById("rankingList").innerHTML = "<p>아직 기록이 없습니다.</p>";
     }
@@ -142,10 +150,7 @@ function renderPuzzleList(puzzles) {
   puzzles.forEach(puzzle => {
     const div = document.createElement("div");
     div.className = "puzzle-card";
-    div.innerHTML = `
-      <h4>${puzzle.title}</h4>
-      <p>${puzzle.author}</p>
-    `;
+    div.innerHTML = `<h4>${puzzle.title}</h4><p>${puzzle.author}</p>`;
     div.onclick = () => openPreview(puzzle);
     puzzleListDiv.appendChild(div);
   });
@@ -156,10 +161,7 @@ function renderTopPuzzles(puzzles) {
   puzzles.forEach(puzzle => {
     const div = document.createElement("div");
     div.className = "puzzle-card";
-    div.innerHTML = `
-      <h4>${puzzle.title}</h4>
-      <p>${puzzle.author}</p>
-    `;
+    div.innerHTML = `<h4>${puzzle.title}</h4><p>${puzzle.author}</p>`;
     div.onclick = () => openPreview(puzzle);
     topPuzzleListDiv.appendChild(div);
   });
@@ -170,26 +172,18 @@ function fetchPuzzles() {
   get(puzzlesRef).then(snapshot => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-      allPuzzles = Object.entries(data).map(([id, value]) => ({
-        ...value,
-        id
-      })).reverse();
-
-      const topPuzzles = allPuzzles.filter(p => recommendedIds.includes(p.id));
-      renderTopPuzzles(topPuzzles);
+      allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
+      renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
       renderPuzzleList(allPuzzles);
     }
   });
 }
 
 sortSelect.addEventListener("change", () => {
-  if (sortSelect.value === "latest") {
-    const sorted = [...allPuzzles].sort((a, b) => b.createdAt - a.createdAt);
-    renderPuzzleList(sorted);
-  } else if (sortSelect.value === "likes") {
-    const sorted = [...allPuzzles].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-    renderPuzzleList(sorted);
-  }
+  const sorted = [...allPuzzles];
+  if (sortSelect.value === "latest") sorted.sort((a, b) => b.createdAt - a.createdAt);
+  else sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+  renderPuzzleList(sorted);
 });
 
 fetchPuzzles();
