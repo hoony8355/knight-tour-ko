@@ -193,7 +193,7 @@ function postPuzzle() {
   const data = {
     title,
     author,
-    description,
+    description: description || "",  // ❗ undefined/null 방지
     seed: encodedSeed,
     createdAt: Date.now()
   };
