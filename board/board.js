@@ -1,6 +1,6 @@
 // board.js
 import {
-  getDatabase, ref, get, query, orderByChild
+  getDatabase, ref, get, query, orderByChild, push
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
@@ -23,7 +23,7 @@ const sortSelect = document.getElementById("sortSelect");
 
 const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
-let boardData = [], moveHistory = [], currentSeed = null, current = null, startTime = null;
+let boardData = [], moveHistory = [], currentSeed = null, current = null;
 
 window.closePreview = function () {
   document.getElementById("previewModal").classList.add("hidden");
@@ -36,7 +36,6 @@ window.closePreview = function () {
 
 window.undoMove = function () {
   if (moveHistory.length <= 1) {
-    // 시작 위치까지 되돌린 경우 초기화
     const first = moveHistory.pop();
     const cell = boardData[first.y][first.x];
     cell.visited = false;
@@ -45,22 +44,14 @@ window.undoMove = function () {
     current = null;
     return;
   }
-
-  // 현재 위치 제거
   const last = moveHistory.pop();
   const cell = boardData[last.y][last.x];
   cell.visited = false;
   cell.el.textContent = "";
   cell.el.classList.remove("current");
-
-  // 이전 위치로 되돌림
   const prev = moveHistory[moveHistory.length - 1];
   boardData[prev.y][prev.x].el.classList.add("current");
   current = { x: prev.x, y: prev.y };
-};
-  } else {
-    current = null;
-  }
 };
 
 window.restartPuzzle = function () {
@@ -68,25 +59,20 @@ window.restartPuzzle = function () {
 };
 
 function openPreview(puzzle) {
-  currentSeed = { ...JSON.parse(atob(puzzle.seed)), id: puzzle.id };
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
 
-  
+  currentSeed = JSON.parse(atob(puzzle.seed));
+  currentSeed.id = puzzle.id;
   playPuzzleInModal(currentSeed);
   loadRankingForPuzzle(puzzle.id);
-
   document.getElementById("previewModal").classList.remove("hidden");
 }
 
 function playPuzzleInModal(seed) {
-  if (!seed) return;
-  currentSeed = seed;
-  
-  startTime = Date.now();
+  const startTime = Date.now();
   const boardArea = document.getElementById("modalBoard");
-  if (!boardArea) return;
   boardArea.querySelector("table")?.remove();
   const rows = seed.rows, cols = seed.cols;
 
@@ -141,10 +127,9 @@ function playPuzzleInModal(seed) {
 
     if (moveHistory.length === (rows * cols - seed.blocked.length)) {
       const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초
-닉네임을 입력하세요:`);
+      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
       if (nickname && nickname.trim()) {
-        const rankingRef = ref(db, `rankings/${currentSeed.id || 'custom'}`);
+        const rankingRef = ref(db, `rankings/${seed.id || 'custom'}`);
         const record = {
           nickname: nickname.trim(),
           time: timeTaken,
@@ -152,7 +137,7 @@ function playPuzzleInModal(seed) {
         };
         push(rankingRef, record);
         alert("✅ 기록이 저장되었습니다!");
-        loadRankingForPuzzle(currentSeed.id || 'custom');
+        loadRankingForPuzzle(seed.id || 'custom');
       } else {
         alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
       }
