@@ -65,12 +65,12 @@ function getSeedObject() {
   }
 
   const seed = { rows, cols, blocked, start: currentStart };
-  console.log("[\uD83D\uDD0D 시드 생성 완료] blocked 좌표:", seed.blocked);
+  console.log("[🔍 시드 생성 완료] blocked 좌표:", seed.blocked);
   return seed;
 }
 
 function testPuzzle() {
-  console.log('[\uD83E\uDDEA 테스트 시작]');
+  console.log('[🧪 테스트 시작]');
   const seed = getSeedObject();
   if (!seed) return;
 
@@ -135,7 +135,7 @@ function testPuzzle() {
     current = { x, y };
 
     if (moveCount === (seed.rows * seed.cols - seed.blocked.length)) {
-      alert("\uD83C\uDF89 퍼즐 클리어 성공! 게시가 가능합니다.");
+      alert("🎉 퍼즐 클리어 성공! 게시가 가능합니다.");
       testPassed = true;
       lastVerifiedSeed = seed;
       console.log('[✅ 테스트 통과]');
@@ -193,7 +193,7 @@ function postPuzzle() {
   const data = {
     title,
     author,
-    description: description || "",  // ❗ undefined/null 방지
+    description: description || "",
     seed: encodedSeed,
     createdAt: Date.now()
   };
@@ -204,11 +204,12 @@ function postPuzzle() {
     return;
   }
 
-  window.postPuzzleToDB(data).then(() => {
-    console.log('[✅ 퍼즐 게시 성공]');
+  window.postPuzzleToDB(data).then((ref) => {
+    const puzzleId = ref.key;
+    const url = `${window.location.origin}/knight-tour-ko/board/?puzzle=${puzzleId}`;
+    console.log('[✅ 퍼즐 게시 성공] 퍼즐 ID:', puzzleId);
     alert("✅ 퍼즐이 게시되었습니다!");
-    document.getElementById("seedOutput").textContent =
-      `${window.location.origin}/knight-tour-ko/?custom=${data.seed}`;
+    document.getElementById("seedOutput").textContent = url;
   }).catch(err => {
     console.error("❌ 퍼즐 게시 실패", err);
     alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
