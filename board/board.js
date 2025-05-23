@@ -1,4 +1,4 @@
-// board.js - Fixed timer to start only after first user click
+// board.js - 타이머는 시작 위치 클릭 후 첫 나이트 이동부터 시작
 import {
   getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -44,7 +44,6 @@ function updateTimerDisplay(elapsed = 0) {
     timerEl.style.fontSize = "1.1em";
     timerEl.style.color = "#333";
     document.getElementById("modalBoard").prepend(timerEl);
-    console.log("🆕 타이머 표시 영역 생성됨");
   }
   timerEl.textContent = `⏱ ${elapsed.toFixed(2)}초 경과 중`;
 }
@@ -100,10 +99,13 @@ function playPuzzleInModal(seed) {
   timerInterval = null;
 
   console.log("🎮 퍼즐 시작됨:", seed);
+  currentSeed = seed;
 
   const table = document.createElement("table");
   table.className = "board";
-  boardData = [], moveHistory = [], current = null;
+  boardData = [];
+  moveHistory = [];
+  current = null;
 
   for (let y = 0; y < seed.rows; y++) {
     const tr = document.createElement("tr");
@@ -140,21 +142,31 @@ function playPuzzleInModal(seed) {
         console.log("❌ 시작 위치가 아님: 클릭된 위치", x, y);
         return;
       }
-      console.log("✅ 시작 클릭됨. 타이머 시작");
+      console.log("🚩 시작 위치 클릭됨. 대기 중...");
+      moveHistory.push({ x, y });
+      cell.visited = true;
+      cell.el.textContent = moveHistory.length;
+      clearHighlight();
+      cell.el.classList.add("current");
+      current = { x, y };
+      return;
+    }
+
+    const dx = Math.abs(x - current.x);
+    const dy = Math.abs(y - current.y);
+    if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
+      console.log("❌ 유효하지 않은 나이트 이동");
+      return;
+    }
+
+    if (!startTime) {
+      console.log("✅ 타이머 시작");
       startTime = performance.now();
       updateTimerDisplay(0);
       timerInterval = setInterval(() => {
         const elapsed = (performance.now() - startTime) / 1000;
         updateTimerDisplay(elapsed);
-        console.log("⏱ 현재 경과 시간:", elapsed.toFixed(2));
       }, 500);
-    } else {
-      const dx = Math.abs(x - current.x);
-      const dy = Math.abs(y - current.y);
-      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
-        console.log("❌ 유효하지 않은 나이트 이동");
-        return;
-      }
     }
 
     moveHistory.push({ x, y });
@@ -164,7 +176,8 @@ function playPuzzleInModal(seed) {
     cell.el.classList.add("current");
     current = { x, y };
 
-    if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
+    const totalPlayable = seed.rows * seed.cols - seed.blocked.length;
+    if (moveHistory.length === totalPlayable) {
       clearInterval(timerInterval);
       const timeTaken = ((performance.now() - startTime) / 1000).toFixed(2);
       console.log("🎉 클리어 완료, 시간:", timeTaken);
