@@ -231,12 +231,16 @@ function playPuzzleInModal(seed) {
     if (cell.visited || cell.blocked) return;
 
     if (!current) {
-      if (x !== seed.start.x || y !== seed.start.y) return;
-    } else {
-      const dx = Math.abs(x - current.x);
-      const dy = Math.abs(y - current.y);
-      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
-    }
+  if (x !== seed.start.x || y !== seed.start.y) return;
+
+  if (!startTime) {
+    startTime = performance.now();
+    timerInterval = setInterval(() => {
+      const elapsed = (performance.now() - startTime) / 1000;
+      updateTimerDisplay(elapsed);
+    }, 100);
+  }
+}
 
     moveHistory.push({ x, y });
     cell.visited = true;
