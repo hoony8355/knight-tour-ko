@@ -1,4 +1,5 @@
-// board.js - Fixed timer to start only after first user click
+// board.js - 완성본 (퍼즐 목록 불러오기 + 클릭 시 보드 표시 기능 포함)
+
 import {
   getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -21,7 +22,6 @@ const puzzleListDiv = document.getElementById("puzzleList");
 const topPuzzleListDiv = document.getElementById("topPuzzleList");
 const sortSelect = document.getElementById("sortSelect");
 
-const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
 let boardData = [], moveHistory = [], currentSeed = null, current = null;
 let startTime = null;
@@ -53,11 +53,7 @@ window.closePreview = function () {
   document.getElementById("modalBoard").querySelector("table")?.remove();
   document.getElementById("playTimer")?.remove();
   document.getElementById("rankingList").innerHTML = "";
-  document.getElementById("modalLikeArea").innerHTML = "";
-  boardData = [];
-  moveHistory = [];
-  current = null;
-  startTime = null;
+  boardData = []; moveHistory = []; current = null; startTime = null;
   clearInterval(timerInterval);
 };
 
@@ -166,7 +162,6 @@ function playPuzzleInModal(seed) {
         };
         push(rankingRef, record);
         alert("✅ 기록이 저장되었습니다!");
-        loadRankingForPuzzle(seed.id || "custom");
       } else {
         alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
       }
@@ -175,7 +170,45 @@ function playPuzzleInModal(seed) {
 
   boardData.forEach(row => row.forEach(cell => cell.el.addEventListener("click", onClick)));
   boardArea.appendChild(table);
-  // 시작 위치 표시만 하고 방문 처리 X
   boardData[seed.start.y][seed.start.x].el.classList.add("current");
-  current = null; // 시작 위치는 누르기 전까지 비활성화 상태
+  current = null;
 }
+
+function renderPuzzleCard(puzzle) {
+  const card = document.createElement("div");
+  card.className = "puzzle-card";
+  card.innerHTML = `
+    <h4>${puzzle.title || "제목 없음"}</h4>
+    <p>작성자: ${puzzle.author || "익명"}</p>
+    <p>추천수: ${puzzle.likes || 0}</p>
+  `;
+  card.addEventListener("click", () => {
+    document.getElementById("modalTitle").textContent = puzzle.title || "제목 없음";
+    document.getElementById("modalAuthor").textContent = "작성자: " + (puzzle.author || "익명");
+    document.getElementById("modalDescription").textContent = puzzle.description || "";
+    document.getElementById("previewModal").classList.remove("hidden");
+    currentSeed = puzzle;
+    playPuzzleInModal(puzzle);
+  });
+  return card;
+}
+
+function renderAllPuzzles(puzzles) {
+  puzzleListDiv.innerHTML = "";
+  puzzles.forEach(p => {
+    const card = renderPuzzleCard(p);
+    puzzleListDiv.appendChild(card);
+  });
+}
+
+function fetchPuzzles() {
+  const puzzlesRef = ref(db, "customPuzzles");
+  onValue(puzzlesRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+    allPuzzles = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+    renderAllPuzzles(allPuzzles);
+  });
+}
+
+fetchPuzzles();
