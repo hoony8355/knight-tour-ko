@@ -1,0 +1,107 @@
+/* 전체 레이아웃 */
+body {
+  max-width: 640px;
+  margin: auto;
+  padding: 1em;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* 컨트롤 영역 */
+.builder-controls {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+/* 보드 컨테이너: 중앙 정렬 */
+#boardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1em 0;
+}
+
+/* 빌더용 셀 생성 보드 */
+#boardBuilder {
+  display: grid;
+  gap: 2px;
+  border: 2px solid #ccc;
+
+  /* 👇 최소 높이 보장 */
+  min-height: 240px;
+  min-width: 240px;
+
+  /* 👇 반응형 대응 - 셀 크기 지정이 JS에서 있으므로, 여긴 유연하게 */
+  width: max-content;
+  height: max-content;
+}
+
+
+/* 셀 기본 설정 */
+.builder-cell {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+.builder-cell.blocked { background: #555; }
+.builder-cell.start { background: orange; }
+
+/* 실제 퍼즐 테스트용 보드 */
+table.board {
+  border-collapse: collapse;
+  margin: auto;
+}
+table.board td {
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 1.1em;
+  border: 1px solid #ccc;
+}
+table.board td.light {
+  background: #f0d9b5;
+}
+table.board td.dark {
+  background: #b58863;
+  color: white;
+}
+table.board td.current {
+  outline: 3px solid orange;
+}
+
+/* 안내 및 입력 영역 */
+.guide-box {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 1em;
+  border-radius: 8px;
+  font-size: 0.9em;
+  margin-top: 1.5em;
+}
+
+.input-section {
+  margin-top: 2em;
+}
+.input-section input,
+.input-section textarea {
+  width: 100%;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  box-sizing: border-box;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 1em;
+}
+
+#seedOutput {
+  text-align: center;
+  font-size: 0.9em;
+  color: #555;
+}
