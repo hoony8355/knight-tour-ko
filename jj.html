@@ -28,7 +28,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const boardSize = "6x6"; // 필요시 수정
+    const boardSize = "5x5"; // 필요시 수정
     const targetRef = ref(db, `rankings/${boardSize}`);
 
     get(targetRef).then(snapshot => {
