@@ -66,18 +66,26 @@ window.restartPuzzle = function () {
 };
 
 function handleLike(puzzleId) {
+  console.log("❤️ 추천 시도:", puzzleId);
   const likeRef = ref(db, `likes/${puzzleId}/${sessionId}`);
   get(likeRef).then(snapshot => {
     if (snapshot.exists()) {
       alert("이미 추천하셨습니다.");
     } else {
       set(likeRef, true).then(() => {
+        console.log("✅ 추천 저장 완료");
         alert("❤️ 추천 완료!");
         loadLikeCount(puzzleId);
+      }).catch(err => {
+        console.error("❌ 추천 저장 실패:", err);
+        alert("추천 중 오류 발생 (권한 또는 네트워크 문제)");
       });
     }
+  }).catch(err => {
+    console.error("❌ 추천 조회 실패:", err);
   });
 }
+window.handleLike = handleLike;
 
 function loadLikeCount(puzzleId) {
   const countRef = ref(db, `likes/${puzzleId}`);
@@ -159,16 +167,21 @@ function renderTopPuzzles(puzzles) {
 }
 
 function fetchPuzzles() {
+  console.log("📡 퍼즐 데이터 불러오는 중...");
   const puzzlesRef = query(ref(db, "puzzlePosts"), orderByChild("createdAt"));
-  get(puzzlesRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
-        renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
-        renderPuzzleList(allPuzzles);
-      }
-    });
+  get(puzzlesRef).then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
+      console.log("✅ 퍼즐 수:", allPuzzles.length);
+      renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
+      renderPuzzleList(allPuzzles);
+    } else {
+      console.warn("⚠ 퍼즐 없음");
+    }
+  }).catch(err => {
+    console.error("❌ Firebase fetch 실패:", err);
+  });
 }
 
 function playPuzzleInModal(seed) {
@@ -176,16 +189,16 @@ function playPuzzleInModal(seed) {
   const boardArea = document.getElementById("modalBoard");
   boardArea.querySelector("table")?.remove();
 
-  const table = document.createElement('table');
-  table.className = 'board';
+  const table = document.createElement("table");
+  table.className = "board";
   boardData = [], moveHistory = [], current = null;
 
   for (let y = 0; y < seed.rows; y++) {
-    const tr = document.createElement('tr');
+    const tr = document.createElement("tr");
     const row = [];
     for (let x = 0; x < seed.cols; x++) {
-      const td = document.createElement('td');
-      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+      const td = document.createElement("td");
+      td.className = (x + y) % 2 === 0 ? "light" : "dark";
       td.dataset.x = x;
       td.dataset.y = y;
       tr.appendChild(td);
@@ -197,11 +210,11 @@ function playPuzzleInModal(seed) {
 
   seed.blocked.forEach(([x, y]) => {
     boardData[y][x].blocked = true;
-    boardData[y][x].el.style.backgroundColor = '#999';
+    boardData[y][x].el.style.backgroundColor = "#999";
   });
 
   function clearHighlight() {
-    boardData.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
+    boardData.forEach(row => row.forEach(cell => cell.el.classList.remove("current")));
   }
 
   function onClick(e) {
@@ -222,7 +235,7 @@ function playPuzzleInModal(seed) {
     cell.visited = true;
     cell.el.textContent = moveHistory.length;
     clearHighlight();
-    cell.el.classList.add('current');
+    cell.el.classList.add("current");
     current = { x, y };
 
     if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
@@ -237,16 +250,16 @@ function playPuzzleInModal(seed) {
         };
         push(rankingRef, record);
         alert("✅ 기록이 저장되었습니다!");
-        loadRankingForPuzzle(seed.id || 'custom');
+        loadRankingForPuzzle(seed.id || "custom");
       } else {
         alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
       }
     }
   }
 
-  boardData.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
+  boardData.forEach(row => row.forEach(cell => cell.el.addEventListener("click", onClick)));
   boardArea.appendChild(table);
-  boardData[seed.start.y][seed.start.x].el.classList.add('current');
+  boardData[seed.start.y][seed.start.x].el.classList.add("current");
   boardData[seed.start.y][seed.start.x].visited = true;
   boardData[seed.start.y][seed.start.x].el.textContent = 1;
   moveHistory.push({ x: seed.start.x, y: seed.start.y });
@@ -259,7 +272,7 @@ function loadRankingForPuzzle(puzzleId) {
     if (snapshot.exists()) {
       const rankArray = Object.values(snapshot.val()).sort((a, b) => a.time - b.time).slice(0, 5);
       document.getElementById("rankingList").innerHTML = rankArray
-        .map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time.toFixed(2)}s</p>`).join('');
+        .map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time.toFixed(2)}s</p>`).join("");
     } else {
       document.getElementById("rankingList").innerHTML = "<p>아직 기록이 없습니다.</p>";
     }
