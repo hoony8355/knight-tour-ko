@@ -2,6 +2,7 @@ import {
   getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { startGameTimer, stopGameTimer, getTimeTaken } from './playTimer.js';
 
 // ✅ 타이머 관련 변수
 let timerInterval = null;
