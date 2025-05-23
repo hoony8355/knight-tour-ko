@@ -27,7 +27,7 @@
     const db = getDatabase(app);
 
     // ✅ 삭제할 데이터가 있는 정확한 경로 입력 (예: rankings/8x8)
-    const parentPath = 'rankings/6x6';
+    const parentPath = 'rankings/5x5';
 
     const dataRef = ref(db, parentPath);
     const queryRef = query(dataRef, orderByChild('name'), equalTo('빠빰'));
