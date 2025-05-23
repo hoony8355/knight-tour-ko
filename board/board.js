@@ -38,6 +38,7 @@ window.closePreview = function () {
 };
 
 function openPreview(puzzle) {
+  console.log("[미리보기 열기]", puzzle.title);
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
