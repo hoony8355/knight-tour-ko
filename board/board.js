@@ -248,8 +248,8 @@ function playPuzzleInModal(seed) {
 
   const totalMoves = seed.rows * seed.cols - seed.blocked.length;
   if (moveHistory.length === totalMoves) {
-    stopGameTimer(); // ⏹️ 클리어 시 타이머 멈춤
-    const timeTaken = getTimeTaken().toFixed(2);
+    const timeTaken = getTimeTaken().toFixed(2);  // ⬅️ 먼저 시간 계산
+    stopGameTimer();                              // ⬅️ 그리고 나서 타이머 종료
     console.log(`[✔ 완료] 퍼즐 클리어, 소요 시간: ${timeTaken}s`);
 
     const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
@@ -268,6 +268,7 @@ function playPuzzleInModal(seed) {
     }
   }
 }
+
 
 
 
