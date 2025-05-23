@@ -1,54 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <title>빠빰 삭제기</title>
+  <meta charset="UTF-8">
+  <title>빠빰 데이터 삭제기</title>
 </head>
 <body>
-  <h3>Firebase에서 '빠빰' 데이터 삭제 중...</h3>
+  <h2>빠빰 데이터를 삭제하는 중입니다... (F12 콘솔 확인)</h2>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getDatabase,
-      ref,
-      get,
-      remove,
-      child
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
       authDomain: "knight-tour-ranking.firebaseapp.com",
       databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "knight-tour-ranking",
-      storageBucket: "knight-tour-ranking.appspot.com",
-      messagingSenderId: "984280335242",
-      appId: "1:984280335242:web:f1fe1ffbf445e5461e7f68"
+      storageBucket: "knight-tour-ranking.firebasestorage.app",
+      messagingSenderId: "1073626351852",
+      appId: "1:1073626351852:web:41ae6cb7db759beb703dc9",
+      measurementId: "G-D2P9PJ00JT"
     };
 
+    // Firebase 초기화
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const boardSize = "5x5"; // 필요시 수정
-    const targetRef = ref(db, `rankings/${boardSize}`);
+    // ✅ 삭제할 데이터가 있는 정확한 경로 입력 (예: rankings/8x8)
+    const parentPath = 'rankings/8x8';
 
-    get(targetRef).then(snapshot => {
-      if (!snapshot.exists()) {
-        alert("데이터가 없습니다.");
-        return;
-      }
+    const dataRef = ref(db, parentPath);
+    const queryRef = query(dataRef, orderByChild('name'), equalTo('빠빰'));
 
-      let count = 0;
-      snapshot.forEach(childSnap => {
-        const data = childSnap.val();
-        if (data.name === "빠빰") {
-          remove(child(childSnap.ref, "")).then(() => {
-            console.log(`삭제됨: ${childSnap.key}`);
-          }).catch(err => {
-            console.error(`삭제 실패: ${childSnap.key}`, err);
-          });
+    console.log(`🔍 '${parentPath}'에서 name이 '빠빰'인 데이터 찾는 중...`);
+
+    get(queryRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const updates = {};
+        let count = 0;
+
+        snapshot.forEach((child) => {
+          const fullPath = `${parentPath}/${child.key}`;
+          updates[fullPath] = null;
           count++;
-        }
-      });
+        });
 
-      alert(`삭제 요청 완료: ${count}개`);
-    }).catch(
+        console.log(`✅ ${count}개의 데이터를 삭제합니다...`);
+        return update(ref(db), updates);
+      } else {
+        console.log("❌ '빠빰' 데이터가 존재하지 않습니다.");
+        return Promise.resolve();
+      }
+    }).then(() => {
+      console.log("🎉 모든 '빠빰' 데이터 삭제 완료!");
+    }).catch((error) => {
+      console.error("⚠️ 삭제 중 오류 발생:", error);
+    });
+  </script>
+</body>
+</html>
