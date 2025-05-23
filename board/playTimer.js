@@ -5,10 +5,11 @@ let startTime = null;
 let displayElement = null;
 
 export function startGameTimer(displayElId = "playTimer") {
-  stopGameTimer(); // 기존 타이머 중지
+  stopGameTimer(); // 중복 실행 방지
   startTime = performance.now();
+  console.log("[⏱️ Timer] 타이머 시작됨:", startTime);
 
-  // 표시 엘리먼트가 없다면 새로 생성
+  // 표시 엘리먼트 생성
   displayElement = document.createElement("div");
   displayElement.id = displayElId;
   displayElement.style.position = "absolute";
@@ -24,28 +25,39 @@ export function startGameTimer(displayElId = "playTimer") {
   const modalBoard = document.getElementById("modalBoard");
   if (modalBoard) {
     modalBoard.appendChild(displayElement);
+  } else {
+    console.warn("[⚠️ Timer] modalBoard 엘리먼트를 찾을 수 없습니다.");
   }
 
-  // 실시간 업데이트
+  // 0.1초 단위 실시간 업데이트
   timerInterval = setInterval(() => {
     if (!startTime || !displayElement) return;
-    const seconds = ((performance.now() - startTime) / 1000).toFixed(2);
-    displayElement.textContent = `⏱ ${seconds}s`;
+    const elapsed = (performance.now() - startTime) / 1000;
+    displayElement.textContent = `⏱ ${elapsed.toFixed(2)}s`;
   }, 100);
 }
 
 export function stopGameTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  startTime = null;
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    console.log("[🛑 Timer] 타이머 중지");
+  }
 
   if (displayElement && displayElement.parentNode) {
     displayElement.parentNode.removeChild(displayElement);
   }
 
   displayElement = null;
+  startTime = null;
 }
 
 export function getTimeTaken() {
-  return startTime ? (performance.now() - startTime) / 1000 : 0;
+  if (startTime === null) {
+    console.warn("[⚠️ Timer] getTimeTaken 호출 시 startTime이 null입니다.");
+    return 0;
+  }
+  const elapsed = (performance.now() - startTime) / 1000;
+  console.log(`[📏 Timer] getTimeTaken → ${elapsed.toFixed(2)}s`);
+  return elapsed;
 }
