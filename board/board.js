@@ -171,10 +171,31 @@ function fetchPuzzles() {
   get(puzzlesRef).then(snapshot => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-      allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
-      renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
-      renderPuzzleList(allPuzzles);
+
+      // 🔄 추천 수 동기화
+      get(ref(db, "likes")).then(likeSnapshot => {
+        const likeData = likeSnapshot.exists() ? likeSnapshot.val() : {};
+        const likeCounts = {};
+
+        for (const puzzleId in likeData) {
+          likeCounts[puzzleId] = Object.keys(likeData[puzzleId]).length;
+        }
+
+        // 퍼즐 데이터 가공
+        allPuzzles = Object.entries(data).map(([id, value]) => ({
+          ...value,
+          id,
+          likes: likeCounts[id] || 0
+        })).reverse();
+
+        renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
+        renderPuzzleList(allPuzzles);
+      });
+    } else {
+      console.warn("⚠ 퍼즐 없음");
     }
+  }).catch(err => {
+    console.error("❌ Firebase fetch 실패:", err);
   });
 }
 
