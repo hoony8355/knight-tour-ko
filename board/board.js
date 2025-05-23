@@ -320,8 +320,13 @@ function loadRankingForPuzzle(puzzleId) {
 
 sortSelect.addEventListener("change", () => {
   const sorted = [...allPuzzles];
-  if (sortSelect.value === "latest") sorted.sort((a, b) => b.createdAt - a.createdAt);
-  else sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+  if (sortSelect.value === "latest") {
+    sorted.sort((a, b) => b.createdAt - a.createdAt);
+    console.log("🔃 최신순 정렬됨");
+  } else {
+    sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    console.log("🔃 추천순 정렬됨");
+  }
   renderPuzzleList(sorted);
 });
 
