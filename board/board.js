@@ -231,7 +231,7 @@ function playPuzzleInModal(seed) {
     }
   }
 
-  // ✅ 사용자의 첫 이동일 경우 타이머 시작
+  // ✅ 첫 사용자 이동 시 타이머 시작
   if (moveHistory.length === 1) {
     console.log("[onClick] ✅ 첫 사용자 이동 → 타이머 시작");
     startGameTimer();
@@ -248,6 +248,7 @@ function playPuzzleInModal(seed) {
 
   const totalMoves = seed.rows * seed.cols - seed.blocked.length;
   if (moveHistory.length === totalMoves) {
+    stopGameTimer(); // ⏹️ 클리어 시 타이머 멈춤
     const timeTaken = getTimeTaken().toFixed(2);
     console.log(`[✔ 완료] 퍼즐 클리어, 소요 시간: ${timeTaken}s`);
 
@@ -267,6 +268,7 @@ function playPuzzleInModal(seed) {
     }
   }
 }
+
 
 
 
