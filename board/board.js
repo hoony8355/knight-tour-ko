@@ -199,7 +199,6 @@ function fetchPuzzles() {
           likes: likeCounts[id] || 0
         })).reverse();
 
-        renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
         renderPuzzleList(allPuzzles);
 
         // ✅ URL에 퍼즐 ID가 있다면 해당 퍼즐 모달 자동 열기
