@@ -195,7 +195,6 @@ function fetchPuzzles() {
     if (snapshot.exists()) {
       const data = snapshot.val();
 
-      // 🔄 추천 수 동기화
       get(ref(db, "likes")).then(likeSnapshot => {
         const likeData = likeSnapshot.exists() ? likeSnapshot.val() : {};
         const likeCounts = {};
@@ -204,7 +203,6 @@ function fetchPuzzles() {
           likeCounts[puzzleId] = Object.keys(likeData[puzzleId]).length;
         }
 
-        // 퍼즐 데이터 가공
         allPuzzles = Object.entries(data).map(([id, value]) => ({
           ...value,
           id,
@@ -213,6 +211,20 @@ function fetchPuzzles() {
 
         renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
         renderPuzzleList(allPuzzles);
+
+        // ✅ URL에 퍼즐 ID가 있다면 해당 퍼즐 모달 자동 열기
+        const urlParams = new URLSearchParams(window.location.search);
+        const puzzleId = urlParams.get("puzzle");
+        if (puzzleId) {
+          const match = allPuzzles.find(p => p.id === puzzleId);
+          if (match) {
+            console.log("🔎 [fetchPuzzles] URL 기반 퍼즐 자동 오픈:", puzzleId);
+            openPreview(match);
+          } else {
+            console.warn("⚠️ [fetchPuzzles] 퍼즐 ID 못 찾음:", puzzleId);
+          }
+        }
+
       });
     } else {
       console.warn("⚠ 퍼즐 없음");
@@ -221,6 +233,7 @@ function fetchPuzzles() {
     console.error("❌ Firebase fetch 실패:", err);
   });
 }
+
 
 function playPuzzleInModal(seed) {
   const boardArea = document.getElementById("modalBoard");
