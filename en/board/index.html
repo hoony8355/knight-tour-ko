@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Puzzle Board</title>
+  <link rel="stylesheet" href="board.css" />
+  <script type="module" src="board.js" defer></script>
+  <script type="module" src="./share-local.js" defer></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 960px;
+      margin: auto;
+      padding: 1rem;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .top-nav-buttons {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .top-nav-buttons a {
+      margin: 0 0.5rem;
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #eee;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .top-nav-buttons a:hover {
+      background-color: #ddd;
+    }
+    .puzzle-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .puzzle-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.75rem;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .puzzle-card:hover {
+      transform: scale(1.03);
+    }
+    .puzzle-card h4 {
+      margin: 0.5rem 0 0.25rem;
+      font-size: 1.1rem;
+    }
+    .puzzle-card p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .sort-controls {
+      text-align: right;
+      margin: 1rem 0;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      max-width: 580px;
+      width: 100%;
+      position: relative;
+    }
+    .close-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .modal-content table.board {
+      margin: 1rem auto;
+      border-collapse: collapse;
+    }
+    .modal-content table.board td {
+      width: 40px;
+      height: 40px;
+      aspect-ratio: 1 / 1;
+      text-align: center;
+      vertical-align: middle;
+      font-weight: bold;
+      font-size: 0.9em;
+      border: 1px solid #ccc;
+      padding: 0;
+    }
+    .modal-content table.board td.light { background: #f0d9b5; }
+    .modal-content table.board td.dark { background: #b58863; color: white; }
+    .modal-content table.board td.current { outline: 3px solid orange; }
+    #modalBoard {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+    .board-controls {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 0.5rem 0 1rem;
+    }
+    .board-controls button {
+      padding: 0.3rem 0.75rem;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #eee;
+      cursor: pointer;
+    }
+    .board-controls button:hover {
+      background-color: #ddd;
+    }
+    #rankingList {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    .share-buttons {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .share-buttons button {
+      margin: 0 0.3rem;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .share-buttons button:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Custom Puzzle Board</h1>
+
+  <div class="custom-nav-buttons" style="text-align: center; margin-top: 1.5rem;">
+    <a href="/knight-tour-ko/en/"
+       style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-bg, #e0e0e0); color: var(--button-color, #222); transition: all 0.2s ease;"
+       onmouseover="this.style.backgroundColor='var(--button-hover-bg, #d0d0d0)'"
+       onmouseout="this.style.backgroundColor='var(--button-bg, #e0e0e0)'">
+      🏠 Main Puzzle Page
+    </a>
+    <a href="/knight-tour-ko/en/builder/"
+       style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-alt-bg, #d0eaff); color: var(--button-alt-color, #003366); transition: all 0.2s ease;"
+       onmouseover="this.style.backgroundColor='var(--button-alt-hover-bg, #b5dcff)'"
+       onmouseout="this.style.backgroundColor='var(--button-alt-bg, #d0eaff)'">
+      ✏️ Build Your Puzzle
+    </a>
+  </div>
+
+  <section class="sort-controls">
+    <label for="sortSelect">↓ Sort by:</label>
+    <select id="sortSelect">
+      <option value="latest">Latest</option>
+      <option value="likes">Most Liked</option>
+    </select>
+  </section>
+
+  <section id="puzzleBoard">
+    <h2>🧩 Browse Custom Puzzles</h2>
+    <div class="puzzle-list" id="puzzleList"></div>
+  </section>
+
+  <div id="previewModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-button" onclick="closePreview()">❌</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalAuthor"></p>
+      <p id="modalDescription"></p>
+
+      <div id="modalLikeArea" style="text-align: center; margin: 0.5rem 0;"></div>
+
+      <div id="modalBoard">
+        <div class="board-controls">
+          <button onclick="undoMove()">↩ Undo</button>
+          <button onclick="restartPuzzle()">🔄 Restart</button>
+        </div>
+      </div>
+
+      <div id="rankingList"></div>
+
+      <div class="share-buttons">
+        <button onclick="shareNative()">📱 Share</button>
+        <button onclick="shareOnTwitter()">🐦 Twitter</button>
+        <button onclick="shareOnFacebook()">📘 Facebook</button>
+        <button onclick="shareKakao()">💬 KakaoTalk</button>
+        <button onclick="copyLocalLink()">🔗 Copy Link</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
