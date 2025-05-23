@@ -160,10 +160,21 @@
 <body>
   <h1>🎮 커스텀 퍼즐 게시판</h1>
 
-  <div class="top-nav-buttons">
-    <a href="../">🏠 메인 퍼즐 플레이</a>
-    <a href="../builder/">✏️ 커스텀 게임 만들기</a>
-  </div>
+  <div class="custom-nav-buttons" style="text-align: center; margin-top: 1.5rem;">
+  <a href="./"
+     style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-bg, #e0e0e0); color: var(--button-color, #222); transition: all 0.2s ease;"
+     onmouseover="this.style.backgroundColor='var(--button-hover-bg, #d0d0d0)'"
+     onmouseout="this.style.backgroundColor='var(--button-bg, #e0e0e0)'">
+    🏠 메인 퍼즐 페이지
+  </a>
+  <a href="./builder/"
+     style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-alt-bg, #d0eaff); color: var(--button-alt-color, #003366); transition: all 0.2s ease;"
+     onmouseover="this.style.backgroundColor='var(--button-alt-hover-bg, #b5dcff)'"
+     onmouseout="this.style.backgroundColor='var(--button-alt-bg, #d0eaff)'">
+    ✏️ 커스텀 게임 만들기
+  </a>
+</div>
+
 
   <section class="sort-controls">
     <label for="sortSelect">↓ 정렬 방식 선택:</label>
