@@ -23,7 +23,7 @@ const sortSelect = document.getElementById("sortSelect");
 
 const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
-let boardData = [], moveHistory = [], currentSeed = null, current = null;
+let boardData = [], moveHistory = [], currentSeed = null, current = null, startTime = null;
 
 window.closePreview = function () {
   document.getElementById("previewModal").classList.add("hidden");
@@ -68,11 +68,12 @@ window.restartPuzzle = function () {
 };
 
 function openPreview(puzzle) {
+  currentSeed = { ...JSON.parse(atob(puzzle.seed)), id: puzzle.id };
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
 
-  currentSeed = JSON.parse(atob(puzzle.seed));
+  
   playPuzzleInModal(currentSeed);
   loadRankingForPuzzle(puzzle.id);
 
@@ -83,7 +84,7 @@ function playPuzzleInModal(seed) {
   if (!seed) return;
   currentSeed = seed;
   
-  const startTime = Date.now();
+  startTime = Date.now();
   const boardArea = document.getElementById("modalBoard");
   if (!boardArea) return;
   boardArea.querySelector("table")?.remove();
