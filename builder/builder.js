@@ -1,5 +1,6 @@
 let currentStart = null;
 let testPassed = false;
+let lastVerifiedSeed = null;
 
 window.addEventListener('load', () => {
   console.log('[로드됨] 보드 자동 생성 시작');
@@ -17,6 +18,7 @@ function generateBoard() {
   board.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
   currentStart = null;
   testPassed = false;
+  lastVerifiedSeed = null;
 
   console.log(`[보드 생성] 행: ${rows}, 열: ${cols}`);
 
@@ -135,6 +137,7 @@ function testPuzzle() {
     if (moveCount === (seed.rows * seed.cols - seed.blocked.length)) {
       alert("🎉 퍼즐 클리어 성공! 게시가 가능합니다.");
       testPassed = true;
+      lastVerifiedSeed = seed; // ✅ 통과된 seed 저장
       console.log('[✅ 테스트 통과]');
     }
   }
@@ -150,10 +153,10 @@ function postPuzzle() {
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
-  const seed = getSeedObject();
+  const seed = lastVerifiedSeed; // ✅ 마지막 통과된 seed 사용
 
   if (!seed) {
-    alert("퍼즐 시드 생성 실패. 시작 위치나 보드를 확인해주세요.");
+    alert("퍼즐 시드가 없습니다. 테스트 플레이를 먼저 완료해주세요.");
     return;
   }
   if (!title || !author) {
