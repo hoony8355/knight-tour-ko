@@ -11,9 +11,9 @@
 
   <!-- 퍼즐 게시용 Firebase 모듈 연결 -->
   <script type="module">
-    import { postPuzzleToDB } from './builder/builder-firebase.js';
-    window.postPuzzleToDB = postPuzzleToDB;
-  </script>
+  import { postPuzzleToDB } from './builder-firebase.js'; // ✅ 수정된 경로
+  window.postPuzzleToDB = postPuzzleToDB;
+</script>
 </head>
 <body>
   <h1>🛠 커스텀 퍼즐 만들기</h1>
