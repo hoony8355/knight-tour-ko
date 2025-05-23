@@ -21,7 +21,6 @@ const app = initializeApp(firebaseConfig, "board");
 const db = getDatabase(app);
 
 const puzzleListDiv = document.getElementById("puzzleList");
-const topPuzzleListDiv = document.getElementById("topPuzzleList");
 const sortSelect = document.getElementById("sortSelect");
 
 const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
@@ -178,16 +177,7 @@ function renderPuzzleList(puzzles) {
   });
 }
 
-function renderTopPuzzles(puzzles) {
-  topPuzzleListDiv.innerHTML = "";
-  puzzles.forEach(puzzle => {
-    const div = document.createElement("div");
-    div.className = "puzzle-card";
-    div.innerHTML = `<h4>${puzzle.title}</h4><p>${puzzle.author}</p>`;
-    div.onclick = () => openPreview(puzzle);
-    topPuzzleListDiv.appendChild(div);
-  });
-}
+
 
 function fetchPuzzles() {
   const puzzlesRef = query(ref(db, "puzzlePosts"), orderByChild("createdAt"));
