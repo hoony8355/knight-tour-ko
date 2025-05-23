@@ -164,8 +164,8 @@ function postPuzzle() {
     createdAt: Date.now()
   };
 
-  const dbPath = window.dbRef("puzzlePosts");
-  window.dbPush(dbPath, data).then(() => {
+  // 🧩 게시용 Firebase 호출 (builder-firebase.js에서 import된 글로벌 함수)
+  window.postPuzzleToDB(data).then(() => {
     alert("✅ 퍼즐이 게시되었습니다!");
     document.getElementById("seedOutput").textContent =
       `${window.location.origin}/knight-tour-ko/?custom=${data.seed}`;
