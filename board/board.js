@@ -25,6 +25,7 @@ let allPuzzles = [];
 let boardData = [], moveHistory = [], currentSeed = null, current = null;
 
 window.closePreview = function () {
+  console.log("🔒 미리보기 닫힘");
   document.getElementById("previewModal").classList.add("hidden");
   document.getElementById("modalBoard").querySelector("table")?.remove();
   document.getElementById("playTimer")?.remove();
@@ -59,6 +60,7 @@ window.restartPuzzle = function () {
 };
 
 function openPreview(puzzle) {
+  console.log("🧩 퍼즐 미리보기:", puzzle);
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
@@ -71,6 +73,7 @@ function openPreview(puzzle) {
 }
 
 function playPuzzleInModal(seed) {
+  console.log("🎯 퍼즐 플레이 시작", seed);
   const boardArea = document.getElementById("modalBoard");
   boardArea.querySelector("table")?.remove();
   document.getElementById("playTimer")?.remove();
@@ -125,17 +128,26 @@ function playPuzzleInModal(seed) {
     const x = +e.target.dataset.x;
     const y = +e.target.dataset.y;
     const cell = boardData[y][x];
-    if (cell.visited || cell.blocked) return;
+
+    if (cell.visited || cell.blocked) {
+      console.log(`⛔ 무효 클릭 (${x}, ${y}) - 방문 또는 막힌 칸`);
+      return;
+    }
 
     if (!current) {
-      if (x !== seed.start.x || y !== seed.start.y) return;
+      if (x !== seed.start.x || y !== seed.start.y) {
+        console.log("🚫 시작 위치 아님");
+        return;
+      }
     } else {
       const dx = Math.abs(x - current.x);
       const dy = Math.abs(y - current.y);
-      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
+      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
+        console.log("❌ 나이트 이동 불가 위치");
+        return;
+      }
     }
 
-    // 첫 클릭 시 타이머 시작
     if (!startTime) {
       startTime = performance.now();
       updateTimer();
@@ -191,6 +203,7 @@ function loadRankingForPuzzle(puzzleId) {
 }
 
 function renderPuzzleList(puzzles) {
+  console.log("🧾 전체 퍼즐 렌더링", puzzles);
   puzzleListDiv.innerHTML = "";
   puzzles.forEach(puzzle => {
     const div = document.createElement("div");
@@ -202,6 +215,7 @@ function renderPuzzleList(puzzles) {
 }
 
 function renderTopPuzzles(puzzles) {
+  console.log("🏅 추천 퍼즐 렌더링", puzzles);
   topPuzzleListDiv.innerHTML = "";
   puzzles.forEach(puzzle => {
     const div = document.createElement("div");
@@ -214,14 +228,22 @@ function renderTopPuzzles(puzzles) {
 
 function fetchPuzzles() {
   const puzzlesRef = query(ref(db, "puzzlePosts"), orderByChild("createdAt"));
-  get(puzzlesRef).then(snapshot => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
-      renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
-      renderPuzzleList(allPuzzles);
-    }
-  });
+  console.log("📡 Firebase fetch 시작");
+  get(puzzlesRef)
+    .then(snapshot => {
+      console.log("📥 Firebase snapshot:", snapshot.val());
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
+        renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
+        renderPuzzleList(allPuzzles);
+      } else {
+        console.warn("⚠️ Firebase snapshot이 비어있습니다.");
+      }
+    })
+    .catch(error => {
+      console.error("❌ Firebase fetch 에러:", error);
+    });
 }
 
 sortSelect.addEventListener("change", () => {
