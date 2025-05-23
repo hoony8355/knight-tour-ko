@@ -7,6 +7,7 @@ let displayElement = null;
 export function startGameTimer(displayElId = "playTimer") {
   stopGameTimer(); // 중복 실행 방지
   startTime = performance.now();
+  console.log("[⏱️ Timer] startGameTimer 호출됨. startTime =", startTime); // 👈 이 줄 추가
   console.log("[⏱️ Timer] 타이머 시작됨:", startTime);
 
   // 표시 엘리먼트 생성
