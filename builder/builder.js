@@ -62,11 +62,13 @@ function getSeedObject() {
     return null;
   }
 
-  return { rows, cols, blocked, start: currentStart };
+  const seed = { rows, cols, blocked, start: currentStart };
+  console.log("[🔍 시드 생성 완료] blocked 좌표:", seed.blocked);
+  return seed;
 }
 
 function testPuzzle() {
-  console.log('[테스트 시작]');
+  console.log('[🧪 테스트 시작]');
   const seed = getSeedObject();
   if (!seed) return;
 
@@ -133,7 +135,7 @@ function testPuzzle() {
     if (moveCount === (seed.rows * seed.cols - seed.blocked.length)) {
       alert("🎉 퍼즐 클리어 성공! 게시가 가능합니다.");
       testPassed = true;
-      console.log('[테스트 통과]');
+      console.log('[✅ 테스트 통과]');
     }
   }
 
@@ -144,7 +146,7 @@ function testPuzzle() {
 }
 
 function postPuzzle() {
-  console.log('[퍼즐 게시 시도]');
+  console.log('[📬 퍼즐 게시 시도]');
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
@@ -163,11 +165,15 @@ function postPuzzle() {
     return;
   }
 
+  const encodedSeed = btoa(JSON.stringify(seed));
+  console.log('[📦 저장될 시드]', seed);
+  console.log('[📦 인코딩된 시드]', encodedSeed);
+
   const data = {
     title,
     author,
     description,
-    seed: btoa(JSON.stringify(seed)),
+    seed: encodedSeed,
     createdAt: Date.now()
   };
 
