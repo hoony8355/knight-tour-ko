@@ -39,9 +39,12 @@ function updateTimerDisplay(elapsed = 0) {
     timerEl.id = "playTimer";
     timerEl.style.textAlign = "center";
     timerEl.style.marginTop = "0.5rem";
-    document.getElementById("modalBoard").appendChild(timerEl);
+    timerEl.style.fontWeight = "bold";
+    timerEl.style.fontSize = "1.1em";
+    timerEl.style.color = "#333";
+    document.getElementById("modalBoard").prepend(timerEl);
   }
-  timerEl.textContent = `⏱ ${elapsed.toFixed(2)}초`;
+  timerEl.textContent = `⏱ ${elapsed.toFixed(2)}초 경과 중`;
 }
 
 window.closePreview = function () {
@@ -81,7 +84,7 @@ window.restartPuzzle = function () {
   if (currentSeed) {
     startTime = null;
     clearInterval(timerInterval);
-    updateTimerDisplay(0);
+    document.getElementById("playTimer")?.remove();
     playPuzzleInModal(currentSeed);
   }
 };
@@ -196,7 +199,6 @@ function playPuzzleInModal(seed) {
   const boardArea = document.getElementById("modalBoard");
   boardArea.querySelector("table")?.remove();
   document.getElementById("playTimer")?.remove();
-  updateTimerDisplay(0);
   clearInterval(timerInterval);
   startTime = null;
 
