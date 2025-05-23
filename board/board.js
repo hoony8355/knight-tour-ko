@@ -31,7 +31,6 @@ const sessionId = localStorage.getItem("sessionId") || (() => {
 })();
 
 window.closePreview = function () {
-  console.log("🔒 미리보기 닫힘");
   document.getElementById("previewModal").classList.add("hidden");
   document.getElementById("modalBoard").querySelector("table")?.remove();
   document.getElementById("playTimer")?.remove();
@@ -73,7 +72,6 @@ function handleLike(puzzleId) {
       alert("이미 추천하셨습니다.");
     } else {
       set(likeRef, true).then(() => {
-        console.log(`👍 추천 완료 for ${puzzleId}`);
         alert("❤️ 추천 완료!");
         loadLikeCount(puzzleId);
       });
@@ -106,6 +104,7 @@ function openPreview(puzzle) {
 
   currentSeed = JSON.parse(atob(puzzle.seed));
   currentSeed.id = puzzle.id;
+
   playPuzzleInModal(currentSeed);
   loadRankingForPuzzle(puzzle.id);
   loadLikeCount(puzzle.id);
@@ -114,10 +113,8 @@ function openPreview(puzzle) {
 }
 
 function renderPuzzleList(puzzles) {
-  console.log("📦 전체 퍼즐 렌더링 시작");
   puzzleListDiv.innerHTML = "";
   puzzles.forEach(puzzle => {
-    console.log("🧾 렌더링 퍼즐:", puzzle);
     const card = document.createElement("div");
     card.className = "puzzle-card";
 
@@ -162,23 +159,98 @@ function renderTopPuzzles(puzzles) {
 }
 
 function fetchPuzzles() {
-  console.log("📡 Firebase 퍼즐 가져오기 시작");
   const puzzlesRef = query(ref(db, "puzzlePosts"), orderByChild("createdAt"));
   get(puzzlesRef)
     .then(snapshot => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         allPuzzles = Object.entries(data).map(([id, value]) => ({ ...value, id })).reverse();
-        console.log("✅ 퍼즐 수:", allPuzzles.length);
         renderTopPuzzles(allPuzzles.filter(p => recommendedIds.includes(p.id)));
         renderPuzzleList(allPuzzles);
-      } else {
-        console.warn("⚠️ 퍼즐 없음");
       }
-    })
-    .catch(error => {
-      console.error("❌ Firebase 에러:", error);
     });
+}
+
+function playPuzzleInModal(seed) {
+  console.log("🎮 퍼즐 시작됨", seed);
+  const boardArea = document.getElementById("modalBoard");
+  boardArea.querySelector("table")?.remove();
+
+  const table = document.createElement('table');
+  table.className = 'board';
+  boardData = [], moveHistory = [], current = null;
+
+  for (let y = 0; y < seed.rows; y++) {
+    const tr = document.createElement('tr');
+    const row = [];
+    for (let x = 0; x < seed.cols; x++) {
+      const td = document.createElement('td');
+      td.className = (x + y) % 2 === 0 ? 'light' : 'dark';
+      td.dataset.x = x;
+      td.dataset.y = y;
+      tr.appendChild(td);
+      row.push({ el: td, visited: false, blocked: false });
+    }
+    table.appendChild(tr);
+    boardData.push(row);
+  }
+
+  seed.blocked.forEach(([x, y]) => {
+    boardData[y][x].blocked = true;
+    boardData[y][x].el.style.backgroundColor = '#999';
+  });
+
+  function clearHighlight() {
+    boardData.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
+  }
+
+  function onClick(e) {
+    const x = +e.target.dataset.x;
+    const y = +e.target.dataset.y;
+    const cell = boardData[y][x];
+    if (cell.visited || cell.blocked) return;
+
+    if (!current) {
+      if (x !== seed.start.x || y !== seed.start.y) return;
+    } else {
+      const dx = Math.abs(x - current.x);
+      const dy = Math.abs(y - current.y);
+      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) return;
+    }
+
+    moveHistory.push({ x, y });
+    cell.visited = true;
+    cell.el.textContent = moveHistory.length;
+    clearHighlight();
+    cell.el.classList.add('current');
+    current = { x, y };
+
+    if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
+      const timeTaken = (performance.now() / 1000).toFixed(2);
+      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
+      if (nickname && nickname.trim()) {
+        const rankingRef = ref(db, `rankings/${seed.id || 'custom'}`);
+        const record = {
+          nickname: nickname.trim(),
+          time: parseFloat(timeTaken),
+          createdAt: Date.now()
+        };
+        push(rankingRef, record);
+        alert("✅ 기록이 저장되었습니다!");
+        loadRankingForPuzzle(seed.id || 'custom');
+      } else {
+        alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
+      }
+    }
+  }
+
+  boardData.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
+  boardArea.appendChild(table);
+  boardData[seed.start.y][seed.start.x].el.classList.add('current');
+  boardData[seed.start.y][seed.start.x].visited = true;
+  boardData[seed.start.y][seed.start.x].el.textContent = 1;
+  moveHistory.push({ x: seed.start.x, y: seed.start.y });
+  current = { x: seed.start.x, y: seed.start.y };
 }
 
 function loadRankingForPuzzle(puzzleId) {
