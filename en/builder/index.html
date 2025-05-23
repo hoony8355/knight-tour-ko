@@ -1,0 +1,74 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build Your Custom Puzzle</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase for ranking (do not edit) -->
+  <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
+
+  <!-- Firebase module for posting puzzles -->
+  <script type="module">
+    import { postPuzzleToDB } from './builder-firebase.js';
+    window.postPuzzleToDB = postPuzzleToDB;
+  </script>
+</head>
+<body>
+  <h1>🛠 Build Your Custom Puzzle</h1>
+
+  <div class="custom-nav-buttons" style="text-align: center; margin-top: 1.5rem;">
+    <a href="/knight-tour-ko/en/"
+       style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-bg, #e0e0e0); color: var(--button-color, #222); transition: all 0.2s ease;"
+       onmouseover="this.style.backgroundColor='var(--button-hover-bg, #d0d0d0)'"
+       onmouseout="this.style.backgroundColor='var(--button-bg, #e0e0e0)'">
+      🏠 Main Puzzle Page
+    </a>
+    <a href="/knight-tour-ko/en/board/"
+       style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-alt-bg, #d0eaff); color: var(--button-alt-color, #003366); transition: all 0.2s ease;"
+       onmouseover="this.style.backgroundColor='var(--button-alt-hover-bg, #b5dcff)'"
+       onmouseout="this.style.backgroundColor='var(--button-alt-bg, #d0eaff)'">
+      🧩 Custom Puzzle Board
+    </a>
+  </div>
+
+  <p>Set the board size, blocked cells, and start position. You must clear the puzzle through a test play before you can publish it.</p>
+
+  <div class="builder-controls">
+    <label>Rows: <input type="number" id="rowsInput" value="6" /></label>
+    <label>Cols: <input type="number" id="colsInput" value="6" /></label>
+    <button onclick="generateBoard()">Generate Board</button>
+  </div>
+
+  <div id="boardContainer">
+    <div id="boardBuilder"></div>
+  </div>
+
+  <div class="guide-box">
+    <strong>📘 Instructions</strong>
+    <ul>
+      <li>⬛ Click cell → Blocked tile (gray)</li>
+      <li>🟧 First click → Set starting point (orange)</li>
+      <li>Click again → Unset</li>
+    </ul>
+  </div>
+
+  <div class="input-section">
+    <h3>Enter Puzzle Info</h3>
+    <input type="text" id="puzzleTitle" placeholder="Puzzle Title" />
+    <input type="text" id="authorName" placeholder="Your Nickname" />
+    <textarea id="puzzleDesc" placeholder="Puzzle Description (Optional)"></textarea>
+  </div>
+
+  <div class="action-buttons">
+    <button onclick="testPuzzle()">👀 Test Puzzle</button>
+    <button onclick="postPuzzle()">📬 Submit Puzzle</button>
+  </div>
+
+  <p id="seedOutput"></p>
+  <p id="testResult" style="font-weight: bold; color: green;"></p>
+
+  <script src="builder.js"></script>
+</body>
+</html>
