@@ -27,6 +27,7 @@
       border-radius: 8px;
       padding: 0.75rem;
       background: #f9f9f9;
+      cursor: pointer;
       transition: transform 0.2s ease;
     }
     .puzzle-card:hover {
@@ -35,24 +36,11 @@
     .puzzle-card h4 {
       margin: 0.5rem 0 0.25rem;
       font-size: 1.1rem;
-      cursor: pointer;
     }
     .puzzle-card p {
       margin: 0;
       font-size: 0.85rem;
       color: #666;
-    }
-    .like-button {
-      margin-top: 0.5rem;
-      background-color: transparent;
-      border: 1px solid #ccc;
-      padding: 0.3rem 0.6rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .like-button:hover {
-      background-color: #ffeaea;
     }
     .sort-controls {
       text-align: right;
@@ -132,11 +120,6 @@
       margin-top: 1rem;
       font-size: 0.85rem;
     }
-    #modalLikeArea {
-      text-align: center;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
   </style>
 </head>
 <body>
@@ -174,9 +157,6 @@
         </div>
         <!-- 보드판이 여기에 들어감 -->
       </div>
-
-      <!-- ❤️ 추천 버튼 위치 -->
-      <div id="modalLikeArea"></div>
 
       <div id="rankingList"></div>
     </div>
