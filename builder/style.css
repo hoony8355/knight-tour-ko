@@ -25,7 +25,16 @@ body {
   display: grid;
   gap: 2px;
   border: 2px solid #ccc;
+
+  /* 👇 최소 높이 보장 */
+  min-height: 240px;
+  min-width: 240px;
+
+  /* 👇 반응형 대응 - 셀 크기 지정이 JS에서 있으므로, 여긴 유연하게 */
+  width: max-content;
+  height: max-content;
 }
+
 
 /* 셀 기본 설정 */
 .builder-cell {
@@ -96,3 +105,5 @@ table.board td.current {
   font-size: 0.9em;
   color: #555;
 }
+
+
