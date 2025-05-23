@@ -80,6 +80,7 @@ function openPreview(puzzle) {
 }
 
 function playPuzzleInModal(seed) {
+  const startTime = Date.now();
   const boardArea = document.getElementById("modalBoard");
   boardArea.querySelector("table")?.remove();
   const rows = seed.rows, cols = seed.cols;
@@ -134,7 +135,22 @@ function playPuzzleInModal(seed) {
     current = { x, y };
 
     if (moveHistory.length === (rows * cols - seed.blocked.length)) {
-      alert("🎉 클리어! 축하합니다.");
+      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초
+닉네임을 입력하세요:`);
+      if (nickname && nickname.trim()) {
+        const rankingRef = ref(db, `rankings/${currentSeed.id || 'custom'}`);
+        const record = {
+          nickname: nickname.trim(),
+          time: timeTaken,
+          createdAt: Date.now()
+        };
+        push(rankingRef, record);
+        alert("✅ 기록이 저장되었습니다!");
+        loadRankingForPuzzle(currentSeed.id || 'custom');
+      } else {
+        alert("❗ 닉네임이 입력되지 않아 저장되지 않았습니다.");
+      }
     }
   }
 
