@@ -80,8 +80,12 @@ function openPreview(puzzle) {
 }
 
 function playPuzzleInModal(seed) {
+  if (!seed) return;
+  currentSeed = seed;
+  
   const startTime = Date.now();
   const boardArea = document.getElementById("modalBoard");
+  if (!boardArea) return;
   boardArea.querySelector("table")?.remove();
   const rows = seed.rows, cols = seed.cols;
 
