@@ -23,7 +23,7 @@ const sortSelect = document.getElementById("sortSelect");
 
 const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
-let boardData = [], moveHistory = [], currentSeed = null;
+let boardData = [], moveHistory = [], currentSeed = null, current = null;
 
 window.closePreview = function () {
   document.getElementById("previewModal").classList.add("hidden");
@@ -31,6 +31,7 @@ window.closePreview = function () {
   document.getElementById("rankingList").innerHTML = "";
   boardData = [];
   moveHistory = [];
+  current = null;
 };
 
 window.undoMove = function () {
@@ -40,9 +41,13 @@ window.undoMove = function () {
   cell.visited = false;
   cell.el.textContent = "";
   cell.el.classList.remove("current");
+
   if (moveHistory.length > 0) {
     const prev = moveHistory[moveHistory.length - 1];
     boardData[prev.y][prev.x].el.classList.add("current");
+    current = { x: prev.x, y: prev.y };
+  } else {
+    current = null;
   }
 };
 
@@ -69,7 +74,7 @@ function playPuzzleInModal(seed) {
 
   const table = document.createElement('table');
   table.className = 'board';
-  boardData = [], moveHistory = [];
+  boardData = [], moveHistory = [], current = null;
 
   for (let y = 0; y < rows; y++) {
     const tr = document.createElement('tr');
@@ -90,8 +95,6 @@ function playPuzzleInModal(seed) {
     boardData[y][x].blocked = true;
     boardData[y][x].el.style.backgroundColor = '#999';
   });
-
-  let current = null;
 
   function clearHighlight() {
     boardData.forEach(row => row.forEach(cell => cell.el.classList.remove('current')));
@@ -126,10 +129,10 @@ function playPuzzleInModal(seed) {
   boardData.forEach(row => row.forEach(cell => cell.el.addEventListener('click', onClick)));
   boardArea.appendChild(table);
   boardData[seed.start.y][seed.start.x].el.classList.add('current');
-  current = { x: seed.start.x, y: seed.start.y };
   boardData[seed.start.y][seed.start.x].visited = true;
   boardData[seed.start.y][seed.start.x].el.textContent = 1;
-  moveHistory.push(current);
+  moveHistory.push({ x: seed.start.x, y: seed.start.y });
+  current = { x: seed.start.x, y: seed.start.y };
 }
 
 function loadRankingForPuzzle(puzzleId) {
