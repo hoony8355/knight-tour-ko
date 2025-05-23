@@ -42,8 +42,8 @@
     }
   });
 
-  // ✅ 한국어(ko) 페이지가 아닐 경우 퍼즐 버튼 추가
-  if (currentLang !== "ko") {
+  // ✅ 퍼즐 기능 버튼 (en/ja/... 등 ko 제외 페이지에서만 생성)
+  if (!currentLang.startsWith("ko")) {
     const nav = document.createElement("div");
     nav.className = "custom-nav-buttons";
     nav.style = "text-align: center; margin-top: 1.5rem;";
