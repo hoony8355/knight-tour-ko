@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>커스텀 퍼즐 게시판</title>
+  <link rel="stylesheet" href="board.css" />
+  <script type="module" src="board.js" defer></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 1em;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .top-puzzle-grid, .puzzle-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1em;
+      margin: 1em 0;
+    }
+
+    .puzzle-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 0.8em;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .puzzle-card:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .sort-controls {
+      text-align: center;
+      margin: 1em 0;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 1.5em;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 0.5em;
+      right: 0.8em;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .play-button {
+      display: inline-block;
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      background: #4caf50;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ 추천 퍼즐 & 전체 퍼즐 모아보기</h1>
+
+  <section id="topPuzzles">
+    <h2>🌟 주인 추천 퍼즐 Top 5</h2>
+    <div class="top-puzzle-grid" id="topPuzzleList"></div>
+  </section>
+
+  <section class="sort-controls">
+    <label for="sortSelect">↓ 정렬 방식 선택:</label>
+    <select id="sortSelect">
+      <option value="latest">최신순</option>
+      <option value="likes">추천순</option>
+    </select>
+  </section>
+
+  <section id="puzzleBoard">
+    <h2>🔹 전체 커스텀 퍼즐 목록</h2>
+    <div class="puzzle-list" id="puzzleList"></div>
+  </section>
+
+  <div id="previewModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-button" onclick="closePreview()">❌</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalAuthor"></p>
+      <p id="modalDescription"></p>
+      <img id="modalImage" src="" alt="퍼즐 미리보기" style="width: 100%; margin: 1em 0;" />
+      <div id="rankingList"></div>
+      <a id="playLink" href="#" class="play-button">🎮 바로 플레이</a>
+    </div>
+  </div>
+</body>
+</html>
