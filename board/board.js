@@ -1,4 +1,39 @@
+// board.js - Fixed timer to start only after first user click
+import {
+  getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
+  authDomain: "knight-tour-ranking.firebaseapp.com",
+  databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "knight-tour-ranking",
+  storageBucket: "knight-tour-ranking.appspot.com",
+  messagingSenderId: "1073626351852",
+  appId: "1:1073626351852:web:41ae6cb7db759beb703dc9"
+};
+
+const app = initializeApp(firebaseConfig, "board");
+const db = getDatabase(app);
+
+const puzzleListDiv = document.getElementById("puzzleList");
+const topPuzzleListDiv = document.getElementById("topPuzzleList");
+const sortSelect = document.getElementById("sortSelect");
+
+const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
+let allPuzzles = [];
+let boardData = [], moveHistory = [], currentSeed = null, current = null;
+let startTime = null;
+let timerInterval = null;
+
+const sessionId = localStorage.getItem("sessionId") || (() => {
+  const id = crypto.randomUUID();
+  localStorage.setItem("sessionId", id);
+  return id;
+})();
+
+function updateTimerDisplay(elapsed = 0) {
   let timerEl = document.getElementById("playTimer");
   if (!timerEl) {
     timerEl = document.createElement("div");
