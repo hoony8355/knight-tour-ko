@@ -1,31 +1,3 @@
-// board.js - 타이머는 시작 위치 클릭 후 첫 나이트 이동부터 시작
-import {
-  getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
-  authDomain: "knight-tour-ranking.firebaseapp.com",
-  databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "knight-tour-ranking",
-  storageBucket: "knight-tour-ranking.appspot.com",
-  messagingSenderId: "1073626351852",
-  appId: "1:1073626351852:web:41ae6cb7db759beb703dc9"
-};
-
-const app = initializeApp(firebaseConfig, "board");
-const db = getDatabase(app);
-
-const puzzleListDiv = document.getElementById("puzzleList");
-const topPuzzleListDiv = document.getElementById("topPuzzleList");
-const sortSelect = document.getElementById("sortSelect");
-
-const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
-let allPuzzles = [];
-let boardData = [], moveHistory = [], currentSeed = null, current = null;
-let startTime = null;
-let timerInterval = null;
 
 const sessionId = localStorage.getItem("sessionId") || (() => {
   const id = crypto.randomUUID();
@@ -44,8 +16,9 @@ function updateTimerDisplay(elapsed = 0) {
     timerEl.style.fontSize = "1.1em";
     timerEl.style.color = "#333";
     document.getElementById("modalBoard").prepend(timerEl);
+    console.log("🆕 타이머 표시 영역 생성됨");
   }
-  timerEl.textContent = `⏱ ${elapsed.toFixed(2)}초 경과 중`;
+  timerEl.textContent = ⏱ ${elapsed.toFixed(2)}초 경과 중;
 }
 
 window.closePreview = function () {
@@ -99,13 +72,10 @@ function playPuzzleInModal(seed) {
   timerInterval = null;
 
   console.log("🎮 퍼즐 시작됨:", seed);
-  currentSeed = seed;
 
   const table = document.createElement("table");
   table.className = "board";
-  boardData = [];
-  moveHistory = [];
-  current = null;
+  boardData = [], moveHistory = [], current = null;
 
   for (let y = 0; y < seed.rows; y++) {
     const tr = document.createElement("tr");
@@ -142,31 +112,21 @@ function playPuzzleInModal(seed) {
         console.log("❌ 시작 위치가 아님: 클릭된 위치", x, y);
         return;
       }
-      console.log("🚩 시작 위치 클릭됨. 대기 중...");
-      moveHistory.push({ x, y });
-      cell.visited = true;
-      cell.el.textContent = moveHistory.length;
-      clearHighlight();
-      cell.el.classList.add("current");
-      current = { x, y };
-      return;
-    }
-
-    const dx = Math.abs(x - current.x);
-    const dy = Math.abs(y - current.y);
-    if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
-      console.log("❌ 유효하지 않은 나이트 이동");
-      return;
-    }
-
-    if (!startTime) {
-      console.log("✅ 타이머 시작");
+      console.log("✅ 시작 클릭됨. 타이머 시작");
       startTime = performance.now();
       updateTimerDisplay(0);
       timerInterval = setInterval(() => {
         const elapsed = (performance.now() - startTime) / 1000;
         updateTimerDisplay(elapsed);
+        console.log("⏱ 현재 경과 시간:", elapsed.toFixed(2));
       }, 500);
+    } else {
+      const dx = Math.abs(x - current.x);
+      const dy = Math.abs(y - current.y);
+      if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
+        console.log("❌ 유효하지 않은 나이트 이동");
+        return;
+      }
     }
 
     moveHistory.push({ x, y });
@@ -176,15 +136,14 @@ function playPuzzleInModal(seed) {
     cell.el.classList.add("current");
     current = { x, y };
 
-    const totalPlayable = seed.rows * seed.cols - seed.blocked.length;
-    if (moveHistory.length === totalPlayable) {
+    if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
       clearInterval(timerInterval);
       const timeTaken = ((performance.now() - startTime) / 1000).toFixed(2);
       console.log("🎉 클리어 완료, 시간:", timeTaken);
 
-      const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
+      const nickname = prompt(🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:);
       if (nickname && nickname.trim()) {
-        const rankingRef = ref(db, `rankings/${seed.id || 'custom'}`);
+        const rankingRef = ref(db, rankings/${seed.id || 'custom'});
         const record = {
           nickname: nickname.trim(),
           time: parseFloat(timeTaken),
