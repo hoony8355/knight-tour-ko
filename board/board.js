@@ -1,4 +1,3 @@
-// board.js
 import {
   getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -24,7 +23,8 @@ const sortSelect = document.getElementById("sortSelect");
 const recommendedIds = ["RECOMMEND_ID_1", "RECOMMEND_ID_2", "RECOMMEND_ID_3", "RECOMMEND_ID_4", "RECOMMEND_ID_5"];
 let allPuzzles = [];
 let boardData = [], moveHistory = [], currentSeed = null, current = null;
-let startTime = null; // ✅ 클리어 시간 측정용 전역 변수 추가
+let startTime = null;
+let timerInterval = null;
 
 const sessionId = localStorage.getItem("sessionId") || (() => {
   const id = crypto.randomUUID();
@@ -32,15 +32,29 @@ const sessionId = localStorage.getItem("sessionId") || (() => {
   return id;
 })();
 
+function updateTimerDisplay(elapsed = 0) {
+  let timerEl = document.getElementById("playTimer");
+  if (!timerEl) {
+    timerEl = document.createElement("div");
+    timerEl.id = "playTimer";
+    timerEl.style.textAlign = "center";
+    timerEl.style.marginTop = "0.5rem";
+    document.getElementById("modalBoard").appendChild(timerEl);
+  }
+  timerEl.textContent = `⏱ ${elapsed.toFixed(2)}초`;
+}
+
 window.closePreview = function () {
   document.getElementById("previewModal").classList.add("hidden");
   document.getElementById("modalBoard").querySelector("table")?.remove();
+  document.getElementById("playTimer")?.remove();
   document.getElementById("rankingList").innerHTML = "";
   document.getElementById("modalLikeArea").innerHTML = "";
   boardData = [];
   moveHistory = [];
   current = null;
-  startTime = null; // ✅ 닫을 때도 초기화
+  startTime = null;
+  clearInterval(timerInterval);
 };
 
 window.undoMove = function () {
@@ -65,7 +79,9 @@ window.undoMove = function () {
 
 window.restartPuzzle = function () {
   if (currentSeed) {
-    startTime = null; // ✅ 다시하기 시 초기화
+    startTime = null;
+    clearInterval(timerInterval);
+    updateTimerDisplay(0);
     playPuzzleInModal(currentSeed);
   }
 };
@@ -133,7 +149,6 @@ function renderPuzzleList(puzzles) {
     author.textContent = puzzle.author;
 
     const likeButton = document.createElement("button");
-    likeButton.className = "like-button";
     likeButton.textContent = "❤️ 추천";
     likeButton.onclick = (e) => {
       e.stopPropagation();
@@ -180,6 +195,10 @@ function fetchPuzzles() {
 function playPuzzleInModal(seed) {
   const boardArea = document.getElementById("modalBoard");
   boardArea.querySelector("table")?.remove();
+  document.getElementById("playTimer")?.remove();
+  updateTimerDisplay(0);
+  clearInterval(timerInterval);
+  startTime = null;
 
   const table = document.createElement("table");
   table.className = "board";
@@ -217,7 +236,11 @@ function playPuzzleInModal(seed) {
 
     if (!current) {
       if (x !== seed.start.x || y !== seed.start.y) return;
-      startTime = performance.now(); // ✅ 첫 클릭 시 시간 측정 시작
+      startTime = performance.now();
+      timerInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        updateTimerDisplay(elapsed);
+      }, 100);
     } else {
       const dx = Math.abs(x - current.x);
       const dy = Math.abs(y - current.y);
@@ -232,6 +255,7 @@ function playPuzzleInModal(seed) {
     current = { x, y };
 
     if (moveHistory.length === (seed.rows * seed.cols - seed.blocked.length)) {
+      clearInterval(timerInterval);
       const timeTaken = ((performance.now() - startTime) / 1000).toFixed(2);
       const nickname = prompt(`🎉 클리어! 소요 시간: ${timeTaken}초\n닉네임을 입력하세요:`);
       if (nickname && nickname.trim()) {
