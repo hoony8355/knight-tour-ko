@@ -217,26 +217,24 @@ function playPuzzleInModal(seed) {
   const cell = boardData[y][x];
 
   if (cell.visited || cell.blocked) {
-    console.log(`[onClick] 🚫 방문 불가한 칸 (x:${x}, y:${y})`);
+    console.log(`[onClick] 🚫 이미 방문했거나 막힌 칸 (x:${x}, y:${y})`);
     return;
   }
 
-  if (!current) {
-    // 최초 클릭: 시작 위치인지 확인
-    if (x !== seed.start.x || y !== seed.start.y) {
-      console.log(`[onClick] ❌ 시작 위치가 아님 (x:${x}, y:${y})`);
-      return;
-    }
-    console.log("[onClick] ✅ 첫 클릭 - 타이머 시작");
-    startGameTimer();
-  } else {
-    // 나이트 이동 규칙 검증
+  // 나이트 이동 검증
+  if (current) {
     const dx = Math.abs(x - current.x);
     const dy = Math.abs(y - current.y);
     if (!((dx === 2 && dy === 1) || (dx === 1 && dy === 2))) {
-      console.log(`[onClick] ❌ 나이트 이동 아님 (from x:${current.x}, y:${current.y} → x:${x}, y:${y})`);
+      console.log(`[onClick] ❌ 나이트 이동 불가 (from x:${current.x}, y:${current.y} → x:${x}, y:${y})`);
       return;
     }
+  }
+
+  // ✅ 사용자의 첫 이동일 경우 타이머 시작
+  if (moveHistory.length === 1) {
+    console.log("[onClick] ✅ 첫 사용자 이동 → 타이머 시작");
+    startGameTimer();
   }
 
   // 이동 처리
@@ -269,6 +267,7 @@ function playPuzzleInModal(seed) {
     }
   }
 }
+
 
 
   boardData.forEach(row => row.forEach(cell => cell.el.addEventListener("click", onClick)));
