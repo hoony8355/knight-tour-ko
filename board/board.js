@@ -1,5 +1,5 @@
 import {
-  getDatabase, ref, get, query, orderByChild, push, set, onValue
+  getDatabase, ref, get, query, orderByChild, push, set, remove, onValue
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
@@ -66,19 +66,26 @@ window.restartPuzzle = function () {
 };
 
 function handleLike(puzzleId) {
-  console.log("❤️ 추천 시도:", puzzleId);
+  console.log("❤️ 추천 토글 시도:", puzzleId);
   const likeRef = ref(db, `likes/${puzzleId}/${sessionId}`);
   get(likeRef).then(snapshot => {
     if (snapshot.exists()) {
-      alert("이미 추천하셨습니다.");
+      // 🔄 추천 취소
+      remove(likeRef).then(() => {
+        alert("💔 추천이 취소되었습니다.");
+        loadLikeCount(puzzleId);
+      }).catch(err => {
+        console.error("❌ 추천 취소 실패:", err);
+        alert("추천 취소 중 오류 발생");
+      });
     } else {
+      // ✅ 추천 추가
       set(likeRef, true).then(() => {
-        console.log("✅ 추천 저장 완료");
         alert("❤️ 추천 완료!");
         loadLikeCount(puzzleId);
       }).catch(err => {
         console.error("❌ 추천 저장 실패:", err);
-        alert("추천 중 오류 발생 (권한 또는 네트워크 문제)");
+        alert("추천 중 오류 발생");
       });
     }
   }).catch(err => {
@@ -272,7 +279,7 @@ function loadRankingForPuzzle(puzzleId) {
     if (snapshot.exists()) {
       const rankArray = Object.values(snapshot.val()).sort((a, b) => a.time - b.time).slice(0, 5);
       document.getElementById("rankingList").innerHTML = rankArray
-        .map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time.toFixed(2)}s</p>`).join("");
+        .map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time.toFixed(2)}s</p>`).join('');
     } else {
       document.getElementById("rankingList").innerHTML = "<p>아직 기록이 없습니다.</p>";
     }
