@@ -64,7 +64,7 @@
       background: white;
       padding: 1.5rem;
       border-radius: 8px;
-      max-width: 560px;
+      max-width: 580px;
       width: 100%;
       position: relative;
     }
@@ -76,13 +76,13 @@
       font-size: 1.2rem;
     }
     .modal-content table.board {
-      width: 100%;
-      margin: 1rem 0;
+      margin: 1rem auto;
       border-collapse: collapse;
     }
     .modal-content table.board td {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
+      aspect-ratio: 1 / 1;
       text-align: center;
       vertical-align: middle;
       font-weight: bold;
@@ -93,6 +93,33 @@
     .modal-content table.board td.light { background: #f0d9b5; }
     .modal-content table.board td.dark { background: #b58863; color: white; }
     .modal-content table.board td.current { outline: 3px solid orange; }
+    #modalBoard {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+    .board-controls {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 0.5rem 0 1rem;
+    }
+    .board-controls button {
+      padding: 0.3rem 0.75rem;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #eee;
+      cursor: pointer;
+    }
+    .board-controls button:hover {
+      background-color: #ddd;
+    }
+    #rankingList {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -122,7 +149,15 @@
       <h3 id="modalTitle"></h3>
       <p id="modalAuthor"></p>
       <p id="modalDescription"></p>
-      <div id="modalBoard"></div>
+
+      <div id="modalBoard">
+        <div class="board-controls">
+          <button onclick="undoMove()">↩ 되돌리기</button>
+          <button onclick="restartPuzzle()">🔄 다시 하기</button>
+        </div>
+        <!-- 보드판이 여기에 들어감 -->
+      </div>
+
       <div id="rankingList"></div>
     </div>
   </div>
