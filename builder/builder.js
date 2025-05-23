@@ -65,12 +65,12 @@ function getSeedObject() {
   }
 
   const seed = { rows, cols, blocked, start: currentStart };
-  console.log("[\uD83D\uDD0D 시드 생성 완료] blocked 좌표:", seed.blocked);
+  console.log("[🔍 시드 생성 완료] blocked 좌표:", seed.blocked);
   return seed;
 }
 
 function testPuzzle() {
-  console.log('[\uD83E\uDDEA 테스트 시작]');
+  console.log('[🧪 테스트 시작]');
   const seed = getSeedObject();
   if (!seed) return;
 
@@ -135,9 +135,9 @@ function testPuzzle() {
     current = { x, y };
 
     if (moveCount === (seed.rows * seed.cols - seed.blocked.length)) {
-      alert("\uD83C\uDF89 퍼즐 클리어 성공! 게시가 가능합니다.");
+      alert("🎉 퍼즐 클리어 성공! 게시가 가능합니다.");
       testPassed = true;
-      lastVerifiedSeed = seed;
+      lastVerifiedSeed = seed; // ✅ 통과된 seed 저장
       console.log('[✅ 테스트 통과]');
     }
   }
@@ -148,30 +148,12 @@ function testPuzzle() {
   highlight(seed.start.x, seed.start.y);
 }
 
-function checkPuzzleUploadThrottle() {
-  const now = Date.now();
-  const lastUpload = localStorage.getItem("lastPuzzleUpload");
-
-  if (lastUpload && now - parseInt(lastUpload, 10) < 10000) {
-    const waitSec = ((10000 - (now - lastUpload)) / 1000).toFixed(1);
-    alert(`⏱ 퍼즐 등록은 10초에 한 번만 가능합니다!\n(${waitSec}초 후 다시 시도해주세요)`);
-    return false;
-  }
-
-  localStorage.setItem("lastPuzzleUpload", now);
-  console.log(`[✅ Throttle] 퍼즐 등록 허용됨 (last: ${lastUpload})`);
-  return true;
-}
-
 function postPuzzle() {
   console.log('[📬 퍼즐 게시 시도]');
-
-  if (!checkPuzzleUploadThrottle()) return;
-
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
-  const seed = lastVerifiedSeed;
+  const seed = lastVerifiedSeed; // ✅ 마지막 통과된 seed 사용
 
   if (!seed) {
     alert("퍼즐 시드가 없습니다. 테스트 플레이를 먼저 완료해주세요.");
