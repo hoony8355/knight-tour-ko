@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>컸스텀 퍼즐 만들기</title>
+  <title>커스텀 퍼즐 만들기</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- 기존 랭킹용 Firebase 초기화 (수정 금지) -->
   <script type="module" src="/knight-tour-ko/firebase-init.js"></script>
+
+  <!-- 퍼즐 게시용 Firebase 모듈 연결 -->
+  <script type="module">
+    import { postPuzzleToDB } from './builder/builder-firebase.js';
+    window.postPuzzleToDB = postPuzzleToDB;
+  </script>
 </head>
 <body>
-  <h1>🛠 케스텀 퍼즐 만들기</h1>
+  <h1>🛠 커스텀 퍼즐 만들기</h1>
   <p>보드 크기와 막히는 칸, 시작 위치를 설정한 후, 반드시 직접 플레이로 클리어 테스트를 완료해야 게시할 수 있습니다.</p>
 
   <div class="builder-controls">
@@ -33,7 +41,7 @@
   <div class="input-section">
     <h3>퍼즐 정보 입력</h3>
     <input type="text" id="puzzleTitle" placeholder="퍼즐 제목" />
-    <input type="text" id="authorName" placeholder="작성자 닉니링" />
+    <input type="text" id="authorName" placeholder="작성자 닉네임" />
     <textarea id="puzzleDesc" placeholder="퍼즐 설명 (선택)"></textarea>
   </div>
 
@@ -45,6 +53,7 @@
   <p id="seedOutput"></p>
   <p id="testResult" style="font-weight: bold; color: green;"></p>
 
+  <!-- 커스텀 빌더 로직 -->
   <script src="builder.js"></script>
 </body>
 </html>
