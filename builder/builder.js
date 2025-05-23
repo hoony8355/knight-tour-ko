@@ -14,13 +14,13 @@ function generateBoard() {
   board.innerHTML = '';
 
   const cellSize = window.innerWidth < 480 ? 30 : 40;
-  board.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
-  board.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+  board.style.gridTemplateRows = repeat(${rows}, ${cellSize}px);
+  board.style.gridTemplateColumns = repeat(${cols}, ${cellSize}px);
   currentStart = null;
   testPassed = false;
   lastVerifiedSeed = null;
 
-  console.log(`[보드 생성] 행: ${rows}, 열: ${cols}`);
+  console.log([보드 생성] 행: ${rows}, 열: ${cols});
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -190,7 +190,7 @@ function postPuzzle() {
     console.log('[✅ 퍼즐 게시 성공]');
     alert("✅ 퍼즐이 게시되었습니다!");
     document.getElementById("seedOutput").textContent =
-      `${window.location.origin}/knight-tour-ko/?custom=${data.seed}`;
+      ${window.location.origin}/knight-tour-ko/?custom=${data.seed};
   }).catch(err => {
     console.error("❌ 퍼즐 게시 실패", err);
     alert("Firebase 저장 실패. 콘솔을 확인해주세요.");
