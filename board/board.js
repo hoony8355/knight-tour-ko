@@ -1,6 +1,7 @@
-// board.js
-import { getDatabase, ref, get, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+import {
+  getDatabase, ref, get, query, orderByChild
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
@@ -15,69 +16,104 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig, "board");
 const db = getDatabase(app);
 
-const puzzleListElem = document.getElementById('puzzleList');
-const topPuzzleListElem = document.getElementById('topPuzzleList');
-const sortSelect = document.getElementById('sortSelect');
+const puzzleListDiv = document.getElementById("puzzleList");
+const topPuzzleListDiv = document.getElementById("topPuzzleList");
+const sortSelect = document.getElementById("sortSelect");
+
+// 예시: 추천 퍼즐 ID 배열 (직접 관리 가능)
+const recommendedIds = [
+  "RECOMMEND_ID_1",
+  "RECOMMEND_ID_2",
+  "RECOMMEND_ID_3",
+  "RECOMMEND_ID_4",
+  "RECOMMEND_ID_5"
+];
 
 let allPuzzles = [];
 
-async function fetchPuzzles() {
-  const snapshot = await get(ref(db, 'puzzlePosts'));
-  if (snapshot.exists()) {
-    allPuzzles = Object.entries(snapshot.val()).map(([id, puzzle]) => ({ id, ...puzzle }));
-    renderAll();
-  }
-}
-
-function renderAll() {
-  renderTopPuzzles();
-  renderPuzzleList();
-}
-
-function renderTopPuzzles() {
-  const top5 = allPuzzles.slice(0, 5); // 관리자 추천 기준으로 교체 가능
-  topPuzzleListElem.innerHTML = '';
-  top5.forEach(puzzle => {
-    const div = document.createElement('div');
-    div.className = 'puzzle-card';
-    div.innerHTML = `<strong>${puzzle.title}</strong><br/><small>by ${puzzle.author}</small>`;
-    div.onclick = () => showPreview(puzzle);
-    topPuzzleListElem.appendChild(div);
-  });
-}
-
-function renderPuzzleList() {
-  const sorted = [...allPuzzles];
-  const sortBy = sortSelect.value;
-  if (sortBy === 'latest') {
-    sorted.sort((a, b) => b.createdAt - a.createdAt);
-  } else if (sortBy === 'likes') {
-    sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-  }
-  puzzleListElem.innerHTML = '';
-  sorted.forEach(puzzle => {
-    const div = document.createElement('div');
-    div.className = 'puzzle-card';
-    div.innerHTML = `<strong>${puzzle.title}</strong><br/><small>by ${puzzle.author}</small>`;
-    div.onclick = () => showPreview(puzzle);
-    puzzleListElem.appendChild(div);
-  });
-}
-
-sortSelect.addEventListener('change', renderPuzzleList);
-
-function showPreview(puzzle) {
-  document.getElementById('modalTitle').textContent = puzzle.title;
-  document.getElementById('modalAuthor').textContent = `by ${puzzle.author}`;
-  document.getElementById('modalDescription').textContent = puzzle.description || '-';
-  document.getElementById('modalImage').src = `/knight-tour-ko/preview.png`; // TODO: 썸네일 생성 로직 적용 가능
-  document.getElementById('playLink').href = `/knight-tour-ko/?custom=${puzzle.seed}`;
-  document.getElementById('rankingList').innerHTML = `<p>TOP 5 랭킹 로딩 예정...</p>`; // TODO: 랭킹 연동
-  document.getElementById('previewModal').classList.remove('hidden');
-}
-
 window.closePreview = function () {
-  document.getElementById('previewModal').classList.add('hidden');
+  document.getElementById("previewModal").classList.add("hidden");
+};
+
+function openPreview(puzzle) {
+  document.getElementById("modalTitle").textContent = puzzle.title;
+  document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
+  document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
+  document.getElementById("modalImage").src = `/knight-tour-ko/preview/${puzzle.id}.png`; // 미리보기 이미지 경로
+  document.getElementById("playLink").href = `/knight-tour-ko/?custom=${puzzle.seed}`;
+  loadRankingForPuzzle(puzzle.id);
+  document.getElementById("previewModal").classList.remove("hidden");
 }
+
+function loadRankingForPuzzle(puzzleId) {
+  const rankRef = ref(db, `rankings/${puzzleId}`);
+  get(rankRef).then(snapshot => {
+    if (snapshot.exists()) {
+      const rankArray = Object.values(snapshot.val());
+      rankArray.sort((a, b) => a.time - b.time);
+      const top5 = rankArray.slice(0, 5);
+
+      const html = top5.map((r, i) => `<p>🥇 ${i + 1}위: ${r.nickname} - ${r.time}s</p>`).join('');
+      document.getElementById("rankingList").innerHTML = html;
+    } else {
+      document.getElementById("rankingList").innerHTML = "<p>아직 기록이 없습니다.</p>";
+    }
+  });
+}
+
+function renderPuzzleList(puzzles) {
+  puzzleListDiv.innerHTML = "";
+  puzzles.forEach(puzzle => {
+    const div = document.createElement("div");
+    div.className = "puzzle-card";
+    div.innerHTML = `
+      <h4>${puzzle.title}</h4>
+      <p>${puzzle.author}</p>
+    `;
+    div.onclick = () => openPreview(puzzle);
+    puzzleListDiv.appendChild(div);
+  });
+}
+
+function renderTopPuzzles(puzzles) {
+  topPuzzleListDiv.innerHTML = "";
+  puzzles.forEach(puzzle => {
+    const div = document.createElement("div");
+    div.className = "puzzle-card";
+    div.innerHTML = `
+      <h4>${puzzle.title}</h4>
+      <p>${puzzle.author}</p>
+    `;
+    div.onclick = () => openPreview(puzzle);
+    topPuzzleListDiv.appendChild(div);
+  });
+}
+
+function fetchPuzzles() {
+  const puzzlesRef = query(ref(db, "puzzlePosts"), orderByChild("createdAt"));
+  get(puzzlesRef).then(snapshot => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      allPuzzles = Object.entries(data).map(([id, value]) => ({
+        ...value,
+        id
+      })).reverse(); // 최신순 정렬
+
+      const topPuzzles = allPuzzles.filter(p => recommendedIds.includes(p.id));
+      renderTopPuzzles(topPuzzles);
+      renderPuzzleList(allPuzzles);
+    }
+  });
+}
+
+sortSelect.addEventListener("change", () => {
+  if (sortSelect.value === "latest") {
+    const sorted = [...allPuzzles].sort((a, b) => b.createdAt - a.createdAt);
+    renderPuzzleList(sorted);
+  } else if (sortSelect.value === "likes") {
+    const sorted = [...allPuzzles].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    renderPuzzleList(sorted);
+  }
+});
 
 fetchPuzzles();
