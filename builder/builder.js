@@ -1,8 +1,10 @@
 let currentStart = null;
 let testPassed = false;
 
-// DOM 로딩 후 초기 보드 생성
-window.addEventListener('load', generateBoard);
+window.addEventListener('load', () => {
+  console.log('[로드됨] 보드 자동 생성 시작');
+  generateBoard();
+});
 
 function generateBoard() {
   const rows = parseInt(document.getElementById('rowsInput').value);
@@ -15,6 +17,8 @@ function generateBoard() {
   board.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
   currentStart = null;
   testPassed = false;
+
+  console.log(`[보드 생성] 행: ${rows}, 열: ${cols}`);
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -62,6 +66,7 @@ function getSeedObject() {
 }
 
 function testPuzzle() {
+  console.log('[테스트 시작]');
   const seed = getSeedObject();
   if (!seed) return;
 
@@ -128,6 +133,7 @@ function testPuzzle() {
     if (moveCount === (seed.rows * seed.cols - seed.blocked.length)) {
       alert("🎉 퍼즐 클리어 성공! 게시가 가능합니다.");
       testPassed = true;
+      console.log('[테스트 통과]');
     }
   }
 
@@ -138,6 +144,7 @@ function testPuzzle() {
 }
 
 function postPuzzle() {
+  console.log('[퍼즐 게시 시도]');
   const title = document.getElementById('puzzleTitle').value.trim();
   const author = document.getElementById('authorName').value.trim();
   const description = document.getElementById('puzzleDesc').value.trim();
@@ -164,8 +171,14 @@ function postPuzzle() {
     createdAt: Date.now()
   };
 
-  // 🧩 게시용 Firebase 호출 (builder-firebase.js에서 import된 글로벌 함수)
+  if (typeof window.postPuzzleToDB !== 'function') {
+    console.error('[🚨 오류] postPuzzleToDB가 정의되지 않았습니다.');
+    alert("내부 오류: Firebase 모듈이 로드되지 않았습니다.");
+    return;
+  }
+
   window.postPuzzleToDB(data).then(() => {
+    console.log('[✅ 퍼즐 게시 성공]');
     alert("✅ 퍼즐이 게시되었습니다!");
     document.getElementById("seedOutput").textContent =
       `${window.location.origin}/knight-tour-ko/?custom=${data.seed}`;
@@ -175,7 +188,7 @@ function postPuzzle() {
   });
 }
 
-// 전역 함수 연결
+// 전역 연결
 window.generateBoard = generateBoard;
 window.testPuzzle = testPuzzle;
 window.postPuzzle = postPuzzle;
