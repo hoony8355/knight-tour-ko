@@ -18,7 +18,24 @@
     h1, h2 {
       text-align: center;
     }
-    .top-puzzle-grid, .puzzle-list {
+    .top-nav-buttons {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .top-nav-buttons a {
+      margin: 0 0.5rem;
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #eee;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .top-nav-buttons a:hover {
+      background-color: #ddd;
+    }
+    .puzzle-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 1rem;
@@ -141,12 +158,12 @@
   </style>
 </head>
 <body>
-  <h1>✨ 추천 퍼즐 & 전체 퍼즐 모아보기</h1>
+  <h1>🎮 커스텀 퍼즐 게시판</h1>
 
-  <section id="topPuzzles">
-    <h2>🌟 주인 추천 퍼즐 Top 5</h2>
-    <div class="top-puzzle-grid" id="topPuzzleList"></div>
-  </section>
+  <div class="top-nav-buttons">
+    <a href="../">🏠 메인 퍼즐 플레이</a>
+    <a href="../builder/">✏️ 커스텀 게임 만들기</a>
+  </div>
 
   <section class="sort-controls">
     <label for="sortSelect">↓ 정렬 방식 선택:</label>
@@ -157,7 +174,7 @@
   </section>
 
   <section id="puzzleBoard">
-    <h2>🔹 전체 커스텀 퍼즐 목록</h2>
+    <h2>🧩 전체 커스텀 퍼즐 목록</h2>
     <div class="puzzle-list" id="puzzleList"></div>
   </section>
 
@@ -168,7 +185,6 @@
       <p id="modalAuthor"></p>
       <p id="modalDescription"></p>
 
-      <!-- ✅ 추천 버튼 위치 -->
       <div id="modalLikeArea" style="text-align: center; margin: 0.5rem 0;"></div>
 
       <div id="modalBoard">
@@ -180,14 +196,13 @@
 
       <div id="rankingList"></div>
 
-      <!-- ✅ 공유 버튼 추가 -->
       <div class="share-buttons">
-  <button onclick="shareNative()">📱 공유하기</button>
-  <button onclick="shareOnTwitter()">🐦 트위터</button>
-  <button onclick="shareOnFacebook()">📘 페이스북</button>
-  <button onclick="shareKakao()">💬 카카오톡</button>
-  <button onclick="copyLocalLink()">🔗 링크 복사</button>
-</div>
+        <button onclick="shareNative()">📱 공유하기</button>
+        <button onclick="shareOnTwitter()">🐦 트위터</button>
+        <button onclick="shareOnFacebook()">📘 페이스북</button>
+        <button onclick="shareKakao()">💬 카카오톡</button>
+        <button onclick="copyLocalLink()">🔗 링크 복사</button>
+      </div>
     </div>
   </div>
 </body>
