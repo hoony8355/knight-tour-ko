@@ -35,17 +35,29 @@ window.closePreview = function () {
 };
 
 window.undoMove = function () {
-  if (moveHistory.length === 0) return;
+  if (moveHistory.length <= 1) {
+    // 시작 위치까지 되돌린 경우 초기화
+    const first = moveHistory.pop();
+    const cell = boardData[first.y][first.x];
+    cell.visited = false;
+    cell.el.textContent = "";
+    cell.el.classList.remove("current");
+    current = null;
+    return;
+  }
+
+  // 현재 위치 제거
   const last = moveHistory.pop();
   const cell = boardData[last.y][last.x];
   cell.visited = false;
   cell.el.textContent = "";
   cell.el.classList.remove("current");
 
-  if (moveHistory.length > 0) {
-    const prev = moveHistory[moveHistory.length - 1];
-    boardData[prev.y][prev.x].el.classList.add("current");
-    current = { x: prev.x, y: prev.y };
+  // 이전 위치로 되돌림
+  const prev = moveHistory[moveHistory.length - 1];
+  boardData[prev.y][prev.x].el.classList.add("current");
+  current = { x: prev.x, y: prev.y };
+};
   } else {
     current = null;
   }
