@@ -101,24 +101,47 @@ function loadLikeCount(puzzleId) {
 }
 
 function openPreview(puzzle) {
+  console.log("🔍 [openPreview] 퍼즐 데이터:", puzzle);
+
+  // 제목, 작성자, 설명 표시
   document.getElementById("modalTitle").textContent = puzzle.title;
   document.getElementById("modalAuthor").textContent = "작성자: " + puzzle.author;
   document.getElementById("modalDescription").textContent = puzzle.description || "설명 없음";
 
-  document.getElementById("modalLikeArea").innerHTML = `
+  // 추천 버튼 삽입
+  const likeArea = document.getElementById("modalLikeArea");
+  likeArea.innerHTML = `
     <button onclick="handleLike('${puzzle.id}')">❤️ 추천</button>
     <span id="modalLikeCount">추천: 0</span>
   `;
 
-  currentSeed = JSON.parse(atob(puzzle.seed));
-  currentSeed.id = puzzle.id;
+  // 퍼즐 시드 디코딩 및 전역 등록
+  try {
+    currentSeed = JSON.parse(atob(puzzle.seed));
+    currentSeed.id = puzzle.id;
+    window.currentSeed = currentSeed;  // ✅ 공유 URL용 전역 등록
+    console.log("✅ [openPreview] 시드 디코딩 완료:", currentSeed);
+  } catch (err) {
+    console.error("❌ [openPreview] 퍼즐 시드 디코딩 실패:", err);
+    alert("퍼즐 정보를 불러오지 못했습니다.");
+    return;
+  }
 
+  // 퍼즐 실행
   playPuzzleInModal(currentSeed);
+
+  // 랭킹/추천 수 불러오기
   loadRankingForPuzzle(puzzle.id);
   loadLikeCount(puzzle.id);
 
+  // 모달 표시
   document.getElementById("previewModal").classList.remove("hidden");
+
+  // URL 히스토리 반영 (뒤로가기 대응 가능)
+  history.pushState(null, "", `?puzzle=${puzzle.id}`);
+  console.log(`🔗 [openPreview] URL 업데이트됨 → ?puzzle=${puzzle.id}`);
 }
+
 
 function renderPuzzleList(puzzles) {
   puzzleListDiv.innerHTML = "";
