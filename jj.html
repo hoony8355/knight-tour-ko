@@ -2,22 +2,14 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>'ㅇㅇ' 데이터 일괄 삭제기</title>
+  <title>'ㅇㅇ' 데이터 삭제기 (전체 보드용)</title>
 </head>
 <body>
-  <h2>name이 'ㅇㅇ'인 데이터를 삭제 중입니다... (F12 콘솔 확인)</h2>
+  <h2>'ㅇㅇ' 데이터를 삭제하는 중입니다... (F12 콘솔 확인)</h2>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getDatabase,
-      ref,
-      query,
-      orderByChild,
-      equalTo,
-      get,
-      update
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, query, orderByChild, equalTo, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
@@ -36,50 +28,39 @@
     const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
     const targetName = 'ㅇㅇ';
 
-    async function deleteEntriesByName() {
-      const allUpdates = {};
-      let totalDeleted = 0;
+    let totalDeleted = 0;
 
-      for (const size of boardSizes) {
-        const path = `rankings/${size}`;
-        const dataRef = ref(db, path);
-        const queryRef = query(dataRef, orderByChild('name'), equalTo(targetName));
+    boardSizes.forEach((size) => {
+      const path = `rankings/${size}`;
+      const dataRef = ref(db, path);
+      const queryRef = query(dataRef, orderByChild('name'), equalTo(targetName));
 
-        console.log(`🔍 '${path}'에서 name이 '${targetName}'인 데이터 찾는 중...`);
+      console.log(`🔍 [${size}] 보드에서 name이 '${targetName}'인 데이터 찾는 중...`);
 
-        try {
-          const snapshot = await get(queryRef);
-          if (snapshot.exists()) {
-            let count = 0;
-            snapshot.forEach(child => {
-              const fullPath = `${path}/${child.key}`;
-              allUpdates[fullPath] = null;
-              count++;
-            });
-            totalDeleted += count;
-            console.log(`✅ ${count}개 삭제 준비 완료 (${path})`);
-          } else {
-            console.log(`❌ '${path}'에 삭제할 '${targetName}' 데이터 없음`);
-          }
-        } catch (err) {
-          console.error(`⚠️ ${path} 에서 오류 발생:`, err);
+      get(queryRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const updates = {};
+          let count = 0;
+
+          snapshot.forEach((child) => {
+            const fullPath = `${path}/${child.key}`;
+            updates[fullPath] = null;
+            count++;
+          });
+
+          totalDeleted += count;
+          console.log(`✅ [${size}] ${count}개의 데이터를 삭제합니다...`);
+          return update(ref(db), updates);
+        } else {
+          console.log(`❌ [${size}] '${targetName}' 데이터가 없습니다.`);
+          return Promise.resolve();
         }
-      }
-
-      if (Object.keys(allUpdates).length > 0) {
-        console.log(`🚀 총 ${totalDeleted}개 데이터 삭제 시작...`);
-        try {
-          await update(ref(db), allUpdates);
-          console.log("🎉 모든 삭제 완료!");
-        } catch (err) {
-          console.error("❌ 삭제 중 오류 발생:", err);
-        }
-      } else {
-        console.log("ℹ️ 삭제할 데이터 없음");
-      }
-    }
-
-    deleteEntriesByName();
+      }).then(() => {
+        console.log(`🎉 [${size}] 삭제 완료! 누적 삭제 수: ${totalDeleted}`);
+      }).catch((error) => {
+        console.error(`⚠️ [${size}] 삭제 중 오류 발생:`, error);
+      });
+    });
   </script>
 </body>
 </html>
