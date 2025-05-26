@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>'ㅇㅇ' 데이터 일괄 삭제기</title>
+  <title>🔥 여러 이름 데이터 일괄 삭제기</title>
 </head>
 <body>
-  <h2>'1' 데이터를 삭제하는 중입니다... (F12 콘솔 확인)</h2>
+  <h2>여러 이름 데이터를 삭제하는 중입니다... (F12 콘솔 확인)</h2>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -25,44 +25,46 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 삭제할 대상 이름
-    const targetName = '대 후 니';
+    // 삭제할 이름 목록
+    const targetNames = ['S', 'E', 'X', 'CHAN'];
 
-    // 동시에 처리할 보드 경로
+    // 삭제 대상 보드 크기
     const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
 
     boardSizes.forEach(boardSize => {
-      const parentPath = `rankings/${boardSize}`;
-      const dataRef = ref(db, parentPath);
-      const queryRef = query(dataRef, orderByChild('name'), equalTo(targetName));
+      targetNames.forEach(name => {
+        const parentPath = `rankings/${boardSize}`;
+        const dataRef = ref(db, parentPath);
+        const queryRef = query(dataRef, orderByChild('name'), equalTo(name));
 
-      console.log(`🔍 [${boardSize}] '${targetName}' 데이터를 찾는 중...`);
+        console.log(`🔍 [${boardSize}] '${name}' 데이터를 찾는 중...`);
 
-      get(queryRef)
-        .then(snapshot => {
-          if (snapshot.exists()) {
-            const updates = {};
-            let count = 0;
+        get(queryRef)
+          .then(snapshot => {
+            if (snapshot.exists()) {
+              const updates = {};
+              let count = 0;
 
-            snapshot.forEach(child => {
-              const fullPath = `${parentPath}/${child.key}`;
-              updates[fullPath] = null;
-              count++;
-            });
+              snapshot.forEach(child => {
+                const fullPath = `${parentPath}/${child.key}`;
+                updates[fullPath] = null;
+                count++;
+              });
 
-            console.log(`✅ [${boardSize}] ${count}개의 '${targetName}' 데이터를 삭제합니다...`);
-            return update(ref(db), updates);
-          } else {
-            console.log(`❌ [${boardSize}] '${targetName}' 데이터 없음`);
-            return Promise.resolve();
-          }
-        })
-        .then(() => {
-          console.log(`🎉 [${boardSize}] 삭제 완료`);
-        })
-        .catch(error => {
-          console.error(`⚠️ [${boardSize}] 삭제 중 오류 발생:`, error);
-        });
+              console.log(`✅ [${boardSize}] ${count}개의 '${name}' 데이터를 삭제합니다...`);
+              return update(ref(db), updates);
+            } else {
+              console.log(`❌ [${boardSize}] '${name}' 데이터 없음`);
+              return Promise.resolve();
+            }
+          })
+          .then(() => {
+            console.log(`🎉 [${boardSize}] '${name}' 삭제 완료`);
+          })
+          .catch(error => {
+            console.error(`⚠️ [${boardSize}] '${name}' 삭제 중 오류 발생:`, error);
+          });
+      });
     });
   </script>
 </body>
