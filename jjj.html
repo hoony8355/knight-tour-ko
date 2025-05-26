@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🔥 중복 이름 자동 삭제기</title>
+</head>
+<body>
+  <h2>중복된 이름(4개 이상) 데이터를 삭제 중입니다... (F12 콘솔 확인)</h2>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
+      authDomain: "knight-tour-ranking.firebaseapp.com",
+      databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "knight-tour-ranking",
+      storageBucket: "knight-tour-ranking.firebasestorage.app",
+      messagingSenderId: "1073626351852",
+      appId: "1:1073626351852:web:41ae6cb7db759beb703dc9",
+      measurementId: "G-D2P9PJ00JT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
+    const nameCount = {};
+    const allEntries = [];
+
+    async function findAndDeleteDuplicates() {
+      for (const boardSize of boardSizes) {
+        const snapshot = await get(ref(db, `rankings/${boardSize}`));
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            const data = child.val();
+            const name = data.name;
+            if (name) {
+              const keyPath = `rankings/${boardSize}/${child.key}`;
+              allEntries.push({ name, path: keyPath });
+              nameCount[name] = (nameCount[name] || 0) + 1;
+            }
+          });
+        }
+      }
+
+      // 4개 이상 등장한 이름 추출
+      const toDeleteNames = Object.entries(nameCount)
+        .filter(([_, count]) => count >= 4)
+        .map(([name]) => name);
+
+      if (toDeleteNames.length === 0) {
+        console.log("✅ 삭제할 중복 이름이 없습니다.");
+        return;
+      }
+
+      console.log(`🗑 삭제 대상 이름: ${toDeleteNames.join(', ')}`);
+
+      // 삭제 대상 데이터 정리
+      const updates = {};
+      let deleteCount = 0;
+
+      allEntries.forEach(entry => {
+        if (toDeleteNames.includes(entry.name)) {
+          updates[entry.path] = null;
+          deleteCount++;
+        }
+      });
+
+      // Firebase에서 삭제
+      await update(ref(db), updates);
+      console.log(`🎉 총 ${deleteCount}개 항목 삭제 완료`);
+    }
+
+    findAndDeleteDuplicates().catch(console.error);
+  </script>
+</body>
+</html>
