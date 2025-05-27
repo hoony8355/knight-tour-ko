@@ -3,6 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>🔥 관리자 자동/수동 삭제 도구</title>
+  <style>
+    #result-table {
+      margin-top: 2em;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    #result-table th, #result-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    #result-table th {
+      background: #f9f9f9;
+    }
+  </style>
 </head>
 <body>
   <h2>🛡 관리자 로그인 후 삭제 기능을 사용할 수 있습니다.</h2>
@@ -23,6 +37,8 @@
     <button onclick="deleteByName()">삭제 실행</button>
   </div>
 
+  <div id="deletedList"></div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -42,6 +58,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
+    const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
 
     async function login() {
       const email = document.getElementById("email").value;
@@ -65,10 +82,26 @@
         resultBox.textContent = "❌ 로그인 실패: " + err.message;
       }
     }
-
     window.login = login;
 
-    const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
+    function renderDeletedList(entries) {
+      const container = document.getElementById("deletedList");
+      if (entries.length === 0) {
+        container.innerHTML = "<p>삭제된 항목 없음</p>";
+        return;
+      }
+
+      const rows = entries.map(entry =>
+        `<tr><td>${entry.board}</td><td>${entry.name}</td></tr>`
+      ).join("");
+
+      container.innerHTML = `
+        <h3>📋 삭제된 목록 (${entries.length}개)</h3>
+        <table id="result-table">
+          <thead><tr><th>보드</th><th>이름</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
 
     async function findAndDeleteDuplicates() {
       const nameCount = {};
@@ -82,7 +115,7 @@
             const name = data.name;
             if (name) {
               const path = `rankings/${boardSize}/${child.key}`;
-              allEntries.push({ name, path });
+              allEntries.push({ name, board: boardSize, path });
               nameCount[name] = (nameCount[name] || 0) + 1;
             }
           });
@@ -94,19 +127,28 @@
         .map(([name]) => name);
 
       const updates = {};
-      let count = 0;
+      const deleted = [];
 
       allEntries.forEach(entry => {
         if (toDeleteNames.includes(entry.name)) {
           updates[entry.path] = null;
-          count++;
+          deleted.push({ name: entry.name, board: entry.board });
         }
       });
 
-      await update(ref(db), updates);
-      alert(`✅ 자동 삭제 완료: ${count}개 항목 삭제됨`);
-    }
+      if (deleted.length === 0) {
+        alert("✅ 삭제할 중복 이름이 없습니다.");
+        renderDeletedList([]);
+        return;
+      }
 
+      const confirmMsg = `⚠️ ${deleted.length}개 항목이 삭제됩니다. 정말 진행하시겠습니까?`;
+      if (!confirm(confirmMsg)) return;
+
+      await update(ref(db), updates);
+      alert(`✅ ${deleted.length}개 항목 삭제 완료`);
+      renderDeletedList(deleted);
+    }
     window.findAndDeleteDuplicates = findAndDeleteDuplicates;
 
     async function deleteByName() {
@@ -120,7 +162,7 @@
       const base = isPattern ? input.slice(0, -1) : input;
 
       const updates = {};
-      let deleteCount = 0;
+      const deleted = [];
 
       for (const boardSize of boardSizes) {
         const snapshot = await get(ref(db, `rankings/${boardSize}`));
@@ -132,21 +174,27 @@
               (!isPattern && name === base) ||
               (isPattern && name.startsWith(base))
             )) {
-              updates[`rankings/${boardSize}/${child.key}`] = null;
-              deleteCount++;
+              const path = `rankings/${boardSize}/${child.key}`;
+              updates[path] = null;
+              deleted.push({ name, board: boardSize });
             }
           });
         }
       }
 
-      if (deleteCount === 0) {
+      if (deleted.length === 0) {
         alert("❌ 해당 이름 또는 패턴에 해당하는 데이터가 없습니다.");
-      } else {
-        await update(ref(db), updates);
-        alert(`✅ ${deleteCount}개 항목 삭제 완료`);
+        renderDeletedList([]);
+        return;
       }
-    }
 
+      const confirmMsg = `⚠️ ${deleted.length}개 항목이 삭제됩니다. 정말 진행하시겠습니까?`;
+      if (!confirm(confirmMsg)) return;
+
+      await update(ref(db), updates);
+      alert(`✅ ${deleted.length}개 항목 삭제 완료`);
+      renderDeletedList(deleted);
+    }
     window.deleteByName = deleteByName;
   </script>
 </body>
