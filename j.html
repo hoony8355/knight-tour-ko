@@ -2,16 +2,25 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>🔥 관리자 전용 중복 삭제 실행기</title>
+  <title>🔥 관리자 자동/수동 삭제 도구</title>
 </head>
 <body>
-  <h2>중복된 이름(4개 이상) 데이터를 삭제하려면 관리자 로그인이 필요합니다</h2>
+  <h2>🛡 관리자 로그인 후 삭제 기능을 사용할 수 있습니다.</h2>
 
   <div id="login-box">
     <input type="email" id="email" placeholder="이메일" /><br />
     <input type="password" id="password" placeholder="비밀번호" /><br />
-    <button onclick="login()">로그인 및 삭제 실행</button>
+    <button onclick="login()">로그인</button>
     <p id="result" style="margin-top: 1em; font-weight: bold;"></p>
+  </div>
+
+  <div id="tools" style="display: none; margin-top: 2em;">
+    <h3>🗑 자동 삭제 (중복 이름 4개 이상)</h3>
+    <button onclick="findAndDeleteDuplicates()">자동 삭제 시작</button>
+
+    <h3 style="margin-top:2em;">🔎 특정 이름 삭제</h3>
+    <input type="text" id="targetName" placeholder="예: 광훈 또는 광훈*" />
+    <button onclick="deleteByName()">삭제 실행</button>
   </div>
 
   <script type="module">
@@ -31,8 +40,8 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
+    const auth = getAuth(app);
 
     async function login() {
       const email = document.getElementById("email").value;
@@ -42,29 +51,29 @@
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        const tokenResult = await user.getIdTokenResult();
+        const token = await user.getIdTokenResult();
 
-        if (tokenResult.claims.admin === true) {
-          resultBox.textContent = "✅ 관리자 확인 완료. 중복 데이터 삭제를 시작합니다...";
+        if (token.claims.admin === true) {
+          resultBox.textContent = "✅ 관리자 인증 완료";
           document.getElementById("login-box").style.display = "none";
-          findAndDeleteDuplicates();
+          document.getElementById("tools").style.display = "block";
         } else {
           resultBox.textContent = "❌ 이 계정은 관리자 권한이 없습니다.";
         }
-      } catch (error) {
-        console.error("로그인 오류:", error);
-        resultBox.textContent = "❌ 로그인 실패: " + error.message;
+      } catch (err) {
+        console.error(err);
+        resultBox.textContent = "❌ 로그인 실패: " + err.message;
       }
     }
 
-    // 🔧 버튼에서 호출할 수 있도록 전역 등록
     window.login = login;
 
     const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
-    const nameCount = {};
-    const allEntries = [];
 
     async function findAndDeleteDuplicates() {
+      const nameCount = {};
+      const allEntries = [];
+
       for (const boardSize of boardSizes) {
         const snapshot = await get(ref(db, `rankings/${boardSize}`));
         if (snapshot.exists()) {
@@ -72,8 +81,8 @@
             const data = child.val();
             const name = data.name;
             if (name) {
-              const keyPath = `rankings/${boardSize}/${child.key}`;
-              allEntries.push({ name, path: keyPath });
+              const path = `rankings/${boardSize}/${child.key}`;
+              allEntries.push({ name, path });
               nameCount[name] = (nameCount[name] || 0) + 1;
             }
           });
@@ -84,28 +93,61 @@
         .filter(([_, count]) => count >= 4)
         .map(([name]) => name);
 
-      if (toDeleteNames.length === 0) {
-        console.log("✅ 삭제할 중복 이름이 없습니다.");
-        document.body.innerHTML += "<p>✅ 삭제할 중복 이름이 없습니다.</p>";
-        return;
-      }
-
-      console.log(`🗑 삭제 대상 이름: ${toDeleteNames.join(', ')}`);
-
       const updates = {};
-      let deleteCount = 0;
+      let count = 0;
 
       allEntries.forEach(entry => {
         if (toDeleteNames.includes(entry.name)) {
           updates[entry.path] = null;
-          deleteCount++;
+          count++;
         }
       });
 
       await update(ref(db), updates);
-      console.log(`🎉 총 ${deleteCount}개 항목 삭제 완료`);
-      document.body.innerHTML += `<p>🎉 총 ${deleteCount}개 항목 삭제 완료</p>`;
+      alert(`✅ 자동 삭제 완료: ${count}개 항목 삭제됨`);
     }
+
+    window.findAndDeleteDuplicates = findAndDeleteDuplicates;
+
+    async function deleteByName() {
+      const input = document.getElementById("targetName").value.trim();
+      if (!input) {
+        alert("닉네임을 입력하세요.");
+        return;
+      }
+
+      const isPattern = input.endsWith("*");
+      const base = isPattern ? input.slice(0, -1) : input;
+
+      const updates = {};
+      let deleteCount = 0;
+
+      for (const boardSize of boardSizes) {
+        const snapshot = await get(ref(db, `rankings/${boardSize}`));
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            const data = child.val();
+            const name = data.name;
+            if (name && (
+              (!isPattern && name === base) ||
+              (isPattern && name.startsWith(base))
+            )) {
+              updates[`rankings/${boardSize}/${child.key}`] = null;
+              deleteCount++;
+            }
+          });
+        }
+      }
+
+      if (deleteCount === 0) {
+        alert("❌ 해당 이름 또는 패턴에 해당하는 데이터가 없습니다.");
+      } else {
+        await update(ref(db), updates);
+        alert(`✅ ${deleteCount}개 항목 삭제 완료`);
+      }
+    }
+
+    window.deleteByName = deleteByName;
   </script>
 </body>
 </html>
