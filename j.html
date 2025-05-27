@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>🔥 관리자 중복 삭제 자동 실행기</title>
+  <title>🔥 관리자 전용 중복 삭제 실행기</title>
 </head>
 <body>
-  <h2>중복된 이름(4개 이상) 데이터를 삭제 중입니다... (먼저 로그인 필요)</h2>
+  <h2>중복된 이름(4개 이상) 데이터를 삭제하려면 관리자 로그인이 필요합니다</h2>
 
   <div id="login-box">
     <input type="email" id="email" placeholder="이메일" /><br />
@@ -56,6 +56,9 @@
         resultBox.textContent = "❌ 로그인 실패: " + error.message;
       }
     }
+
+    // 🔧 버튼에서 호출할 수 있도록 전역 등록
+    window.login = login;
 
     const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
     const nameCount = {};
