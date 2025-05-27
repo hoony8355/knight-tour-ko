@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔥 관리자 중복 삭제 자동 실행기</title>
+</head>
+<body>
+  <h2>중복된 이름(4개 이상) 데이터를 삭제 중입니다... (먼저 로그인 필요)</h2>
+
+  <div id="login-box">
+    <input type="email" id="email" placeholder="이메일" /><br />
+    <input type="password" id="password" placeholder="비밀번호" /><br />
+    <button onclick="login()">로그인 및 삭제 실행</button>
+    <p id="result" style="margin-top: 1em; font-weight: bold;"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBle_FLyJxn7v9AMQXlCo7U7hjcx88WrlU",
+      authDomain: "knight-tour-ranking.firebaseapp.com",
+      databaseURL: "https://knight-tour-ranking-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "knight-tour-ranking",
+      storageBucket: "knight-tour-ranking.firebasestorage.app",
+      messagingSenderId: "1073626351852",
+      appId: "1:1073626351852:web:41ae6cb7db759beb703dc9",
+      measurementId: "G-D2P9PJ00JT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const resultBox = document.getElementById("result");
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const tokenResult = await user.getIdTokenResult();
+
+        if (tokenResult.claims.admin === true) {
+          resultBox.textContent = "✅ 관리자 확인 완료. 중복 데이터 삭제를 시작합니다...";
+          document.getElementById("login-box").style.display = "none";
+          findAndDeleteDuplicates();
+        } else {
+          resultBox.textContent = "❌ 이 계정은 관리자 권한이 없습니다.";
+        }
+      } catch (error) {
+        console.error("로그인 오류:", error);
+        resultBox.textContent = "❌ 로그인 실패: " + error.message;
+      }
+    }
+
+    const boardSizes = ['5x5', '6x6', '7x7', '8x8'];
+    const nameCount = {};
+    const allEntries = [];
+
+    async function findAndDeleteDuplicates() {
+      for (const boardSize of boardSizes) {
+        const snapshot = await get(ref(db, `rankings/${boardSize}`));
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            const data = child.val();
+            const name = data.name;
+            if (name) {
+              const keyPath = `rankings/${boardSize}/${child.key}`;
+              allEntries.push({ name, path: keyPath });
+              nameCount[name] = (nameCount[name] || 0) + 1;
+            }
+          });
+        }
+      }
+
+      const toDeleteNames = Object.entries(nameCount)
+        .filter(([_, count]) => count >= 4)
+        .map(([name]) => name);
+
+      if (toDeleteNames.length === 0) {
+        console.log("✅ 삭제할 중복 이름이 없습니다.");
+        document.body.innerHTML += "<p>✅ 삭제할 중복 이름이 없습니다.</p>";
+        return;
+      }
+
+      console.log(`🗑 삭제 대상 이름: ${toDeleteNames.join(', ')}`);
+
+      const updates = {};
+      let deleteCount = 0;
+
+      allEntries.forEach(entry => {
+        if (toDeleteNames.includes(entry.name)) {
+          updates[entry.path] = null;
+          deleteCount++;
+        }
+      });
+
+      await update(ref(db), updates);
+      console.log(`🎉 총 ${deleteCount}개 항목 삭제 완료`);
+      document.body.innerHTML += `<p>🎉 총 ${deleteCount}개 항목 삭제 완료</p>`;
+    }
+  </script>
+</body>
+</html>
