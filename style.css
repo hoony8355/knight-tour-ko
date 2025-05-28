@@ -1,4 +1,4 @@
-/* 🌈 통합 스타일 + CLS 최적화 + 반응형 대응 */
+      /* 🌈 통합 스타일 (다크모드 + 반응형 + 고도화된 인터랙션 및 색상체계) */
 
 :root {
   --light-color: #f0d9b5;
@@ -69,7 +69,11 @@ button:active {
   z-index: 1000;
 }
 
-.table { margin: auto; border-collapse: collapse; }
+table {
+  margin: auto;
+  border-collapse: collapse;
+}
+
 td {
   width: 45px;
   height: 45px;
@@ -115,66 +119,51 @@ td {
 #status { margin-top: 1em; font-weight: bold; }
 #timer { margin-top: 0.5em; font-size: 1em; color: #888; }
 
-#utterances-container,
-#ranking,
-#shareAreaBottom,
-footer.footer-links {
-  min-height: 200px;
-  margin-top: 2em;
-  transition: min-height 0.3s;
+#utterances-container {
+  max-width: 700px;
+  margin: 3em auto;
+  text-align: left;
 }
 
-.placeholder {
-  width: 100%;
-  height: 100px;
-  background-color: #f0f0f0;
-  opacity: 0.3;
-  animation: pulse 1.5s infinite ease-in-out;
+.sns-share {
+  margin: 2em auto;
+  font-size: 1em;
 }
 
-.custom-nav-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 1em;
-  margin-top: 1.5em;
-  flex-wrap: wrap;
-}
-
-.nav-btn {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+.sns-share a {
+  margin: 0 0.5em;
   text-decoration: none;
   font-weight: bold;
-  transition: all 0.2s ease;
 }
 
-.board-btn {
-  background-color: var(--button-bg);
-  color: var(--font-color);
+#ranking {
+  text-align: center;
 }
 
-.board-btn:hover {
-  background-color: var(--button-hover);
+#ranking ol {
+  list-style: none;
+  padding-left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 320px;
 }
 
-.builder-btn {
-  background-color: var(--button-alt-bg, #d0eaff);
-  color: var(--button-alt-color, #003366);
+#ranking li {
+  display: block;
+  background: #fffaf0;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 0.4em 0.8em;
+  margin-bottom: 0.4em;
+  font-size: 0.95em;
+  text-align: left;
+  border-radius: 6px;
+  transition: background 0.3s;
 }
 
-.builder-btn:hover {
-  background-color: var(--button-alt-hover-bg, #b5dcff);
-}
-
-.button-group {
-  margin-top: 1em;
-  display: flex;
-  justify-content: center;
-  gap: 0.5em;
-  flex-wrap: wrap;
-  min-height: 60px;
+body.dark-mode #ranking li {
+  background: #1a1a1a;
+  border-color: #444;
 }
 
 .modal {
@@ -232,29 +221,59 @@ footer.footer-links {
   cursor: pointer;
 }
 
-.footer-links ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3em;
-}
-
-@media (min-width: 768px) {
-  .footer-links ul {
-    flex-direction: row;
-    justify-content: center;
-  }
-}
-
 @media (max-width: 600px) {
   td { width: 32px; height: 32px; font-size: 0.85em; }
   h1 { font-size: 1.4em; }
   h2 { font-size: 1.2em; }
   .modal-content { padding: 1.5em; }
-  .nav-btn { width: 90%; text-align: center; }
-  #shareAreaBottom button { margin-top: 0.5em; width: 90%; font-size: 0.9em; }
-  #ranking ol { max-width: 90%; }
-  #utterances-container { padding: 0 1em; }
+}
+
+/* 🌐 언어 선택 드롭다운 메뉴 스타일 */
+#langMenuContainer {
+  position: fixed;
+  top: 10px;
+  right: 60px;
+  z-index: 1000;
+}
+
+#langToggleBtn {
+  font-size: 1.2em;
+  background: none;
+  border: none;
+  color: var(--font-color);
+  cursor: pointer;
+}
+
+#langList {
+  display: none;
+  position: absolute;
+  right: 0;
+  margin-top: 0.5em;
+  padding: 0;
+  background: var(--modal-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  list-style: none;
+  box-shadow: 0 2px 6px var(--modal-shadow);
+  overflow: hidden;
+  font-size: 0.9em;
+  min-width: 140px;
+}
+
+#langList li a {
+  display: block;
+  padding: 0.5em 1em;
+  color: var(--font-color);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#langList li a:hover {
+  background-color: var(--button-hover);
+}
+
+#langList li a:focus {
+  background-color: var(--hint-color);
+  color: white;
+  outline: none;
 }
