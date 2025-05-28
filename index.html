@@ -150,20 +150,11 @@
   <button id="darkToggle">🌙</button>
   <h1>기사의 여행 퍼즐 🧩</h1>
   <p>퍼즐을 완주한 시간을 기록하고 전 세계 사람들과 경쟁해보세요!</p>
-  <div class="custom-nav-buttons" style="text-align: center; margin-top: 1.5rem;">
-  <a href="./board/"
-     style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-bg, #e0e0e0); color: var(--button-color, #222); transition: all 0.2s ease;"
-     onmouseover="this.style.backgroundColor='var(--button-hover-bg, #d0d0d0)'"
-     onmouseout="this.style.backgroundColor='var(--button-bg, #e0e0e0)'">
-    🧩 커스텀 게임 게시판
-  </a>
-  <a href="./builder/"
-     style="margin: 0.4rem 0.3rem; display: inline-block; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: bold; background-color: var(--button-alt-bg, #d0eaff); color: var(--button-alt-color, #003366); transition: all 0.2s ease;"
-     onmouseover="this.style.backgroundColor='var(--button-alt-hover-bg, #b5dcff)'"
-     onmouseout="this.style.backgroundColor='var(--button-alt-bg, #d0eaff)'">
-    ✏️ 커스텀 게임 만들기
-  </a>
-</div>
+
+  <div class="custom-nav-buttons">
+    <a href="./board/" class="nav-btn board-btn">🧩 커스텀 게임 게시판</a>
+    <a href="./builder/" class="nav-btn builder-btn">✏️ 커스텀 게임 만들기</a>
+  </div>
 
   <label>보드 크기 선택:
     <select id="sizeSelect">
@@ -176,34 +167,33 @@
 
   <div id="status">시작할 칸을 클릭하세요.</div>
   <div id="timer">경과 시간: <span id="timeElapsed">0</span>초</div>
+
   <canvas id="confetti" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999;display:none;"></canvas>
   <table id="board"></table>
 
-  <div style="margin-top: 1em;">
+  <div class="button-group">
     <button id="resetBtn">🔄 다시 시작</button>
     <button id="undoBtn">↩️ 되돌리기</button>
     <button id="hintBtn">💡 힌트 보기</button>
   </div>
 
-  <div id="ranking">
+  <!-- CLS 최소화를 위한 고정 공간 확보 -->
+  <div id="ranking" class="section-block">
     <h2>🏆 글로벌 랭킹</h2>
-    <ol id="rankingList"></ol>
+    <ol id="rankingList" style="min-height: 120px;"></ol>
   </div>
 
-  <!-- ✅ 닉네임 입력 모달 -->
-<div id="resultModal" class="modal">
-  <div class="modal-content">
-    <button id="closeModalBtn" title="닫기" aria-label="닫기">✖</button>
-    <h2>🎉 클리어 성공!</h2>
-    <p id="resultMessage">총 시간: 0초</p>
-    <input type="text" id="nicknameInput" placeholder="닉네임을 입력해주세요" />
-    <button id="submitScoreBtn">등록하기</button>
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <button id="closeModalBtn" title="닫기" aria-label="닫기">✖</button>
+      <h2>🎉 클리어 성공!</h2>
+      <p id="resultMessage">총 시간: 0초</p>
+      <input type="text" id="nicknameInput" placeholder="닉네임을 입력해주세요" />
+      <button id="submitScoreBtn">등록하기</button>
+    </div>
   </div>
-</div>
 
-
-  <!-- ✅ 하단 공유 버튼 -->
-  <div id="shareAreaBottom" style="text-align:center; margin-top: 2em;">
+  <div id="shareAreaBottom" class="section-block">
     <h3>🔗 퍼즐 공유하기</h3>
     <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
     <button onclick="shareOnTwitter()">X (트위터)</button>
@@ -212,7 +202,7 @@
     <button onclick="copyLink()">🔗 링크 복사</button>
   </div>
 
-  <div id="utterances-container" style="margin-top: 2em;">
+  <div id="utterances-container" class="section-block">
     <h2>💬 댓글</h2>
     <script src="https://utteranc.es/client.js"
             repo="hoony8355/knight-tour-comments"
@@ -224,28 +214,23 @@
     </script>
   </div>
 
-  <!-- 외부 참고 링크 -->
-  <footer style="margin-top: 4em; text-align: center; font-size: 0.9em;">
+  <footer class="footer-links">
     <p>🔗 더 알아보기:</p>
-    <ul style="list-style: none; padding: 0;">
+    <ul>
       <li><a href="https://en.wikipedia.org/wiki/Knight%27s_tour" target="_blank">📚 Knight's Tour 위키백과 (영문)</a></li>
       <li><a href="https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89" target="_blank">📘 기사 여행 위키백과 (한글)</a></li>
       <li><a href="https://www.netflix.com/kr/title/81688109" target="_blank">🎬 넷플릭스 데블스플랜 시즌2</a></li>
     </ul>
   </footer>
 
-  <!-- ✅ 필수 스크립트 -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="firebase-init.js"></script>
   <script src="game.js"></script>
-
-  <!-- ✅ 순서 중요: Kakao SDK > 공유 기능 스크립트 -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
-        integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
-        crossorigin="anonymous"></script>
+          integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
+          crossorigin="anonymous"></script>
   <script src="share.js"></script>
-
-  <!-- ✅ Web Share API 비지원 브라우저 대응 -->
   <script>
     if (!navigator.share) {
       document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
