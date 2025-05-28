@@ -177,12 +177,13 @@
     <button id="hintBtn">💡 힌트 보기</button>
   </div>
 
-  <!-- CLS 최소화를 위한 고정 공간 확보 -->
   <div id="ranking" class="section-block">
     <h2>🏆 글로벌 랭킹</h2>
-    <ol id="rankingList" style="min-height: 120px;"></ol>
+    <div class="placeholder" id="ranking-placeholder"></div>
+    <ol id="rankingList"></ol>
   </div>
 
+  <!-- 닉네임 입력 모달 -->
   <div id="resultModal" class="modal">
     <div class="modal-content">
       <button id="closeModalBtn" title="닫기" aria-label="닫기">✖</button>
@@ -193,6 +194,7 @@
     </div>
   </div>
 
+  <!-- 퍼즐 공유 버튼 -->
   <div id="shareAreaBottom" class="section-block">
     <h3>🔗 퍼즐 공유하기</h3>
     <button id="shareNativeBtn" onclick="shareNative()">📱 기본 공유</button>
@@ -202,28 +204,22 @@
     <button onclick="copyLink()">🔗 링크 복사</button>
   </div>
 
+  <!-- 댓글 영역 (lazy load 처리) -->
   <div id="utterances-container" class="section-block">
-    <h2>💬 댓글</h2>
-    <script src="https://utteranc.es/client.js"
-            repo="hoony8355/knight-tour-comments"
-            issue-term="pathname"
-            label="comment"
-            theme="github-light"
-            crossorigin="anonymous"
-            async>
-    </script>
+    <div class="placeholder" id="comment-placeholder"></div>
   </div>
 
+  <!-- 푸터 참고 링크 -->
   <footer class="footer-links">
     <p>🔗 더 알아보기:</p>
     <ul>
       <li><a href="https://en.wikipedia.org/wiki/Knight%27s_tour" target="_blank">📚 Knight's Tour 위키백과 (영문)</a></li>
-      <li><a href="https://ko.wikipedia.org/wiki/%EA%B8%B0%EC%82%AC%EC%9D%98_%EC%97%AC%ED%96%89" target="_blank">📘 기사 여행 위키백과 (한글)</a></li>
+      <li><a href="https://ko.wikipedia.org/wiki/기사의_여행" target="_blank">📘 기사 여행 위키백과 (한글)</a></li>
       <li><a href="https://www.netflix.com/kr/title/81688109" target="_blank">🎬 넷플릭스 데블스플랜 시즌2</a></li>
     </ul>
   </footer>
 
-  <!-- Scripts -->
+  <!-- 필수 스크립트 -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script type="module" src="firebase-init.js"></script>
   <script src="game.js"></script>
@@ -231,11 +227,32 @@
           integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
           crossorigin="anonymous"></script>
   <script src="share.js"></script>
+
   <script>
     if (!navigator.share) {
       document.querySelectorAll('#shareNativeBtn').forEach(btn => btn.style.display = 'none');
     }
   </script>
   <script src="https://hoony8355.github.io/knight-tour-ko/lang-menu.js"></script>
+  <script>
+    // IntersectionObserver로 댓글 lazy-load 처리
+    const commentContainer = document.getElementById('utterances-container');
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        commentContainer.innerHTML = `
+          <h2>💬 댓글</h2>
+          <script src="https://utteranc.es/client.js"
+                  repo="hoony8355/knight-tour-comments"
+                  issue-term="pathname"
+                  label="comment"
+                  theme="github-light"
+                  crossorigin="anonymous"
+                  async><\\/script>
+        `;
+        observer.disconnect();
+      }
+    });
+    observer.observe(commentContainer);
+  </script>
 </body>
 </html>
