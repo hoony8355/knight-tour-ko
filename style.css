@@ -1,4 +1,4 @@
-/* 🌈 통합 스타일 (다크모드 + 반응형 + 고도화된 인터랙션 및 색상체계 + CLS 개선) */
+/* 🌈 통합 스타일 (다크모드 + 반응형 + 고도화된 인터랙션 및 색상체계 + CLS 최종 개선) */
 
 :root {
   --light-color: #f0d9b5;
@@ -75,7 +75,7 @@ button:active {
 
 /* 📌 CLS 개선 요소 */
 #ranking {
-  min-height: 300px;
+  min-height: 480px;
   text-align: center;
 }
 #rankingList {
@@ -105,7 +105,11 @@ body.dark-mode #ranking li {
 }
 
 #shareAreaBottom {
-  min-height: 160px;
+  min-height: 140px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4em;
   text-align: center;
   margin-top: 2em;
 }
@@ -116,13 +120,14 @@ body.dark-mode #ranking li {
 
 footer {
   min-height: 120px;
+  padding-bottom: 2em;
   margin-top: 4em;
   text-align: center;
   font-size: 0.9em;
 }
 
 #utterances-container {
-  min-height: 140px;
+  min-height: 320px;
   max-width: 700px;
   margin: 3em auto;
   text-align: left;
