@@ -105,8 +105,11 @@ td {
   border-radius: 4px;
   font-size: 0.9em;
 }
-@media (max-width: 600px) {
-  td { font-size: 0.75em; }
+@media (max-width: 480px) {
+  td {
+    width: 13vw;
+    font-size: 0.7em;
+  }
 }
 
 .light { background: var(--light-color); }
@@ -301,4 +304,22 @@ footer {
   background-color: var(--hint-color);
   color: white;
   outline: none;
+}
+
+/* 🧩 td 내부에 정사각형 영역을 만들기 위한 래퍼 */
+td > .cell-inner {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 💡 높이를 너비 기준으로 1:1 비율 확보 */
+  box-sizing: border-box;
+}
+
+/* 🧩 안쪽 텍스트를 가운데 정렬 */
+td > .cell-inner > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 0.9em;
 }
