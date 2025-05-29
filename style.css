@@ -77,14 +77,14 @@ button:active {
 /* 📌 보드 테이블을 정사각형 유지 + CLS 0 대응 */
 #board {
   min-height: 400px;
-  display: grid;  /* ⚠️ display: table 삭제 */
-  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr)); /* 자동 칼럼 크기 */
-  justify-content: center;
-  align-content: center;
+  display: table;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr); /* 기본값은 8x8로 지정, JS 미수정 시 고정됨 */
   aspect-ratio: 1 / 1;
   width: 90vmin;
   max-width: 90vmin;
   margin: auto;
+  border-collapse: collapse;
   transition: none !important;
 }
 
