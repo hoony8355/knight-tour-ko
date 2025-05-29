@@ -229,29 +229,38 @@ function renderRanking() {
 
   const size = parseInt(document.getElementById("sizeSelect")?.value || "8");
   const dbPath = window.dbRef(window.db, `rankings/${size}x${size}`);
-  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(30)); // 수정: 10 → 30
+  const q = window.dbQuery(dbPath, window.dbOrderByChild("time"), window.dbLimitToFirst(30));
+
+  // ✅ DOM 변경 최소화 시작
+  // 1. 미리 placeholder 유지 (CLS 방지)
+  rankingList.innerHTML = "<li style='visibility: hidden;'>로딩 중 자리 확보</li>";
 
   window.dbGet(q).then(snapshot => {
-    rankingList.innerHTML = "";
-
+    // 2. 데이터 수신 완료 후만 실제 렌더링
     if (!snapshot.exists()) {
       rankingList.innerHTML = "<li>아직 랭킹 정보가 없습니다.</li>";
       return;
     }
 
+    const fragment = document.createDocumentFragment();
     let index = 1;
     snapshot.forEach(child => {
       const { name, time } = child.val();
       const li = document.createElement("li");
       li.textContent = `${index}. ${name || "익명"} - ${parseFloat(time).toFixed(2)}초`;
-      rankingList.appendChild(li);
+      fragment.appendChild(li);
       index++;
     });
+
+    // 3. 일괄 렌더링 → 기존 노드 변경 최소화
+    rankingList.innerHTML = "";
+    rankingList.appendChild(fragment);
   }).catch(err => {
     console.error("❌ 랭킹 로딩 실패:", err);
     rankingList.innerHTML = "<li>랭킹을 불러올 수 없습니다.</li>";
   });
 }
+
 
 resetBtn.addEventListener('click', createBoard);
 undoBtn.addEventListener('click', undoMove);
