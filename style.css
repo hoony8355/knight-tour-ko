@@ -105,17 +105,22 @@ body.dark-mode #ranking li {
 }
 
 #shareAreaBottom {
-  min-height: 140px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4em;
   text-align: center;
   margin-top: 2em;
 }
 #shareAreaBottom button {
-  min-width: 100px;
-  min-height: 38px;
+  margin: 0.3em 0.4em;
+  padding: 0.5em 1em;
+  font: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--button-bg);
+  color: var(--font-color);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#shareAreaBottom button:hover {
+  background-color: var(--button-hover);
 }
 
 footer {
