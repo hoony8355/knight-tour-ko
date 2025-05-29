@@ -76,13 +76,18 @@ button:active {
 
 /* 📌 보드 테이블을 정사각형 유지 + CLS 0 대응 */
 #board {
-  display: grid;
-  justify-content: center;  /* 가로 방향 가운데 정렬 */
-  align-content: center;    /* 세로 방향 가운데 정렬 */
-  gap: 1px;
-  width: fit-content;
+  min-height: 400px;
+  display: grid;  /* ⚠️ display: table 삭제 */
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr)); /* 자동 칼럼 크기 */
+  justify-content: center;
+  align-content: center;
+  aspect-ratio: 1 / 1;
+  width: 90vmin;
+  max-width: 90vmin;
   margin: auto;
+  transition: none !important;
 }
+
 
 /* 셀 스타일 */
 td {
