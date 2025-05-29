@@ -1,4 +1,4 @@
-/* 🌈 통합 스타일 (CLS 최적화 + 모바일 대응 + 보드 비율 복원 + 공유 버튼 복원) */
+/* 🌈 통합 스타일 (CLS 0, 모바일 대응, 보드 비율 유지, 공유 버튼 복원, JS 수정 없음 기준) */
 
 :root {
   --light-color: #f0d9b5;
@@ -26,7 +26,6 @@ body {
   padding: 1em;
   transition: background-color 0.3s, color 0.3s;
 }
-
 body.dark-mode {
   --bg-color: #111;
   --font-color: #eee;
@@ -44,9 +43,11 @@ body.dark-mode {
 h1 {
   font-size: 1.8em;
   margin-bottom: 0.5em;
-  font-family: 'Segoe UI', sans-serif;
 }
-h2 { font-size: 1.4em; margin-top: 2em; }
+h2 {
+  font-size: 1.4em;
+  margin-top: 2em;
+}
 
 button, select {
   margin-top: 1em;
@@ -57,7 +58,7 @@ button, select {
   border-radius: 5px;
   background: var(--button-bg);
   color: var(--font-color);
-  transition: background-color 0.3s, transform 0.2s, color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 button:hover {
   background: var(--button-hover);
@@ -73,53 +74,46 @@ button:active {
   z-index: 1000;
 }
 
-/* 📌 CLS 방지 및 모바일 대응 */
+/* 📌 보드 테이블을 정사각형 유지 + CLS 0 대응 */
 #board {
-  min-height: 400px;
-  display: table;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr); /* 기본값은 8x8로 지정, JS 미수정 시 고정됨 */
+  aspect-ratio: 1 / 1;
+  width: 90vmin;
+  max-width: 90vmin;
   margin: auto;
-  border-collapse: collapse;
-  transition: none !important;
+  gap: 2px;
+}
+
+/* 셀 스타일 */
+td {
+  all: unset;
+  background: var(--light-color);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2em;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 @media (max-width: 600px) {
-  #board {
-    min-height: unset;
-  }
-}
-
-table {
-  margin: auto;
-  border-collapse: collapse;
-}
-td {
-  width: 12vw;
-  max-width: 45px;
-  height: auto;         /* 💡 높이 비율 문제 해결 */
-  aspect-ratio: 1 / 1;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: bold;
-  opacity: 1;
-  animation: none;
-  transition: box-shadow 0.3s ease, transform 0.2s ease, background-color 0.3s;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-@media (max-width: 480px) {
   td {
-    width: 13vw;
-    font-size: 0.7em;
+    font-size: 1em;
   }
 }
-
-.light { background: var(--light-color); }
-.dark { background: var(--dark-color); color: white; }
-
+.light {
+  background: var(--light-color);
+}
+.dark {
+  background: var(--dark-color);
+  color: white;
+}
 .current {
   outline: 3px solid var(--highlight-color);
   z-index: 1;
 }
-
 .hint {
   box-shadow: inset 0 0 0 3px var(--hint-color);
   border-radius: 3px;
@@ -134,8 +128,15 @@ td {
   50% { box-shadow: inset 0 0 0 6px orange; }
 }
 
-#status { margin-top: 1em; font-weight: bold; }
-#timer { margin-top: 0.5em; font-size: 1em; color: #888; }
+#status {
+  margin-top: 1em;
+  font-weight: bold;
+}
+#timer {
+  margin-top: 0.5em;
+  font-size: 1em;
+  color: #888;
+}
 
 #ranking {
   min-height: 480px;
@@ -145,8 +146,7 @@ td {
   min-height: 120px;
   list-style: none;
   padding-left: 0;
-  margin-left: auto;
-  margin-right: auto;
+  margin: auto;
   max-width: 320px;
 }
 #ranking li {
@@ -166,7 +166,7 @@ body.dark-mode #ranking li {
   border-color: #444;
 }
 
-/* 공유 버튼 원상복구 💡 */
+/* 공유 버튼 */
 #shareAreaBottom {
   text-align: center;
   margin-top: 2em;
@@ -180,7 +180,7 @@ body.dark-mode #ranking li {
   background: var(--button-bg);
   color: var(--font-color);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 #shareAreaBottom button:hover {
   background-color: var(--button-hover);
@@ -211,7 +211,6 @@ footer {
   height: 100%;
   background-color: var(--modal-overlay);
   transition: background-color 0.3s;
-  will-change: opacity, transform;
 }
 .modal-content {
   background-color: var(--modal-bg);
@@ -256,14 +255,13 @@ footer {
   cursor: pointer;
 }
 
-/* 🌐 언어 선택 드롭다운 메뉴 스타일 */
+/* 언어 선택 드롭다운 */
 #langMenuContainer {
   position: fixed;
   top: 10px;
   right: 60px;
   z-index: 1000;
 }
-
 #langToggleBtn {
   font-size: 1.2em;
   background: none;
@@ -271,7 +269,6 @@ footer {
   color: var(--font-color);
   cursor: pointer;
 }
-
 #langList {
   display: none;
   position: absolute;
@@ -287,7 +284,6 @@ footer {
   font-size: 0.9em;
   min-width: 140px;
 }
-
 #langList li a {
   display: block;
   padding: 0.5em 1em;
@@ -295,31 +291,11 @@ footer {
   text-decoration: none;
   transition: background-color 0.2s, color 0.2s;
 }
-
 #langList li a:hover {
   background-color: var(--button-hover);
 }
-
 #langList li a:focus {
   background-color: var(--hint-color);
   color: white;
   outline: none;
-}
-
-/* 🧩 td 내부에 정사각형 영역을 만들기 위한 래퍼 */
-td > .cell-inner {
-  position: relative;
-  width: 100%;
-  padding-top: 100%; /* 💡 높이를 너비 기준으로 1:1 비율 확보 */
-  box-sizing: border-box;
-}
-
-/* 🧩 안쪽 텍스트를 가운데 정렬 */
-td > .cell-inner > span {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-weight: bold;
-  font-size: 0.9em;
 }
