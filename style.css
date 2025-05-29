@@ -94,6 +94,7 @@ table {
 td {
   width: 12vw;
   max-width: 45px;
+  height: auto;         /* 💡 높이 비율 문제 해결 */
   aspect-ratio: 1 / 1;
   text-align: center;
   vertical-align: middle;
@@ -162,7 +163,7 @@ body.dark-mode #ranking li {
   border-color: #444;
 }
 
-/* 공유 버튼 원상복구 */
+/* 공유 버튼 원상복구 💡 */
 #shareAreaBottom {
   text-align: center;
   margin-top: 2em;
