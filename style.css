@@ -77,12 +77,11 @@ button:active {
 /* 📌 보드 테이블을 정사각형 유지 + CLS 0 대응 */
 #board {
   display: grid;
-  grid-template-columns: repeat(8, 1fr); /* 기본값은 8x8로 지정, JS 미수정 시 고정됨 */
-  aspect-ratio: 1 / 1;
-  width: 90vmin;
-  max-width: 90vmin;
+  justify-content: center;  /* 가로 방향 가운데 정렬 */
+  align-content: center;    /* 세로 방향 가운데 정렬 */
+  gap: 1px;
+  width: fit-content;
   margin: auto;
-  gap: 2px;
 }
 
 /* 셀 스타일 */
