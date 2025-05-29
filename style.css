@@ -277,3 +277,49 @@ body.dark-mode #ranking li {
   color: white;
   outline: none;
 }
+
+#ranking {
+    min-height: 300px; /* 평균 높이에 맞춰 조정 가능 */
+  }
+
+  #shareAreaBottom {
+    min-height: 160px;
+  }
+
+  footer {
+    min-height: 120px;
+  }
+
+  /* H1 텍스트 폰트 이동 방지 */
+  @font-face {
+    font-family: 'Segoe UI';
+    src: local('Segoe UI');
+    font-display: swap;
+  }
+
+  h1 {
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* 로딩 중 요소들 미리 공간 확보 */
+  #rankingList,
+  #utterances-container {
+    min-height: 120px;
+  }
+
+  /* 공유 버튼 버튼 영역 안정화 */
+  #shareAreaBottom button {
+    min-width: 100px;
+    min-height: 38px;
+  }
+
+  /* 모달은 처음부터 공간 차지하지 않지만 시각 효과 최적화 */
+  .modal {
+    will-change: opacity, transform;
+  }
+
+  /* board 테이블 초기 opacity 애니메이션 제거로 CLS 안정화 */
+  td {
+    opacity: 1 !important;
+    animation: none !important;
+  }
