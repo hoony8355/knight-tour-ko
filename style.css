@@ -138,6 +138,13 @@ table {
   margin: auto;
   border-collapse: collapse;
 }
+
+/* 🎯 CLS 방지를 위한 보드 높이 고정 */
+#board {
+  min-height: 400px;
+  display: table;
+  transition: none !important;
+}
 td {
   width: 45px;
   height: 45px;
